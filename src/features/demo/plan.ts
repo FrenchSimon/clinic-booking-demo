@@ -144,3 +144,14 @@ export function demoBookings(now: Date): DemoBooking[] {
     };
   });
 }
+
+/**
+ * Whose place the visitor takes in "View as" (checklist #20), by the local
+ * part of the seeded address. Camille works every day, Saturday included;
+ * Nora has a session today, one to come that she can still cancel, and a
+ * refunded one.
+ */
+export const DEMO_STAND_INS = {
+  practitioner: DEMO_PHYSIOS[0].key,
+  patient: DEMO_PATIENTS[2],
+} as const;
