@@ -1,14 +1,18 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
-import { getOwnedClinic } from "@/features/clinics/queries";
+import { landingPath } from "@/features/auth/landing";
 import { adminDb } from "@/lib/db";
 import { createClient } from "@/lib/supabase/server";
-import { getUser } from "@/server/auth";
+import { getUser, requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
 import { deleteExpiredDemos } from "./cleanup";
 import { createDemoClinic } from "./create";
+import { getDemoRole } from "./queries";
+import { viewAsInput } from "./schema";
+import { switchDemoRole } from "./view-as";
 
 export type DemoState = { error?: string };
 
@@ -26,7 +30,8 @@ async function visitorId(): Promise<string | null> {
  * "Try the demo" (checklist #19): no form, no account. The visitor gets an
  * anonymous Supabase session and their own filled clinic, which they own,
  * so row level security applies to them like to any owner. Clicked again,
- * it opens the clinic they already have. No requireUser(): this action is
+ * it opens the clinic they already have, in the role they last picked in
+ * "View as". No requireUser(): this action is
  * the sign-in, like logIn(); the rate limit guards it instead.
  */
 export async function startDemo(_prev: DemoState): Promise<DemoState> {
@@ -37,11 +42,39 @@ export async function startDemo(_prev: DemoState): Promise<DemoState> {
   if (!visitor) {
     return { error: "The demo is unavailable right now. Try again later." };
   }
-  if (!(await getOwnedClinic(visitor))) {
+  const role = await getDemoRole(visitor);
+  if (!role) {
     await createDemoClinic(visitor);
     // adminDb inside: the clean-up job, run on each new visitor as well as
     // daily, so expired demos never wait long for the cron.
     after(() => deleteExpiredDemos(adminDb));
   }
-  redirect("/clinic");
+  redirect(landingPath([role ?? "owner"]));
+}
+
+/**
+ * "View as owner / practitioner / patient" (checklist #20): changes the
+ * visitor's real role in their demo clinic, then opens that role's home.
+ * Only an anonymous visitor can switch, and only in the clinic they started.
+ */
+export async function viewAs(
+  _prev: DemoState,
+  formData: FormData,
+): Promise<DemoState> {
+  const user = await requireUser();
+  const parsed = viewAsInput.safeParse({ role: formData.get("role") });
+  if (!user.is_anonymous || !parsed.success) {
+    return { error: "This switch only works in a demo clinic." };
+  }
+  const { role } = parsed.data;
+  // adminDb: the switch moves memberships and bookings between the visitor
+  // and a seeded account, which no policy lets a user write. switchDemoRole
+  // only touches the clinic this visitor created.
+  const done = await adminDb.transaction((tx) =>
+    switchDemoRole(tx, user.id, role),
+  );
+  if (!done) return { error: "Your demo clinic has ended. Start a new one." };
+  // The bar lives in the root layout, which a redirect does not re-render.
+  refresh();
+  redirect(landingPath([role]));
 }

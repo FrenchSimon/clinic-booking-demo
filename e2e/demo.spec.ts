@@ -24,9 +24,28 @@ test("Try the demo opens a filled clinic of one's own", async ({ page }) => {
   await expect(page.getByText("Maison Tilleul").first()).toBeVisible();
   await expect(page.getByText("Camille Peeters").first()).toBeVisible();
 
-  // A second click opens the same clinic instead of a new one.
+  // Checklist #20: "View as" takes the button's place and changes the
+  // visitor's real role, then gives the owner's clinic back unchanged.
   const address = await page.getByText(/Booking page address/).textContent();
-  await page.getByRole("button", { name: "Try the demo" }).click();
+  const viewAs = page.getByRole("group", { name: "View as" });
+  await expect(viewAs.getByRole("button", { name: "Owner" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+
+  await viewAs.getByRole("button", { name: "Practitioner" }).click();
+  await expect(
+    page.getByRole("link", { name: "My hours", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Patients", exact: true }),
+  ).toHaveCount(0);
+
+  await viewAs.getByRole("button", { name: "Patient" }).click();
+  await page.waitForURL("**/bookings");
+  await expect(page.getByText("Refunded").first()).toBeVisible();
+
+  await viewAs.getByRole("button", { name: "Owner" }).click();
   await page.waitForURL("**/clinic");
   await expect(page.getByText(/Booking page address/)).toHaveText(
     address ?? "",
