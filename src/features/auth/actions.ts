@@ -2,10 +2,12 @@
 
 import { redirect } from "next/navigation";
 import type { z } from "zod";
+import { listMyRoles } from "@/features/clinics/queries";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
 import { siteOrigin } from "@/server/site-origin";
+import { landingPath } from "./landing";
 import {
   emailInput,
   logInInput,
@@ -22,6 +24,15 @@ export type FormState = {
 };
 
 const TOO_MANY = "Too many attempts. Wait a minute and try again.";
+
+/**
+ * Resolves /start here instead of redirecting to it: a Server Action redirect
+ * is a client-side navigation, and /start is a route handler, so the address
+ * would stay on /start and the next action (log out) would post to it.
+ */
+async function destination(next: string, userId: string): Promise<string> {
+  return next === "/start" ? landingPath(await listMyRoles(userId)) : next;
+}
 
 function fieldErrors(error: z.ZodError): FormState["fieldErrors"] {
   const result: Record<string, string> = {};
@@ -45,7 +56,7 @@ export async function logIn(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
     // Same message whatever went wrong, so the form does not reveal which emails exist.
     const message =
@@ -55,7 +66,8 @@ export async function logIn(
     return { error: message, values: { email } };
   }
 
-  redirect(safeNext(formData.get("next"), "/clinic"));
+  const next = safeNext(formData.get("next"), "/start");
+  redirect(await destination(next, data.user.id));
 }
 
 export async function signUp(
@@ -65,7 +77,7 @@ export async function signUp(
   const email = String(formData.get("email") ?? "");
   if (!(await rateLimit("auth:signup", 5))) return { error: TOO_MANY };
 
-  const next = safeNext(formData.get("next"), "/clinic");
+  const next = safeNext(formData.get("next"), "/start");
   const parsed = signUpInput.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { fieldErrors: fieldErrors(parsed.error), values: { email } };
@@ -86,12 +98,12 @@ export async function signUp(
   }
 
   // With email confirmation on, Supabase returns no session until the link is opened.
-  if (!data.session) {
+  if (!data.session || !data.user) {
     return {
       message: `Almost there: we sent a confirmation link to ${parsed.data.email}.`,
     };
   }
-  redirect(next);
+  redirect(await destination(next, data.user.id));
 }
 
 export async function logOut(): Promise<void> {

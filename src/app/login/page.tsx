@@ -12,7 +12,7 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
       <Suspense fallback={null}>
         {searchParams.then((params) => (
           <LoginForm
-            next={safeNext(params.next, "/clinic")}
+            next={safeNext(params.next, "/start")}
             error={params.error === "link" ? LINK_ERROR : undefined}
           />
         ))}
