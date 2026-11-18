@@ -6,7 +6,7 @@ Kinora is an online booking app for small physiotherapy clinics: patients book a
 
 **Live app: https://kinora-booking.vercel.app**
 
-<!-- Mobile screenshot: docs/mobile.png, 375 px wide -->
+<img src="docs/mobile.png" width="375" alt="Maison Tilleul's booking page on a 375 px phone: three sessions with their prices, the physio choice, and a bar with the chosen slot, Thursday 19 November at 10:00, and the Continue to payment button">
 
 ## Features
 
@@ -28,10 +28,69 @@ Next.js 16 (App Router, Server Actions) · React 19 · TypeScript · Tailwind CS
 ## How it is built
 
 - **Mobile first.** Every screen is designed at 375 px, then widened. Pages render on the server, so phones download little JavaScript.
-- **Security lives in the database.** Row level security on every table: a user can never read another user's data, even by calling the API directly.
 - **Every input is validated on the server** with Zod, and every action checks the signed-in user.
 - **One folder per feature** in `src/features/`, so a new feature does not touch the others.
 - **Small, readable commits**, each tied to a roadmap task. CI runs the typecheck, lint, tests, build and a secret scan on every push.
+
+## Technical report
+
+A booking app that takes money has five places where "it works on my machine" is not enough. For each one: the risk, what Kinora does, why, and the test that proves it. The `*.db.test.ts` files run against a real Postgres with `pnpm test:db`; each test is rolled back, except the concurrency tests, which need committed rows and delete them afterwards.
+
+### 1. Clinic isolation
+
+**Risk.** Several clinics share one database. A missing `where clinic_id = …` in one query, or a direct call to the Supabase API, would show one clinic's patients to another.
+
+**What Kinora does.** Access is enforced by Postgres row level security, not by the app's queries. Every user query runs through `withRls()` (`src/lib/db.ts`), which opens a transaction as the `authenticated` role with the user's id, so Postgres applies the policies written next to each table in `table.ts`. The policies call two helpers, `private.is_member()` and `private.has_role()` (`drizzle/0001`), in a schema the Supabase API does not expose. An event trigger (`drizzle/0000`) turns RLS on for every new table, so a table without policies denies everything instead of exposing everything. Nobody writes bookings directly: there is no write policy on `bookings`, and holding, cancelling and confirming go through database functions that check the caller and the rules themselves (`drizzle/0014`, `0018`, `0019`).
+
+**Why.** One forgotten filter in the app is a data leak; one forgotten policy is a denied query. RLS also covers the Supabase Data API, which a user can call with their own token, bypassing the app.
+
+**Proof.** `src/db/cross-clinic.db.test.ts` checks that RLS is on for every table, and that an owner can neither read, change, join nor email for another clinic, even with its id. `roles.db.test.ts` checks that a patient sees no other patient and a practitioner changes no role. `agenda.db.test.ts` checks that a physio never gets a colleague's sessions, even when asking for them, and `my-bookings.db.test.ts` that a patient gets only their own.
+
+### 2. No double booking
+
+**Risk.** Two patients look at the same free 10:00 slot and pay at the same second. Checking "is the slot free?" and then inserting leaves a gap where both checks pass.
+
+**What Kinora does.** The app computes free slots for display, but the database has the last word: an exclusion constraint (`drizzle/0011`) refuses any two bookings of the same physio whose time ranges overlap, as long as they are pending payment or confirmed. Ranges are `[start, end)`, so back-to-back sessions are allowed. A slot is held for 15 minutes while the patient pays; an expired hold frees it.
+
+**Why.** A constraint holds whatever the timing, the number of servers or the code path. Locks or a "check then insert" in the app would each need to be right in every place that books.
+
+**Proof.** `src/db/double-booking.db.test.ts` opens two connections that insert the same slot and wait before committing, so the two transactions overlap: exactly one succeeds, the other gets SQLSTATE `23P01`. It also checks a one-minute overlap is refused and an expired hold cannot come back over a newer booking.
+
+### 3. Stripe webhook replay
+
+**Risk.** Stripe delivers a webhook at least once: retries, and sometimes the same event twice at the same moment. A naive handler confirms the booking twice and sends two confirmation emails. And a patient who closes the tab before coming back from Stripe must still see their booking.
+
+**What Kinora does.** The webhook (`src/features/booking/webhook.ts`) first checks Stripe's signature on the raw body. Then, in one transaction (`payment.ts`), it inserts the event id into `stripe_events`, whose primary key makes a second delivery a no-op, locks the booking row and confirms it only if it is still pending. The confirmation email is queued in the same transaction, so it exists if and only if the booking was confirmed. If the transaction fails, the event is not recorded and Stripe's retry gets a fresh try. A payment that arrives after its hold expired is confirmed if the slot is still free, and refunded in full if someone else took it. The return page asks Stripe directly whether the session is paid and settles it the same way, so a late webhook never leaves a paid patient looking at "pending".
+
+**Why.** Idempotency on the event id is what Stripe recommends, and doing it in the same transaction as the confirmation means there is no moment where the event is marked handled but the booking is not.
+
+**Proof.** `src/db/stripe-webhook.db.test.ts` replays the same event and confirms once; sends the same event on two connections at the same moment and confirms once; checks the event is recorded only when the booking is settled; and covers the late payment, confirmed or refunded. `confirmation-email.db.test.ts` checks the second call queues no second email.
+
+### 4. One reminder per booking
+
+**Risk.** A cron that runs twice (a retry, a manual run, two deployments) sends every patient two reminders.
+
+**What Kinora does.** Every email is first a row in the `emails` table (`drizzle/0005`) with a unique `dedupe_key`, here `booking_reminder:<booking id>`. The daily job (`src/features/booking/reminders.ts`) selects tomorrow's confirmed sessions, in Brussels time, and inserts their reminders with `on conflict do nothing`: a booking that already has its reminder gets nothing new. Sending (`src/features/email/outbox.ts`) moves a row from "pending" to "sending" in one update, so only one caller sends it, and passes the row id to Resend as an idempotency key. A cancelled or refunded booking is not "confirmed", so it never gets a reminder.
+
+A Vercel cron (`vercel.json`) calls `/api/cron/reminders` every day at 16:00 UTC, that is 17:00 in Brussels in winter and 18:00 in summer. The route checks `Authorization: Bearer $CRON_SECRET` with a constant-time comparison. Set `CRON_SECRET` in Vercel, then try it by hand:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" https://kinora-booking.vercel.app/api/cron/reminders
+```
+
+**Why.** The free Vercel cron runs once a day, which is enough for a day-before reminder. The guarantee does not depend on the scheduler: it lives in a unique key, so any number of runs, at any time, gives one email.
+
+**Proof.** `src/db/reminders.db.test.ts` runs the job twice in a row and twice at the same moment on two connections, and gets one reminder; it also checks cancelled, refunded and unpaid bookings get none, and that the demo's per-clinic run leaves other clinics alone. `reminders-cron.test.ts` checks the bearer token.
+
+### 5. Assistant limits
+
+**Risk.** The assistant on the public page calls a language model for anyone, without an account. Without limits, a script can spend the whole free Groq quota; without checks, the model can invent a free slot or give medical advice.
+
+**What Kinora does.** Each question (`src/features/assistant/actions.ts`) is parsed with Zod, rate limited per IP, then counted against 15 questions per visitor per Brussels day, in the database, before Groq is called. The count is one upsert that stops at the limit (`quota.ts`), so two questions sent together cannot both take the last place. The visitor is a hash of the IP and the day, never the IP itself, and the daily clean-up job deletes past days. The model only knows the clinic's public facts, and gets free slots through one tool that calls the app's own slot calculation. Its reply is checked: if it names a time the app did not compute, it is replaced by a sentence built from the app's slot. Groq gets a 10-second timeout and a fallback model; when both fail, or the quota is reached, the visitor sees a short message and can still book on the page. The opening note asks patients not to share health details.
+
+**Why.** A counter in memory resets on every serverless instance; the database is shared by all of them. And a booking app must never promise a slot that does not exist, so the model writes the sentence but the app owns the facts.
+
+**Proof.** `src/db/assistant-quota.db.test.ts` checks 15 questions then a refusal, separate counts per visitor and per day, no IP stored, and one winner when two questions race for the last place. `src/features/assistant/conversation.test.ts` checks the slot shown is the app's, a reply with an invented time is replaced, invalid tool arguments are refused, and the model gets at most three turns.
 
 ## Run it locally
 
@@ -53,14 +112,6 @@ pnpm dev
 | `pnpm e2e` | Playwright journeys on a phone viewport |
 | `pnpm db:generate` | Create a migration from the tables in `src/features/*/table.ts` |
 | `pnpm db:migrate` | Apply migrations |
-
-## Day-before reminders
-
-A Vercel cron (`vercel.json`) calls `/api/cron/reminders` every day at 16:00 UTC, that is 17:00 in Brussels in winter and 18:00 in summer. It emails every patient whose confirmed session is the next day. Each booking gets one reminder at most: the email's dedupe key is unique in the database, so two runs at the same moment still send one. Set `CRON_SECRET` in Vercel, then try it by hand:
-
-```bash
-curl -H "Authorization: Bearer $CRON_SECRET" https://kinora-booking.vercel.app/api/cron/reminders
-```
 
 ## Try the demo
 
