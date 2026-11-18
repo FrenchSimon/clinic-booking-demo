@@ -52,9 +52,10 @@ Always a label, never a color alone.
 
 ## Navigation
 
-- Portfolio bar (a change from the mockup, decided after approval): a thin dark bar above every page, "Portfolio demo · fictional clinic" with "Read the code", and "Try the demo" once the demo mode exists. It speaks to people evaluating the demo, so the product pages below never link to the source code. In a demo clinic it merges with the demo bar.
+- Portfolio bar (a change from the mockup, decided after approval, redrawn on 2026-11-18): a dark bar above every page, on two lines at every width. Line 1: "Portfolio demo · fictional clinic" alone, muted. Line 2: "Read the code ↗" on the left; on the right "Try the demo", or inside a demo clinic the role menu then "Outbox" with a badge counting its emails (hidden at 0). It speaks to people evaluating the demo, so the product pages below never link to the source code.
 - Clinic space: top bar with the Kinora logo and the clinic name, then pill tabs (Today, Agenda, Patients, Services, Outbox), the current one in soft green with `aria-current="page"`. On a phone the tabs scroll sideways.
-- Demo clinics: a dark bar on top with "Demo clinic · resets in …" and the "View as Owner / Practitioner / Patient" switch, using `aria-pressed`.
+- Role menu (demo clinics): a pill button with the current role and a chevron ("Owner ▾", `aria-haspopup="menu"`). It opens a white panel under it, aligned right: "View the demo as", then Owner, Practitioner, Patient, at least 44px each; the current one in soft green, bold, with a check. Closed by a click outside, Escape or a choice; arrow keys move between roles. The panel is the one element with a shadow (`0 8px 24px rgba(30,43,36,.16)`): it floats over the page.
+- Clinic space top bar: on a phone, the Kinora logo and "Log out" only, the clinic name from `sm:`.
 - Public booking page: the clinic's name only, Kinora appears as "Booking by Kinora" in the footer. One column on a phone, steps 1 Session, 2 Physio, 3 Day and time, then a summary bar fixed at the bottom with "Continue to payment".
 - Slot picking: a row of days, then a grid of times. Never a full month calendar on a phone.
 

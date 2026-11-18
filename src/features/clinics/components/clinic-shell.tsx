@@ -17,7 +17,7 @@ export function ClinicShell({
   return (
     <div className="flex flex-1 flex-col">
       <header className="border-b">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-3 sm:px-8">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-8">
           <div className="flex min-w-0 items-baseline gap-3">
             <Link
               href="/"
@@ -26,7 +26,7 @@ export function ClinicShell({
               Kinora
             </Link>
             {clinicName && (
-              <span className="truncate text-muted-foreground">
+              <span className="hidden truncate text-muted-foreground sm:inline">
                 {clinicName}
               </span>
             )}

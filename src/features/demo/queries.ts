@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import {
   clinics,
   type MembershipRole,
@@ -65,6 +65,17 @@ export async function getOutbox(visitorId: string, clinicId: string) {
       .orderBy(desc(emails.createdAt), desc(emails.id))
       .limit(OUTBOX_SIZE),
   );
+}
+
+/** How many emails the demo clinic's Outbox holds, for the badge in the bar. */
+export async function countOutbox(
+  visitorId: string,
+  clinicId: string,
+): Promise<number> {
+  const [row] = await withRls(visitorId, (tx) =>
+    tx.select({ n: count() }).from(emails).where(eq(emails.clinicId, clinicId)),
+  );
+  return row?.n ?? 0;
 }
 
 export type OutboxEmail = Awaited<ReturnType<typeof getOutbox>>[number];
