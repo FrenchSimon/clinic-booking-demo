@@ -9,7 +9,7 @@ Checklist confirmed on: 2026-11-18
 
 - [x] R1.1 Project setup: Next.js, starter kit, CI green, first Vercel preview
 - [x] R1.2 Supabase auth: sign up, log in, log out, password reset by email (checklist #1)
-- [ ] R1.3 Clinics and memberships tables, roles owner / practitioner / patient, row level security and migrations (checklist #3, #4)
+- [x] R1.3 Clinics and memberships tables, roles owner / practitioner / patient, row level security and migrations (checklist #3, #4)
 - [ ] R1.4 Owner creates a clinic: name, address, opening hours (checklist #2)
 - [ ] R1.5 Email outbox: every email is stored as a row, unique per booking and kind, then sent with Resend (checklist #14, #15)
 - [ ] R1.6 Owner invites a practitioner by email, invitation accepted on sign-up (checklist #2, #14)

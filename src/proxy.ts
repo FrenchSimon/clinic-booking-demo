@@ -4,7 +4,7 @@ import { env } from "@/lib/env";
 
 // Pages that need a signed-in user. Actions and pages still call requireUser():
 // this redirect is a convenience, not the access control.
-const PROTECTED = ["/notes", "/reset-password"];
+const PROTECTED = ["/reset-password"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
