@@ -57,6 +57,7 @@ describe("nextFreeSlot", () => {
       found: true,
       slot: {
         day: "2026-11-24",
+        when: "Tuesday, 24 November 2026 at 08:00",
         time: "08:00",
         physio: "Tom Peeters",
         service: "Initial assessment",

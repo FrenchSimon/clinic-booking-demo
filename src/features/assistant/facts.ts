@@ -1,4 +1,6 @@
 import type { BookingPage } from "@/features/booking/public";
+import { BOOKING_DAYS } from "@/features/booking/selection";
+import { addDays, weekday } from "@/features/booking/time";
 import { DAY_LABELS, DAYS } from "@/features/clinics/schema";
 import { formatEuros } from "@/features/services/schema";
 
@@ -14,7 +16,7 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", {
 });
 
 /** "Wednesday, 18 November 2026" for "2026-11-18". */
-function longDate(date: string): string {
+export function longDate(date: string): string {
   return dateFormat.format(new Date(`${date}T12:00:00Z`));
 }
 
@@ -33,6 +35,7 @@ export function clinicFacts(page: BookingPage, today: string): string {
     `Clinic: ${page.name}`,
     `Address: ${page.address}`,
     `Today: ${longDate(today)} (${today}), time zone Europe/Brussels`,
+    `Next days: ${calendar(today)}`,
     "Opening hours:",
     ...hours,
     "Sessions (name: duration, price, physios):",
@@ -41,4 +44,12 @@ export function clinicFacts(page: BookingPage, today: string): string {
     "Cancellation: up to 24 hours before the session, with a full refund to the card.",
     "Reminder: an email the day before the session.",
   ].join("\n");
+}
+
+/** "Thursday 2026-11-19, Friday 2026-11-20…": the dates the slot tool takes. */
+function calendar(today: string): string {
+  return Array.from({ length: BOOKING_DAYS }, (_, i) => {
+    const date = addDays(today, i);
+    return `${DAY_LABELS[weekday(date)]} ${date}`;
+  }).join(", ");
 }

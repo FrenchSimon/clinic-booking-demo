@@ -12,6 +12,7 @@ import {
   type PhysioSchedule,
 } from "@/features/booking/slots";
 import { addDays } from "@/features/booking/time";
+import { longDate } from "./facts";
 
 // The assistant's only tool: the next free slot, from the same freeSlots()
 // as the booking page (R2.3). The model picks the arguments, the app
@@ -37,7 +38,8 @@ export const NEXT_SLOT_TOOL = {
         },
         from: {
           type: "string",
-          description: "First day to search, YYYY-MM-DD. Omit to start today.",
+          description:
+            "First day to search, YYYY-MM-DD, from the clinic facts' list of next days. Set it whenever the patient names a day. Omit to start today.",
         },
       },
       required: ["service"],
@@ -56,6 +58,8 @@ export type NextSlotArgs = z.infer<typeof nextSlotArgs>;
 /** A slot the patient can open, prefilled, on the booking page. */
 export type ProposedSlot = {
   day: string;
+  /** "Monday, 23 November 2026 at 11:00": the model repeats it, so it never names the wrong weekday. */
+  when: string;
   time: string;
   physio: string;
   service: string;
@@ -125,6 +129,13 @@ export function nextFreeSlot(
   const name = page.physios.find((p) => p.id === slot.membershipId)?.name ?? "";
   return {
     found: true,
-    slot: { day, time, physio: name, service: service.name, href },
+    slot: {
+      day,
+      when: `${longDate(day)} at ${time}`,
+      time,
+      physio: name,
+      service: service.name,
+      href,
+    },
   };
 }
