@@ -8,6 +8,27 @@
       "when": 1794967412620,
       "tag": "0000_enable_rls_on_new_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794967471064,
+      "tag": "0001_membership_helpers",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794967496033,
+      "tag": "0002_clinics_and_memberships",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794967503668,
+      "tag": "0003_clinic_owner_trigger",
+      "breakpoints": true
     }
   ]
 }
