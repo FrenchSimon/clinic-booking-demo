@@ -55,7 +55,7 @@ export async function logIn(
     return { error: message, values: { email } };
   }
 
-  redirect(safeNext(formData.get("next"), "/clinic"));
+  redirect(safeNext(formData.get("next"), "/start"));
 }
 
 export async function signUp(
@@ -65,7 +65,7 @@ export async function signUp(
   const email = String(formData.get("email") ?? "");
   if (!(await rateLimit("auth:signup", 5))) return { error: TOO_MANY };
 
-  const next = safeNext(formData.get("next"), "/clinic");
+  const next = safeNext(formData.get("next"), "/start");
   const parsed = signUpInput.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { fieldErrors: fieldErrors(parsed.error), values: { email } };

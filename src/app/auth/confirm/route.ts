@@ -16,7 +16,7 @@ const otpType = z.enum([
 // The link carries either a one-time code (PKCE) or a token hash, depending on the email template.
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
-  const next = safeNext(params.get("next"));
+  const next = safeNext(params.get("next"), "/start");
   const code = params.get("code");
   const tokenHash = params.get("token_hash");
   const type = otpType.safeParse(params.get("type"));

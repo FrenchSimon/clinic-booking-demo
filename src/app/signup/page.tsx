@@ -11,7 +11,7 @@ export default function SignupPage({ searchParams }: PageProps<"/signup">) {
     >
       <Suspense fallback={null}>
         {searchParams.then((params) => (
-          <SignupForm next={safeNext(params.next, "/clinic")} />
+          <SignupForm next={safeNext(params.next, "/start")} />
         ))}
       </Suspense>
     </AuthShell>
