@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ClinicForm } from "@/features/clinics/components/clinic-form";
 import { ClinicShell } from "@/features/clinics/components/clinic-shell";
-import { getOwnedClinic } from "@/features/clinics/queries";
+import { getStaffClinic } from "@/features/clinics/queries";
 import { requireUser } from "@/server/auth";
 
 export default function NewClinicPage() {
@@ -29,7 +29,7 @@ export default function NewClinicPage() {
 
 async function NewClinic() {
   const user = await requireUser();
-  if (await getOwnedClinic(user.id)) redirect("/clinic");
+  if (await getStaffClinic(user.id)) redirect("/clinic");
 
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";

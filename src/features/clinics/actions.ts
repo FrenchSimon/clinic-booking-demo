@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { withRls } from "@/lib/db";
+import { isUniqueViolation } from "@/lib/pg-errors";
 import { requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
 import { getOwnedClinic } from "./queries";
@@ -13,13 +14,6 @@ export type ClinicFormState = {
   /** Keyed by field path: "name", "slug", "openingHours.mon.to"… */
   fieldErrors?: Partial<Record<string, string>>;
 };
-
-function isUniqueViolation(error: unknown, constraint: string): boolean {
-  const cause = (
-    error as { cause?: { code?: string; constraint_name?: string } }
-  )?.cause;
-  return cause?.code === "23505" && cause.constraint_name === constraint;
-}
 
 export async function createClinic(
   _prev: ClinicFormState,

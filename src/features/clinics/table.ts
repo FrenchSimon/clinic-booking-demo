@@ -94,6 +94,8 @@ export const memberships = pgTable(
       .notNull()
       .references(() => authUsers.id, { onDelete: "cascade" }),
     role: membershipRole().notNull(),
+    // Shown to patients for staff ("Camille"), set from the invitation.
+    displayName: text("display_name"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

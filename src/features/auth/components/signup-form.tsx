@@ -6,7 +6,7 @@ import { Field, FormMessage } from "@/components/field";
 import { Button } from "@/components/ui/button";
 import { type FormState, signUp } from "../actions";
 
-export function SignupForm() {
+export function SignupForm({ next }: { next: string }) {
   const [state, action, pending] = useActionState<FormState, FormData>(
     signUp,
     {},
@@ -16,6 +16,7 @@ export function SignupForm() {
 
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
+      <input type="hidden" name="next" value={next} />
       <Field
         name="email"
         label="Email"
@@ -41,7 +42,10 @@ export function SignupForm() {
       </Button>
       <p className="text-muted-foreground text-sm">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-primary underline">
+        <Link
+          href={`/login?next=${encodeURIComponent(next)}`}
+          className="font-medium text-primary underline"
+        >
           Log in
         </Link>
       </p>

@@ -12,7 +12,7 @@ Checklist confirmed on: 2026-11-18
 - [x] R1.3 Clinics and memberships tables, roles owner / practitioner / patient, row level security and migrations (checklist #3, #4)
 - [x] R1.4 Owner creates a clinic: name, address, opening hours (checklist #2)
 - [x] R1.5 Email outbox: every email is stored as a row, unique per booking and kind, then sent with Resend (checklist #14, #15)
-- [ ] R1.6 Owner invites a practitioner by email, invitation accepted on sign-up (checklist #2, #14)
+- [x] R1.6 Owner invites a practitioner by email, invitation accepted on sign-up (checklist #2, #14)
 - [ ] R1.7 Isolation tests: no cross-clinic read or write, a patient sees only their own data (checklist #3, #4)
 - [x] R1.8 `DESIGN.md` turned into theme variables (after the design is approved)
 

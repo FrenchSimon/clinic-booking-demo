@@ -44,7 +44,10 @@ export function LoginForm({ next, error }: { next: string; error?: string }) {
       </Button>
       <p className="text-muted-foreground text-sm">
         No account yet?{" "}
-        <Link href="/signup" className="font-medium text-primary underline">
+        <Link
+          href={`/signup?next=${encodeURIComponent(next)}`}
+          className="font-medium text-primary underline"
+        >
           Sign up
         </Link>
       </p>

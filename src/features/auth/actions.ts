@@ -1,11 +1,11 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
+import { siteOrigin } from "@/server/site-origin";
 import {
   emailInput,
   logInInput,
@@ -30,16 +30,6 @@ function fieldErrors(error: z.ZodError): FormState["fieldErrors"] {
     result[key] ??= issue.message;
   }
   return result;
-}
-
-/** The site's own origin, used to build the links sent by email. */
-async function siteOrigin(): Promise<string> {
-  const h = await headers();
-  const origin = h.get("origin");
-  if (origin) return origin;
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  return `${proto}://${host}`;
 }
 
 export async function logIn(
@@ -75,6 +65,7 @@ export async function signUp(
   const email = String(formData.get("email") ?? "");
   if (!(await rateLimit("auth:signup", 5))) return { error: TOO_MANY };
 
+  const next = safeNext(formData.get("next"), "/clinic");
   const parsed = signUpInput.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { fieldErrors: fieldErrors(parsed.error), values: { email } };
@@ -84,7 +75,7 @@ export async function signUp(
   const { data, error } = await supabase.auth.signUp({
     ...parsed.data,
     options: {
-      emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=/clinic`,
+      emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=${encodeURIComponent(next)}`,
     },
   });
   if (error) {
@@ -100,7 +91,7 @@ export async function signUp(
       message: `Almost there: we sent a confirmation link to ${parsed.data.email}.`,
     };
   }
-  redirect("/clinic");
+  redirect(next);
 }
 
 export async function logOut(): Promise<void> {
