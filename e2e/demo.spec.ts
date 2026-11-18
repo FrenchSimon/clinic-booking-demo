@@ -14,7 +14,7 @@ test("every page offers to try the demo", async ({ page }) => {
 // test payments, deleted after 24 hours: CI has no Supabase project.
 test("Try the demo opens a filled clinic of one's own", async ({ page }) => {
   test.skip(Boolean(process.env.CI), "Needs a real Supabase project");
-  test.setTimeout(60_000);
+  test.setTimeout(120_000);
 
   await page.goto("/");
   await page.getByRole("button", { name: "Try the demo" }).click();
@@ -34,6 +34,9 @@ test("Try the demo opens a filled clinic of one's own", async ({ page }) => {
   const viewAs = async (role: string) => {
     await roleMenu.click();
     await page.getByRole("menuitemradio", { name: role }).click();
+    // The bar shows the new role once the switch and the page refresh are
+    // done, which can take a while when the dev server compiles a page.
+    await expect(roleMenu).toHaveText(new RegExp(role), { timeout: 20_000 });
   };
 
   await viewAs("Practitioner");
@@ -64,9 +67,11 @@ test("Try the demo opens a filled clinic of one's own", async ({ page }) => {
   await send.click();
   await expect(
     page.getByText(/reminders? added below|No new reminder/),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15_000 });
   await send.click();
-  await expect(page.getByText(/No new reminder/)).toBeVisible();
+  await expect(page.getByText(/No new reminder/)).toBeVisible({
+    timeout: 15_000,
+  });
 
   const overflow = await page.evaluate(
     () =>
