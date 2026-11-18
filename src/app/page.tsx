@@ -99,10 +99,10 @@ async function AccountLinks() {
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="hidden max-w-48 truncate text-muted-foreground text-sm md:inline">
-        {user.email}
-      </span>
+    <div className="flex items-center gap-2">
+      <Link href="/clinic" className={buttonVariants()}>
+        My clinic
+      </Link>
       <LogoutButton />
     </div>
   );

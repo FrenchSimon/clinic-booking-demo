@@ -33,7 +33,7 @@ test("sign-up shows errors next to the fields", async ({ page }) => {
 
 test("login ignores a redirect to another site", async ({ page }) => {
   await page.goto("/login?next=//evil.example");
-  await expect(page.locator('input[name="next"]')).toHaveValue("/");
+  await expect(page.locator('input[name="next"]')).toHaveValue("/clinic");
 });
 
 test("an invalid email link sends back to login with a message", async ({
@@ -62,4 +62,11 @@ test("the new password page needs the session from the email link", async ({
 }) => {
   await page.goto("/reset-password");
   await expect(page).toHaveURL(/\/login\?next=%2Freset-password/);
+});
+
+test("the clinic space needs a signed-in user", async ({ page }) => {
+  for (const path of ["/clinic", "/clinic/new"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/login\?next=%2Fclinic/);
+  }
 });
