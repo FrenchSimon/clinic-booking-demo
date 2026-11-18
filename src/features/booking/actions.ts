@@ -79,7 +79,7 @@ export async function cancelMyBooking(formData: FormData): Promise<void> {
   const outcome = await cancelAndRefund(user.id, id);
   redirect(
     outcome === "refunded"
-      ? `/bookings/${id}`
+      ? `/bookings/${id}?cancelled=1`
       : `/bookings/${id}?error=${outcome}`,
   );
 }

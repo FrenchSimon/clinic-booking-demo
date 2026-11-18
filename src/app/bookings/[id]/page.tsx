@@ -2,7 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
-import { BookingReceipt } from "@/features/booking/components/booking-receipt";
+import {
+  BookingReceipt,
+  type EmailNotice,
+} from "@/features/booking/components/booking-receipt";
 import {
   CANCEL_ERRORS,
   CancelSection,
@@ -24,6 +27,7 @@ export default function BookingPage({
           id={id}
           sessionId={query.session_id}
           confirming={query.cancel === "confirm"}
+          justCancelled={query.cancelled === "1"}
           error={CANCEL_ERRORS[String(query.error)]}
         />
       ))}
@@ -37,11 +41,13 @@ async function Booking({
   id,
   sessionId,
   confirming,
+  justCancelled,
   error,
 }: {
   id: string;
   sessionId: string | string[] | undefined;
   confirming: boolean;
+  justCancelled: boolean;
   error: string | undefined;
 }) {
   if (!z.uuid().safeParse(id).success) notFound();
@@ -53,6 +59,13 @@ async function Booking({
   if (session.success && (await settleOnReturn(booking, session.data))) {
     booking = (await getMyBooking(user.id, id)) ?? booking;
   }
+
+  const notice = emailNotice(
+    booking.status,
+    session.success,
+    justCancelled,
+    user.email,
+  );
 
   return (
     <div className="flex flex-1 flex-col">
@@ -69,7 +82,7 @@ async function Booking({
             {error}
           </p>
         )}
-        <BookingReceipt booking={booking} />
+        <BookingReceipt booking={booking} notice={notice} />
         <CancelSection
           booking={booking}
           confirming={confirming}
@@ -87,4 +100,21 @@ async function Booking({
       </main>
     </div>
   );
+}
+
+/**
+ * Tells the patient an email is coming (checklist #14), only on the page they
+ * land on right after paying (back from Stripe) or after cancelling, not on
+ * every later visit.
+ */
+function emailNotice(
+  status: string,
+  backFromStripe: boolean,
+  justCancelled: boolean,
+  to: string | undefined,
+): EmailNotice | undefined {
+  if (!to) return undefined;
+  if (backFromStripe && status === "confirmed") return { kind: "booked", to };
+  if (justCancelled && status === "refunded") return { kind: "cancelled", to };
+  return undefined;
 }

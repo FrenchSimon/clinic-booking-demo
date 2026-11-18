@@ -53,8 +53,23 @@ function headline(booking: MyBooking) {
   };
 }
 
+/** Which email the patient was just sent, shown once after paying or cancelling. */
+export type EmailNotice = { kind: "booked" | "cancelled"; to: string };
+
+// "On its way", not "sent": the email goes out after this page, and may fail.
+const NOTICES: Record<EmailNotice["kind"], string> = {
+  booked: "A confirmation is on its way to",
+  cancelled: "A confirmation of the cancellation and refund is on its way to",
+};
+
 /** The patient's booking: what, when, where, and what happens next. */
-export function BookingReceipt({ booking }: { booking: MyBooking }) {
+export function BookingReceipt({
+  booking,
+  notice,
+}: {
+  booking: MyBooking;
+  notice?: EmailNotice;
+}) {
   const { title, text } = headline(booking);
   const rows = [
     ["Session", booking.serviceName],
@@ -69,6 +84,15 @@ export function BookingReceipt({ booking }: { booking: MyBooking }) {
         <StatusPill status={booking.status} />
         <h1 className="font-heading font-normal text-3xl">{title}</h1>
         <p className="text-muted-foreground">{text}</p>
+        {notice && (
+          <p className="text-muted-foreground">
+            {NOTICES[notice.kind]}{" "}
+            {/* The address moves to the next line whole, not cut at a dash. */}
+            <span className="inline-block max-w-full break-all text-foreground">
+              {notice.to}.
+            </span>
+          </p>
+        )}
       </div>
       <dl className="flex flex-col">
         {rows.map(([label, value]) => (
