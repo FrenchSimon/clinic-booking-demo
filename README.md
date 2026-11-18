@@ -4,7 +4,7 @@
 
 Kinora is an online booking app for small physiotherapy clinics: patients book and pay a session, cancel with an automatic refund and get a reminder the day before. The demo clinic is Maison Tilleul, a fictional practice in Brussels.
 
-**Live app: not deployed yet**
+**Live app: https://kinora-booking.vercel.app**
 
 <!-- Mobile screenshot: docs/mobile.png, 375 px wide -->
 
