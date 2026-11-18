@@ -47,6 +47,9 @@ export async function handleStripeWebhook(request: Request): Promise<Response> {
 function paidCheckout(event: Stripe.Event): PaidCheckout | null {
   if (!PAID_EVENTS.has(event.type)) return null;
   const session = event.data.object as Stripe.Checkout.Session;
+  // The Stripe account may serve other apps: only Kinora's sessions carry a
+  // booking id (see checkout.ts). Others are ignored, not even recorded.
+  if (!session.metadata?.booking_id) return null;
   if (session.payment_status !== "paid") return null;
   const paymentIntent =
     typeof session.payment_intent === "string"
