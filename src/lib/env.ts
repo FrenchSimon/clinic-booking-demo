@@ -17,7 +17,7 @@ export const env = createEnv({
     // `stripe listen` locally. Without it, the webhook answers 503.
     STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
     // Vercel sends it as "Authorization: Bearer <CRON_SECRET>" when it calls
-    // the daily reminders job. Without it, the job answers 503.
+    // the daily jobs (reminders, demo cleanup). Without it, they answer 503.
     CRON_SECRET: z.string().min(16).optional(),
   },
   client: {

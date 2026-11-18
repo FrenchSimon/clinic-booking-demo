@@ -1,11 +1,12 @@
 import { ArrowUpRight } from "lucide-react";
+import { TryDemoButton } from "@/features/demo/components/try-demo-button";
 
 const SOURCE_CODE = "https://github.com/FrenchSimon/clinic-booking-demo";
 
 /**
  * Thin bar above every page, for people evaluating this demo. It frames the
  * product without being part of it: Kinora and Maison Tilleul are fictional.
- * "Try the demo" joins it with the demo mode (R5.1).
+ * "Try the demo" opens the visitor's own demo clinic (R5.1).
  */
 export function PortfolioBar() {
   return (
@@ -13,11 +14,12 @@ export function PortfolioBar() {
       aria-label="About this demo"
       className="bg-demo text-demo-foreground text-sm"
     >
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 sm:px-8">
-        <p className="py-2 text-demo-muted">
+      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-4 px-4 sm:gap-x-6 sm:px-8">
+        <p className="mr-auto py-2 text-demo-muted">
           Portfolio demo
           <span className="hidden sm:inline"> · fictional clinic</span>
         </p>
+        <TryDemoButton />
         <a
           href={SOURCE_CODE}
           target="_blank"
