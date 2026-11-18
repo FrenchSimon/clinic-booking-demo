@@ -27,7 +27,8 @@ Checklist confirmed on: 2026-11-18
 - [x] R2.7 Stripe webhook confirms the booking, idempotent on the event id, replay test (checklist #10)
 - [x] R2.8 Return page checks the Checkout session, so a paid booking shows even if the webhook is late (checklist #10)
 - [x] R2.9 Booking confirmation email (checklist #14)
-- [ ] R2.10 Patient sees upcoming and past bookings (checklist #11)
+- [x] R2.10 Patient sees upcoming and past bookings (checklist #11)
+- [ ] R2.11 After logging in without a page to return to, a patient lands on their bookings and staff on their clinic, instead of every user being sent to create a clinic (checklist #1, #11, asked by Simon on 2026-11-18)
 
 ## R3. Dashboards (~10 %)
 
