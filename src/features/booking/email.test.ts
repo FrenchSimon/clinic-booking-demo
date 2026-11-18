@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { confirmationEmail, formatSessionTime } from "./email";
+import {
+  cancellationEmail,
+  confirmationEmail,
+  formatSessionTime,
+} from "./email";
 
 describe("formatSessionTime", () => {
   it("writes the time in Brussels, winter and summer", () => {
@@ -41,6 +45,40 @@ describe("confirmationEmail", () => {
     const email = confirmationEmail({ ...base, physioName: null });
     expect(email.paragraphs[0]).toBe(
       "Follow-up with your physio on Tuesday 1 December at 10:00.",
+    );
+  });
+});
+
+describe("cancellationEmail", () => {
+  const base = {
+    serviceName: "Follow-up",
+    physioName: "Thomas",
+    clinicName: "Maison Tilleul",
+    clinicAddress: "Rue Exemple 12, 1000 Brussels",
+    startsAt: new Date("2026-12-01T09:00:00Z"),
+    priceCents: 4500,
+    byClinic: false,
+    link: "https://kinora-booking.vercel.app/bookings/b1",
+  };
+
+  it("says which session is cancelled and how much is refunded", () => {
+    const email = cancellationEmail(base);
+    expect(email.heading).toBe("Your session at Maison Tilleul is cancelled");
+    expect(email.paragraphs).toEqual([
+      "You cancelled your session: Follow-up with Thomas on Tuesday 1 December at 10:00.",
+      "Your payment of €45.00 is refunded in full to your card. It usually shows on your account within 5 to 10 business days.",
+    ]);
+    expect(email.action?.url).toBe(base.link);
+  });
+
+  it("tells the patient when the clinic cancelled", () => {
+    const email = cancellationEmail({
+      ...base,
+      byClinic: true,
+      physioName: null,
+    });
+    expect(email.paragraphs[0]).toBe(
+      "Maison Tilleul cancelled your session: Follow-up with your physio on Tuesday 1 December at 10:00.",
     );
   });
 });
