@@ -5,12 +5,17 @@ import { Label } from "@/components/ui/label";
 type FieldProps = ComponentProps<typeof Input> & {
   name: string;
   label: string;
+  /** Help shown under the field, read by screen readers with it. */
+  hint?: string;
   error?: string;
 };
 
-/** A labelled input with its error right below, linked for screen readers. */
-export function Field({ name, label, error, ...input }: FieldProps) {
+/** A labelled input with its hint and error right below, linked for screen readers. */
+export function Field({ name, label, hint, error, ...input }: FieldProps) {
   const id = `field-${name}`;
+  const describedBy =
+    [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") ||
+    undefined;
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor={id}>{label}</Label>
@@ -18,9 +23,14 @@ export function Field({ name, label, error, ...input }: FieldProps) {
         id={id}
         name={name}
         aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={describedBy}
         {...input}
       />
+      {hint && (
+        <p id={`${id}-hint`} className="text-muted-foreground text-sm">
+          {hint}
+        </p>
+      )}
       {error && (
         <p id={`${id}-error`} className="text-destructive text-sm">
           {error}

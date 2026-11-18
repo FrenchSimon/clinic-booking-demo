@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   check,
   index,
+  jsonb,
   pgEnum,
   pgPolicy,
   pgTable,
@@ -11,6 +12,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { authenticatedRole, authUid, authUsers } from "drizzle-orm/supabase";
+import type { OpeningHours } from "./schema";
 
 // Row level security: a clinic and its members are only visible to people
 // who belong to that clinic, whatever the code above does. The helpers
@@ -32,6 +34,9 @@ export const clinics = pgTable(
     name: text().notNull(),
     // Public address of the clinic page, for example /c/maison-tilleul.
     slug: text().notNull(),
+    address: text().notNull(),
+    // One entry per weekday, checked by openingHoursSchema in schema.ts.
+    openingHours: jsonb("opening_hours").$type<OpeningHours>().notNull(),
     // Deleting the account that created a clinic deletes the clinic too:
     // that is how demo clinics disappear with their anonymous visitor.
     createdBy: uuid("created_by")
@@ -47,6 +52,10 @@ export const clinics = pgTable(
     check(
       "clinics_slug_format",
       sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and length(${t.slug}) <= 60`,
+    ),
+    check(
+      "clinics_opening_hours_days",
+      sql`jsonb_typeof(${t.openingHours}) = 'object' and ${t.openingHours} ?& array['mon','tue','wed','thu','fri','sat','sun']`,
     ),
     // The creator can read the row right after the insert, before the
     // owner membership added by the trigger in drizzle/0003 is visible.

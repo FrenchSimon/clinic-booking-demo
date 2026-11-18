@@ -65,7 +65,7 @@ export async function logIn(
     return { error: message, values: { email } };
   }
 
-  redirect(safeNext(formData.get("next")));
+  redirect(safeNext(formData.get("next"), "/clinic"));
 }
 
 export async function signUp(
@@ -83,7 +83,9 @@ export async function signUp(
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     ...parsed.data,
-    options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm` },
+    options: {
+      emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=/clinic`,
+    },
   });
   if (error) {
     return {
@@ -98,7 +100,7 @@ export async function signUp(
       message: `Almost there: we sent a confirmation link to ${parsed.data.email}.`,
     };
   }
-  redirect("/");
+  redirect("/clinic");
 }
 
 export async function logOut(): Promise<void> {

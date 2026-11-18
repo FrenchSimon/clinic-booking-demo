@@ -1,9 +1,9 @@
 "use client";
 
 import { useActionState } from "react";
+import { Field, FormMessage } from "@/components/field";
 import { Button } from "@/components/ui/button";
 import { type FormState, updatePassword } from "../actions";
-import { Field, FormMessage } from "./field";
 
 export function ResetPasswordForm() {
   const [state, action, pending] = useActionState<FormState, FormData>(
