@@ -1,27 +1,37 @@
 import Link from "next/link";
 import { getUser } from "@/server/auth";
-import { getDemoRole } from "../queries";
+import { countOutbox, getDemoClinic } from "../queries";
+import { RoleMenu } from "./role-menu";
 import { TryDemoButton } from "./try-demo-button";
-import { ViewAsSwitch } from "./view-as-switch";
 
 /**
- * The demo part of the portfolio bar: the Outbox (#21) and "View as" (#20)
- * for a visitor inside their demo clinic, "Try the demo" for everyone else
- * (#19).
+ * The demo part of the portfolio bar: inside their demo clinic, the
+ * visitor's role menu (#20) then the Outbox with its email count (#21);
+ * "Try the demo" for everyone else (#19).
  */
 export async function DemoControls() {
   const user = await getUser();
-  const role = user?.is_anonymous ? await getDemoRole(user.id) : null;
-  if (!role) return <TryDemoButton />;
+  const clinic = user?.is_anonymous ? await getDemoClinic(user.id) : null;
+  if (!user || !clinic) return <TryDemoButton />;
+  const emails = await countOutbox(user.id, clinic.id);
   return (
     <>
+      <RoleMenu current={clinic.role} />
       <Link
         href="/outbox"
-        className="inline-flex min-h-11 items-center font-semibold text-demo-foreground underline underline-offset-4"
+        aria-label={emails > 0 ? `Outbox, ${emails} emails` : undefined}
+        className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-demo-foreground underline underline-offset-4"
       >
         Outbox
+        {emails > 0 && (
+          <span
+            aria-hidden="true"
+            className="rounded-full bg-demo-foreground px-1.5 font-bold text-[11px] text-demo leading-4 no-underline"
+          >
+            {emails}
+          </span>
+        )}
       </Link>
-      <ViewAsSwitch current={role} />
     </>
   );
 }
