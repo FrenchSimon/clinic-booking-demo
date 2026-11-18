@@ -59,3 +59,18 @@ export async function getService(
     return { ...service, practitionerIds: links.map((l) => l.id) };
   });
 }
+
+/** True when the clinic has at least one service, hidden ones included. */
+export async function hasServices(
+  userId: string,
+  clinicId: string,
+): Promise<boolean> {
+  const rows = await withRls(userId, (tx) =>
+    tx
+      .select({ id: services.id })
+      .from(services)
+      .where(eq(services.clinicId, clinicId))
+      .limit(1),
+  );
+  return rows.length > 0;
+}
