@@ -4,7 +4,11 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { authUsers } from "drizzle-orm/supabase";
 import type * as schema from "@/db/schema";
 import { clinics, memberships } from "@/features/clinics/table";
-import { deliverEmail, queueEmail } from "@/features/email/outbox";
+import {
+  DEMO_VISITOR_EMAIL,
+  deliverEmail,
+  queueEmail,
+} from "@/features/email/outbox";
 import { services } from "@/features/services/table";
 import { adminDb } from "@/lib/db";
 import { reminderEmail } from "./email";
@@ -54,12 +58,11 @@ export async function queueTomorrowsReminders(
 
   const queued: string[] = [];
   for (const booking of due) {
-    if (!booking.patientEmail) continue;
     const id = await queueEmail(db, {
       clinicId: booking.clinicId,
       kind: "booking_reminder",
       dedupeKey: `booking_reminder:${booking.id}`,
-      to: booking.patientEmail,
+      to: booking.patientEmail ?? DEMO_VISITOR_EMAIL,
       content: reminderEmail({
         ...booking,
         link: `${origin}/bookings/${booking.id}`,

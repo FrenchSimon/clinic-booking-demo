@@ -2,7 +2,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { authUsers } from "drizzle-orm/supabase";
 import { clinics, memberships } from "@/features/clinics/table";
-import { queueEmail } from "@/features/email/outbox";
+import { DEMO_VISITOR_EMAIL, queueEmail } from "@/features/email/outbox";
 import { services } from "@/features/services/table";
 import { confirmationEmail } from "./email";
 import type { Tx } from "./payment";
@@ -37,13 +37,13 @@ export async function queueConfirmationEmail(
     .innerJoin(clinics, eq(clinics.id, bookings.clinicId))
     .innerJoin(memberships, eq(memberships.id, bookings.membershipId))
     .where(eq(bookings.stripeCheckoutSessionId, sessionId));
-  if (!booking?.patientEmail) return null;
+  if (!booking) return null;
 
   return queueEmail(tx, {
     clinicId: booking.clinicId,
     kind: "booking_confirmation",
     dedupeKey: `booking_confirmation:${booking.id}`,
-    to: booking.patientEmail,
+    to: booking.patientEmail ?? DEMO_VISITOR_EMAIL,
     content: confirmationEmail({
       ...booking,
       link: `${origin}/bookings/${booking.id}`,
