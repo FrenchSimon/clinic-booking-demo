@@ -17,6 +17,7 @@ export async function getMyBooking(userId: string, bookingId: string) {
         endsAt: bookings.endsAt,
         priceCents: bookings.priceCents,
         stripeCheckoutSessionId: bookings.stripeCheckoutSessionId,
+        cancelledAt: bookings.cancelledAt,
         serviceName: services.name,
         physioName: memberships.displayName,
         clinicName: clinics.name,

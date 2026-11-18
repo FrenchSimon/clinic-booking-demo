@@ -36,3 +36,20 @@ export function lapsedHold(row: HistoryRow, now: Date) {
     (row.holdExpiresAt === null || row.holdExpiresAt <= now)
   );
 }
+
+const DAY_MS = 24 * 60 * 60_000;
+
+/**
+ * Whether the patient may still cancel online: a paid session at least 24
+ * hours away (checklist #12). Only for the page: private.cancel_booking()
+ * checks the rule again on the database's clock.
+ */
+export function canCancel(
+  row: { status: BookingStatus; startsAt: Date },
+  now: Date,
+) {
+  return (
+    row.status === "confirmed" &&
+    row.startsAt.getTime() - DAY_MS >= now.getTime()
+  );
+}
