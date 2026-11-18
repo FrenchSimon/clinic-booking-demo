@@ -1,14 +1,21 @@
 import "server-only";
+import { and, eq } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { brusselsToday } from "@/features/availability/schema";
 import { lapsedHold } from "@/features/booking/history";
+import { bookings } from "@/features/booking/table";
 import { addDays, brusselsInstant } from "@/features/booking/time";
+import { memberships } from "@/features/clinics/table";
 import { clinicBookings } from "@/features/dashboard/queries";
 import { clinicPatients } from "@/features/patients/queries";
+import { services } from "@/features/services/table";
 import { withRls } from "@/lib/db";
 
 // The owner's bookings (checklist #5, #13): every session from today on, and
 // one booking to cancel. Patients are known by the email of their account,
 // read through private.clinic_patients() like the patient list.
+
+const patient = alias(memberships, "patient");
 
 /** Every session from today on for a year, soonest first, never-paid holds aside. */
 export async function getUpcomingBookings(
@@ -39,3 +46,46 @@ export async function getUpcomingBookings(
 export type UpcomingBooking = Awaited<
   ReturnType<typeof getUpcomingBookings>
 >[number];
+
+/** One booking of the clinic with its patient's email, or null. Read through RLS. */
+export async function getClinicBooking(
+  userId: string,
+  clinicId: string,
+  bookingId: string,
+  now = new Date(),
+) {
+  const { rows, patients } = await withRls(userId, async (tx) => ({
+    rows: await tx
+      .select({
+        id: bookings.id,
+        status: bookings.status,
+        startsAt: bookings.startsAt,
+        endsAt: bookings.endsAt,
+        priceCents: bookings.priceCents,
+        cancelledAt: bookings.cancelledAt,
+        serviceName: services.name,
+        physioName: memberships.displayName,
+        patientMembershipId: patient.id,
+      })
+      .from(bookings)
+      .innerJoin(services, eq(services.id, bookings.serviceId))
+      .innerJoin(memberships, eq(memberships.id, bookings.membershipId))
+      .leftJoin(
+        patient,
+        and(
+          eq(patient.clinicId, bookings.clinicId),
+          eq(patient.userId, bookings.patientId),
+        ),
+      )
+      .where(and(eq(bookings.id, bookingId), eq(bookings.clinicId, clinicId))),
+    patients: await clinicPatients(tx, clinicId, now),
+  }));
+  const row = rows[0];
+  if (!row) return null;
+  const email = patients.find((p) => p.id === row.patientMembershipId)?.email;
+  return { ...row, patientEmail: email ?? null };
+}
+
+export type ClinicBooking = NonNullable<
+  Awaited<ReturnType<typeof getClinicBooking>>
+>;
