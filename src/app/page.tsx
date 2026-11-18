@@ -4,18 +4,20 @@ import { buttonVariants } from "@/components/ui/button";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { getUser } from "@/server/auth";
 
+// Written for the clinic owner: what Kinora changes in their day.
+// The technical guarantees behind them belong in the README.
 const FEATURES = [
   {
-    title: "Paid when booked",
-    text: "Card payment with Stripe. A slot is held 15 minutes, never sold twice.",
+    title: "Fewer no-shows",
+    text: "Patients pay when they book, so they come. No more chasing payments at the desk.",
   },
   {
-    title: "Refunded on its own",
-    text: "Cancel up to 24 hours before: full refund, slot freed.",
+    title: "Cancellations sort themselves out",
+    text: "A patient who cancels the day before gets their money back, and the slot opens up for someone else.",
   },
   {
-    title: "Reminded once",
-    text: "One email the day before. Never two, never for a cancelled visit.",
+    title: "A reminder the day before",
+    text: "Every patient gets an email the evening before their session. You don't have to call anyone.",
   },
 ];
 

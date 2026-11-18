@@ -32,11 +32,11 @@ test("every page shows the portfolio bar with the source code", async ({
   for (const path of ["/", "/login"]) {
     await page.goto(path);
     const bar = page.getByRole("complementary", { name: "About this demo" });
-    await expect(
-      bar.getByRole("link", { name: "Read the code" }),
-    ).toHaveAttribute(
+    const link = bar.getByRole("link", { name: /Read the code/ });
+    await expect(link).toHaveAttribute(
       "href",
       "https://github.com/FrenchSimon/clinic-booking-demo",
     );
+    await expect(link).toHaveAttribute("target", "_blank");
   }
 });
