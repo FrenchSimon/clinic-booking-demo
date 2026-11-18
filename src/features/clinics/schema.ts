@@ -67,11 +67,18 @@ export const clinicInput = z.object({
     .min(3, "At least 3 characters")
     .max(60, "60 characters max")
     .regex(SLUG_PATTERN, "Use lowercase letters, digits and dashes"),
+  // Easy to confuse with an email address: refuse one, and ask for a number
+  // (street number or postcode), which every real address has.
   address: z
     .string()
     .trim()
-    .min(5, "Enter the street, postcode and city")
-    .max(200, "200 characters max"),
+    .min(5, "Enter the street, number, postcode and city")
+    .max(200, "200 characters max")
+    .refine(
+      (v) => !v.includes("@"),
+      "Enter the clinic's street address, not an email",
+    )
+    .refine((v) => /\d/.test(v), "Add the street number and postcode"),
   openingHours: openingHoursSchema,
 });
 

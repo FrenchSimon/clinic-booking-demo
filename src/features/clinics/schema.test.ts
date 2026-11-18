@@ -46,6 +46,15 @@ describe("clinicInput", () => {
   });
 });
 
+describe("clinicInput address", () => {
+  it.each([
+    ["an email", "anna@example.com"],
+    ["text without a number", "beznjjnmail.com"],
+  ])("refuses %s", (_label, address) => {
+    expect(clinicInput.safeParse({ ...valid, address }).success).toBe(false);
+  });
+});
+
 describe("openingHoursSchema", () => {
   it("refuses a day that closes before it opens", () => {
     const result = openingHoursSchema.safeParse({

@@ -56,8 +56,10 @@ export function ClinicForm({ origin }: { origin: string }) {
       </div>
       <Field
         name="address"
-        label="Address"
+        label="Street address"
+        hint="Street, number, postcode and city, as patients will see it."
         autoComplete="street-address"
+        placeholder="Rue Exemple 12, 1000 Brussels"
         required
         value={address}
         onChange={(e) => setAddress(e.target.value)}
