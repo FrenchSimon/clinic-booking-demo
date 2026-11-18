@@ -1,11 +1,11 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
+import { siteOrigin } from "@/server/site-origin";
 import {
   emailInput,
   logInInput,
@@ -30,16 +30,6 @@ function fieldErrors(error: z.ZodError): FormState["fieldErrors"] {
     result[key] ??= issue.message;
   }
   return result;
-}
-
-/** The site's own origin, used to build the links sent by email. */
-async function siteOrigin(): Promise<string> {
-  const h = await headers();
-  const origin = h.get("origin");
-  if (origin) return origin;
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  return `${proto}://${host}`;
 }
 
 export async function logIn(

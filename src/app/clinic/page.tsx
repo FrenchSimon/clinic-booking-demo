@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { ClinicShell } from "@/features/clinics/components/clinic-shell";
 import { OpeningHoursList } from "@/features/clinics/components/opening-hours-list";
 import { getOwnedClinic } from "@/features/clinics/queries";
+import { TeamSection } from "@/features/invitations/components/team-section";
 import { requireUser } from "@/server/auth";
 
 // Temporary clinic home: the owner dashboard replaces it in R3.
@@ -39,6 +40,7 @@ async function ClinicOverview() {
         </h2>
         <OpeningHoursList hours={clinic.openingHours} />
       </section>
+      <TeamSection userId={user.id} clinicId={clinic.id} />
       <p className="text-muted-foreground text-sm">
         Booking page address: /c/{clinic.slug}
       </p>
