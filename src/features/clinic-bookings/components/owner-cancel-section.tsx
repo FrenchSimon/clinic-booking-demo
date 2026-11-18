@@ -39,7 +39,10 @@ export function OwnerCancelSection({
     return (
       <Link
         href={`/clinic/bookings/${booking.id}?cancel=confirm`}
-        className="flex min-h-11 items-center self-start text-primary underline underline-offset-4"
+        className={buttonVariants({
+          variant: "danger-outline",
+          className: "self-start",
+        })}
       >
         Cancel this booking
       </Link>
@@ -58,7 +61,7 @@ export function OwnerCancelSection({
         card in full. It cannot be undone.
       </p>
       <div className="flex flex-wrap items-center gap-3">
-        <CancelForm bookingId={booking.id} label="Cancel and refund" />
+        <CancelForm bookingId={booking.id} label="Cancel and refund" danger />
         <Link
           href={`/clinic/bookings/${booking.id}`}
           className={buttonVariants({ variant: "outline" })}
@@ -70,17 +73,22 @@ export function OwnerCancelSection({
   );
 }
 
+/** "Cancel and refund" is red; "Try the refund again" only finishes it. */
 function CancelForm({
   bookingId,
   label,
+  danger = false,
 }: {
   bookingId: string;
   label: string;
+  danger?: boolean;
 }) {
   return (
     <form action={cancelClinicBooking}>
       <input type="hidden" name="booking" value={bookingId} />
-      <Button type="submit">{label}</Button>
+      <Button type="submit" variant={danger ? "danger" : "default"}>
+        {label}
+      </Button>
     </form>
   );
 }

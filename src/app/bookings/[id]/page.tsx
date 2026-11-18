@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
+import { BackLink } from "@/components/back-link";
 import { BookingReceipt } from "@/features/booking/components/booking-receipt";
 import {
   CANCEL_ERRORS,
@@ -76,6 +76,7 @@ async function Booking({
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-6">
+        <BackLink href="/bookings" label="All your bookings" />
         {error && (
           <p role="alert" className="rounded-[14px] border bg-card p-4">
             {error}
@@ -87,12 +88,6 @@ async function Booking({
           confirming={confirming}
           now={new Date()}
         />
-        <Link
-          href="/bookings"
-          className="flex min-h-11 items-center self-center text-primary underline underline-offset-4"
-        >
-          All your bookings
-        </Link>
         <p className="text-center text-muted-foreground text-xs">
           Booking by Kinora
         </p>
