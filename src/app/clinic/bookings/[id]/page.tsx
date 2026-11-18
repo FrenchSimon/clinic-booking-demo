@@ -48,10 +48,7 @@ async function Booking({
   if (!booking) notFound();
 
   return (
-    <ClinicShell
-      clinicName={clinic.name}
-      tabs={{ current: "bookings", role: "owner" }}
-    >
+    <ClinicShell clinic={clinic} tabs={{ current: "bookings", role: "owner" }}>
       <BackLink href="/clinic/bookings" label="All bookings" />
       {error && (
         <p role="alert" className="rounded-[14px] border bg-card p-4">

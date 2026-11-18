@@ -8,7 +8,12 @@ import {
 import { emails } from "@/features/email/table";
 import { withRls } from "@/lib/db";
 
-export type DemoClinic = { id: string; name: string; role: MembershipRole };
+export type DemoClinic = {
+  id: string;
+  name: string;
+  slug: string;
+  role: MembershipRole;
+};
 
 /**
  * The demo clinic the visitor started, with their role in it, or null when
@@ -21,7 +26,12 @@ export async function getDemoClinic(
 ): Promise<DemoClinic | null> {
   const rows = await withRls(visitorId, (tx) =>
     tx
-      .select({ id: clinics.id, name: clinics.name, role: memberships.role })
+      .select({
+        id: clinics.id,
+        name: clinics.name,
+        slug: clinics.slug,
+        role: memberships.role,
+      })
       .from(clinics)
       .innerJoin(
         memberships,

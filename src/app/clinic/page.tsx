@@ -28,7 +28,7 @@ async function ClinicOverview() {
   const { clinic, role } = mine;
 
   return (
-    <ClinicShell clinicName={clinic.name} tabs={{ current: "today", role }}>
+    <ClinicShell clinic={clinic} tabs={{ current: "today", role }}>
       {user.is_anonymous && <DemoNotice startedAt={user.created_at} />}
       {role === "owner" ? (
         <>

@@ -21,7 +21,7 @@ async function NewService() {
   const { physios } = await getTeam(user.id, clinic.id);
 
   return (
-    <ServicePage clinicName={clinic.name} title="Add a service">
+    <ServicePage clinic={clinic} title="Add a service">
       <ServiceForm physios={physios} />
     </ServicePage>
   );

@@ -26,7 +26,7 @@ async function Hours() {
 
   return (
     <ClinicShell
-      clinicName={clinic.name}
+      clinic={clinic}
       tabs={{ current: "hours", role: "practitioner" }}
     >
       <div className="flex flex-col gap-1">

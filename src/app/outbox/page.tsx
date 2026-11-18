@@ -23,7 +23,7 @@ async function Outbox() {
   const emails = await getOutbox(user.id, clinic.id);
 
   return (
-    <ClinicShell clinicName={clinic.name}>
+    <ClinicShell clinic={clinic}>
       <div className="flex flex-col gap-1">
         <h1 className="font-heading font-normal text-3xl sm:text-4xl">
           Outbox

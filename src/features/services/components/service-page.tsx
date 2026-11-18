@@ -4,19 +4,16 @@ import { ClinicShell } from "@/features/clinics/components/clinic-shell";
 
 /** Frame of the add and edit pages: title, back link, then the form in a card. */
 export function ServicePage({
-  clinicName,
+  clinic,
   title,
   children,
 }: {
-  clinicName: string;
+  clinic: { name: string; slug: string };
   title: string;
   children: ReactNode;
 }) {
   return (
-    <ClinicShell
-      clinicName={clinicName}
-      tabs={{ current: "services", role: "owner" }}
-    >
+    <ClinicShell clinic={clinic} tabs={{ current: "services", role: "owner" }}>
       <div className="flex flex-col gap-1">
         <Link
           href="/clinic/services"

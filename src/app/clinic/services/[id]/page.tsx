@@ -32,7 +32,7 @@ async function EditService({ id }: { id: string }) {
   if (!service) notFound();
 
   return (
-    <ServicePage clinicName={clinic.name} title={service.name}>
+    <ServicePage clinic={clinic} title={service.name}>
       <ServiceForm physios={team.physios} service={service} />
     </ServicePage>
   );

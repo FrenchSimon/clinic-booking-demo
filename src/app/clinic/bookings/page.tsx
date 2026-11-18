@@ -23,10 +23,7 @@ async function Bookings() {
   const bookings = await getUpcomingBookings(user.id, clinic.id);
 
   return (
-    <ClinicShell
-      clinicName={clinic.name}
-      tabs={{ current: "bookings", role: "owner" }}
-    >
+    <ClinicShell clinic={clinic} tabs={{ current: "bookings", role: "owner" }}>
       <div className="flex flex-col gap-1">
         <h1 className="font-heading font-normal text-3xl sm:text-4xl">
           Bookings

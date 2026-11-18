@@ -23,10 +23,7 @@ async function Patients() {
   const patients = await getPatients(user.id, clinic.id);
 
   return (
-    <ClinicShell
-      clinicName={clinic.name}
-      tabs={{ current: "patients", role: "owner" }}
-    >
+    <ClinicShell clinic={clinic} tabs={{ current: "patients", role: "owner" }}>
       <div className="flex flex-col gap-1">
         <h1 className="font-heading font-normal text-3xl sm:text-4xl">
           Patients
