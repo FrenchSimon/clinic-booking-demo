@@ -4,6 +4,7 @@ import { adminDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { stripe } from "@/server/stripe";
 import { type PaidCheckout, settlePaidCheckout } from "./payment";
+import { paidSession, refundLatePayment } from "./stripe-session";
 
 // Events that mean a Checkout session is paid. Cards are paid at once;
 // methods like Klarna confirm later with async_payment_succeeded.
@@ -46,33 +47,6 @@ export async function handleStripeWebhook(request: Request): Promise<Response> {
 
 function paidCheckout(event: Stripe.Event): PaidCheckout | null {
   if (!PAID_EVENTS.has(event.type)) return null;
-  const session = event.data.object as Stripe.Checkout.Session;
-  // The Stripe account may serve other apps: only Kinora's sessions carry a
-  // booking id (see checkout.ts). Others are ignored, not even recorded.
-  if (!session.metadata?.booking_id) return null;
-  if (session.payment_status !== "paid") return null;
-  const paymentIntent =
-    typeof session.payment_intent === "string"
-      ? session.payment_intent
-      : session.payment_intent?.id;
-  if (!paymentIntent) return null;
-  return {
-    eventId: event.id,
-    eventType: event.type,
-    sessionId: session.id,
-    paymentIntentId: paymentIntent,
-  };
-}
-
-/** Full refund of a payment that came after its slot was taken. */
-async function refundLatePayment(
-  client: Stripe,
-  bookingId: string,
-  paymentIntent: string,
-): Promise<void> {
-  await client.refunds.create(
-    { payment_intent: paymentIntent, metadata: { booking_id: bookingId } },
-    // A retried event never refunds twice.
-    { idempotencyKey: `refund:${bookingId}` },
-  );
+  const paid = paidSession(event.data.object as Stripe.Checkout.Session);
+  return paid ? { eventId: event.id, eventType: event.type, ...paid } : null;
 }
