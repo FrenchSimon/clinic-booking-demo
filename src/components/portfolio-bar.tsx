@@ -1,3 +1,5 @@
+import { ArrowUpRight } from "lucide-react";
+
 const SOURCE_CODE = "https://github.com/FrenchSimon/clinic-booking-demo";
 
 /**
@@ -20,9 +22,11 @@ export function PortfolioBar() {
           href={SOURCE_CODE}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-11 items-center font-semibold text-demo-foreground underline underline-offset-4"
+          className="inline-flex min-h-11 items-center gap-1 font-semibold text-demo-foreground underline underline-offset-4"
         >
           Read the code
+          {/* The arrow says the link leaves the site; screen readers get the text. */}
+          <ArrowUpRight aria-hidden="true" className="size-4" />
           <span className="sr-only"> (opens in a new tab)</span>
         </a>
       </div>
