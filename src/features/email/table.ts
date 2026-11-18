@@ -69,6 +69,13 @@ export const emails = pgTable(
       to: authenticatedRole,
       using: owner(t.clinicId),
     }),
+    // A demo visitor reads their clinic's Outbox whatever role "View as"
+    // gave them (drizzle/0020).
+    pgPolicy("emails_select_demo_visitor", {
+      for: "select",
+      to: authenticatedRole,
+      using: sql`private.is_demo_visitor(${t.clinicId})`,
+    }),
     pgPolicy("emails_insert_owner", {
       for: "insert",
       to: authenticatedRole,

@@ -51,6 +51,20 @@ test("Try the demo opens a filled clinic of one's own", async ({ page }) => {
     address ?? "",
   );
 
+  // Checklist #21: the Outbox shows the emails instead of sending them, and
+  // the reminder job adds one reminder per booking, however often it runs.
+  await page.getByRole("link", { name: "Outbox", exact: true }).click();
+  await page.waitForURL("**/outbox");
+  const send = page.getByRole("button", {
+    name: "Send tomorrow's reminders now",
+  });
+  await send.click();
+  await expect(
+    page.getByText(/reminders? added below|No new reminder/),
+  ).toBeVisible();
+  await send.click();
+  await expect(page.getByText(/No new reminder/)).toBeVisible();
+
   const overflow = await page.evaluate(
     () =>
       document.documentElement.scrollWidth -

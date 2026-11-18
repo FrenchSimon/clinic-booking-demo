@@ -60,11 +60,12 @@ async function Booking({
     booking = (await getMyBooking(user.id, id)) ?? booking;
   }
 
+  // An anonymous visitor is in their demo clinic: no address, the Outbox.
   const notice = emailNotice(
     booking.status,
     session.success,
     justCancelled,
-    user.email,
+    user.is_anonymous ? null : user.email,
   );
 
   return (
@@ -103,17 +104,17 @@ async function Booking({
 }
 
 /**
- * Tells the patient an email is coming (checklist #14), only on the page they
- * land on right after paying (back from Stripe) or after cancelling, not on
- * every later visit.
+ * Tells the patient an email is coming (checklist #14), or that it is in the
+ * demo's Outbox (#21), only on the page they land on right after paying
+ * (back from Stripe) or after cancelling, not on every later visit.
  */
 function emailNotice(
   status: string,
   backFromStripe: boolean,
   justCancelled: boolean,
-  to: string | undefined,
+  to: string | null | undefined,
 ): EmailNotice | undefined {
-  if (!to) return undefined;
+  if (to === undefined || to === "") return undefined;
   if (backFromStripe && status === "confirmed") return { kind: "booked", to };
   if (justCancelled && status === "refunded") return { kind: "cancelled", to };
   return undefined;

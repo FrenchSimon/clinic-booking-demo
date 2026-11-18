@@ -4,7 +4,11 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { authUsers } from "drizzle-orm/supabase";
 import type * as schema from "@/db/schema";
 import { clinics, memberships } from "@/features/clinics/table";
-import { deliverEmail, queueEmail } from "@/features/email/outbox";
+import {
+  DEMO_VISITOR_EMAIL,
+  deliverEmail,
+  queueEmail,
+} from "@/features/email/outbox";
 import { services } from "@/features/services/table";
 import { adminDb } from "@/lib/db";
 import { reminderEmail } from "./email";
@@ -22,11 +26,14 @@ const brusselsMidnight = (now: Date, days: number) =>
  * never gets one. The dedupe key "booking_reminder:<booking id>" is unique:
  * a second run, even at the same moment, queues nothing for a booking that
  * already has its reminder. Returns the ids of the emails this run queued.
+ * With `clinicId`, only that clinic's: the demo's "Send tomorrow's reminders
+ * now" button (#21).
  */
 export async function queueTomorrowsReminders(
   db: Db,
   now: Date,
   origin: string,
+  clinicId?: string,
 ): Promise<string[]> {
   const due = await db
     .select({
@@ -49,17 +56,17 @@ export async function queueTomorrowsReminders(
         eq(bookings.status, "confirmed"),
         gte(bookings.startsAt, brusselsMidnight(now, 1)),
         lt(bookings.startsAt, brusselsMidnight(now, 2)),
+        clinicId ? eq(bookings.clinicId, clinicId) : undefined,
       ),
     );
 
   const queued: string[] = [];
   for (const booking of due) {
-    if (!booking.patientEmail) continue;
     const id = await queueEmail(db, {
       clinicId: booking.clinicId,
       kind: "booking_reminder",
       dedupeKey: `booking_reminder:${booking.id}`,
-      to: booking.patientEmail,
+      to: booking.patientEmail ?? DEMO_VISITOR_EMAIL,
       content: reminderEmail({
         ...booking,
         link: `${origin}/bookings/${booking.id}`,

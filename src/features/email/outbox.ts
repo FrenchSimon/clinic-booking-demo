@@ -8,6 +8,13 @@ import { type EmailKind, emails } from "./table";
 
 type Inserter = Pick<typeof adminDb, "insert">;
 
+/**
+ * Where a patient's email goes when their account has no address: only an
+ * anonymous demo visitor has none. The reserved .example domain makes the
+ * database hold it for the Outbox instead of sending it (drizzle/0020).
+ */
+export const DEMO_VISITOR_EMAIL = "you@demo-visitor.example";
+
 export type QueuedEmail = {
   clinicId: string;
   kind: EmailKind;
