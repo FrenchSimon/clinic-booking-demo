@@ -6,6 +6,10 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     DATABASE_URL: z.url(),
+    // Resend > API keys. Optional: without it, emails stay queued in the outbox.
+    RESEND_API_KEY: z.string().startsWith("re_").optional(),
+    // Without a verified domain, Resend only delivers to the account's own address.
+    EMAIL_FROM: z.string().min(3).default("Kinora <onboarding@resend.dev>"),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.url(),
@@ -13,6 +17,8 @@ export const env = createEnv({
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    EMAIL_FROM: process.env.EMAIL_FROM,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
