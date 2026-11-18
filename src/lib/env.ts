@@ -16,6 +16,9 @@ export const env = createEnv({
     // Stripe > Developers > Webhooks > the endpoint's signing secret, or
     // `stripe listen` locally. Without it, the webhook answers 503.
     STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
+    // Vercel sends it as "Authorization: Bearer <CRON_SECRET>" when it calls
+    // the daily reminders job. Without it, the job answers 503.
+    CRON_SECRET: z.string().min(16).optional(),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.url(),
@@ -27,6 +30,7 @@ export const env = createEnv({
     EMAIL_FROM: process.env.EMAIL_FROM,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    CRON_SECRET: process.env.CRON_SECRET,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,

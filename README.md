@@ -54,6 +54,14 @@ pnpm dev
 | `pnpm db:generate` | Create a migration from the tables in `src/features/*/table.ts` |
 | `pnpm db:migrate` | Apply migrations |
 
+## Day-before reminders
+
+A Vercel cron (`vercel.json`) calls `/api/cron/reminders` every day at 16:00 UTC, that is 17:00 in Brussels in winter and 18:00 in summer. It emails every patient whose confirmed session is the next day. Each booking gets one reminder at most: the email's dedupe key is unique in the database, so two runs at the same moment still send one. Set `CRON_SECRET` in Vercel, then try it by hand:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" https://kinora-booking.vercel.app/api/cron/reminders
+```
+
 ## License
 
 This code is shared publicly as a portfolio sample. No license is granted: you may read it, but you may not copy, modify, distribute or reuse it, in whole or in part, without written permission.
