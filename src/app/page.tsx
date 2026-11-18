@@ -106,7 +106,10 @@ async function AccountLinks() {
       <Link href="/clinic" className={buttonVariants()}>
         My clinic
       </Link>
-      <LogoutButton />
+      {/* On a phone, log out from your bookings or the clinic space. */}
+      <div className="hidden sm:block">
+        <LogoutButton />
+      </div>
     </div>
   );
 }
