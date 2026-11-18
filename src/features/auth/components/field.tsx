@@ -19,7 +19,6 @@ export function Field({ name, label, error, ...input }: FieldProps) {
         name={name}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
-        className="min-h-11"
         {...input}
       />
       {error && (
