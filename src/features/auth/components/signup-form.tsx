@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { Field, FormMessage } from "@/components/field";
 import { Button } from "@/components/ui/button";
 import { type FormState, signUp } from "../actions";
+import { TermsCheckbox } from "./terms-checkbox";
 
 export function SignupForm({ next }: { next: string }) {
   const [state, action, pending] = useActionState<FormState, FormData>(
@@ -36,6 +37,7 @@ export function SignupForm({ next }: { next: string }) {
         required
         error={state.fieldErrors?.password}
       />
+      <TermsCheckbox error={state.fieldErrors?.terms} />
       <FormMessage error={state.error} />
       <Button type="submit" size="lg" disabled={pending} className="w-full">
         {pending ? "Creating your account…" : "Create account"}

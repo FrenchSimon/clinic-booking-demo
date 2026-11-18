@@ -35,7 +35,7 @@ export function SummaryBar({
       : "Pick a day and a time";
 
   return (
-    <div className="fixed inset-x-0 bottom-0 border-t bg-card">
+    <div className="sticky bottom-0 border-t bg-card">
       {floating && (
         <div className="pointer-events-none absolute inset-x-0 bottom-full">
           <div className="mx-auto flex w-full max-w-xl justify-end px-4 pb-4">

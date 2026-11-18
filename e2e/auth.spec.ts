@@ -28,6 +28,9 @@ test("sign-up shows errors next to the fields", async ({ page }) => {
   await expect(page.locator("#field-password-error")).toHaveText(
     "Use at least 8 characters",
   );
+  await expect(page.locator("#field-terms-error")).toHaveText(
+    "Accept the terms to create an account",
+  );
   await expect(page.getByLabel("Email")).toHaveValue("not-an-email");
 });
 
