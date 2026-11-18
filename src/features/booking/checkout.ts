@@ -53,7 +53,9 @@ export async function startCheckout(input: {
           },
         },
       ],
-      customer_email: input.user.email,
+      // An anonymous demo visitor has an empty address, which Stripe
+      // refuses: Checkout then asks for one.
+      customer_email: input.user.email || undefined,
       client_reference_id: bookingId,
       metadata: { booking_id: bookingId },
       payment_intent_data: { metadata: { booking_id: bookingId } },
