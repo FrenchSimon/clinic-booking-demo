@@ -81,7 +81,7 @@ async function Booking({
           <p className="text-muted-foreground text-sm">{page.address}</p>
         </div>
       </header>
-      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 pt-5 pb-48">
+      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 pt-5 pb-56">
         {selection.service ? (
           <>
             <ServiceStep

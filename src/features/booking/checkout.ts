@@ -57,6 +57,14 @@ export async function startCheckout(input: {
       client_reference_id: bookingId,
       metadata: { booking_id: bookingId },
       payment_intent_data: { metadata: { booking_id: bookingId } },
+      // Stripe runs in test mode only (env.ts): the card to use is shown
+      // above the Pay button (checklist #21).
+      custom_text: {
+        submit: {
+          message:
+            "Test mode, no real payment: pay with card 4242 4242 4242 4242, any future date and any CVC.",
+        },
+      },
       expires_at: Math.floor(Date.now() / 1000) + CHECKOUT_MINUTES * 60,
       success_url: `${origin}/bookings/${bookingId}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}${input.backTo}`,

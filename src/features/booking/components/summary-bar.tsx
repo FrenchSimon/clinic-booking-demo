@@ -51,6 +51,13 @@ export function SummaryBar({
           <PayButton disabled={!day || !at} />
         </form>
         <p className="text-center text-muted-foreground text-xs">
+          Test mode, no real payment: pay with card{" "}
+          <span className="whitespace-nowrap font-semibold text-foreground">
+            4242 4242 4242 4242
+          </span>
+          , any future date and any CVC.
+        </p>
+        <p className="text-center text-muted-foreground text-xs">
           Your slot is held for 15 minutes while you pay · Booking by Kinora
         </p>
       </div>

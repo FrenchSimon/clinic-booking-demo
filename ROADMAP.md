@@ -48,7 +48,7 @@ Checklist confirmed on: 2026-11-18
 
 - [x] R5.1 "Try the demo": anonymous session, own clinic seeded with practitioners, patients, services and paid, cancelled and refunded bookings, deleted after 24 hours (checklist #19)
 - [x] R5.2 "View as owner / practitioner / patient" bar that changes the visitor's real role in their demo clinic (checklist #20)
-- [ ] R5.3 Outbox page instead of real emails in demo clinics, "Send tomorrow's reminders now" button, test card 4242 shown at checkout, and the booking page points to the Outbox instead of saying an email is on its way (checklist #21)
+- [x] R5.3 Outbox page instead of real emails in demo clinics, "Send tomorrow's reminders now" button, test card 4242 shown at checkout, and the booking page points to the Outbox instead of saying an email is on its way (checklist #21)
 - [ ] R5.4 Assistant on the public page with Groq: answers from the clinic's data only, next free slot through a tool call to R2.3, no medical advice (checklist #18)
 - [ ] R5.5 Assistant limits: 15 questions per visitor per day checked on the server, fallback message when the quota is reached or Groq fails (checklist #18)
 - [ ] R5.6 Legal pages `/terms` and `/privacy`, terms checkbox at sign-up
