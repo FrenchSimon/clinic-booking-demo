@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { splitBookings } from "./history";
+import { canCancel, splitBookings } from "./history";
 import type { BookingStatus } from "./table";
 
 const NOW = new Date("2026-11-24T10:00:00Z");
@@ -97,5 +97,28 @@ describe("splitBookings", () => {
     );
     expect(upcoming).toEqual([]);
     expect(past).toEqual([]);
+  });
+});
+
+describe("canCancel", () => {
+  it("allows a paid session 24 hours away or more", () => {
+    expect(canCancel(row("a", "2026-11-25T10:00:00Z"), NOW)).toBe(true);
+    expect(canCancel(row("a", "2026-11-28T10:00:00Z"), NOW)).toBe(true);
+  });
+
+  it("refuses within 24 hours", () => {
+    expect(canCancel(row("a", "2026-11-25T09:59:00Z"), NOW)).toBe(false);
+  });
+
+  it("refuses a booking that is not paid", () => {
+    for (const status of [
+      "pending_payment",
+      "cancelled",
+      "refunded",
+    ] as const) {
+      expect(canCancel(row("a", "2026-11-28T10:00:00Z", status), NOW)).toBe(
+        false,
+      );
+    }
   });
 });

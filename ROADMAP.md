@@ -38,7 +38,7 @@ Checklist confirmed on: 2026-11-18
 
 ## R4. Second journey: cancel, refund and remind (~20 %)
 
-- [ ] R4.1 Patient cancels up to 24 hours before: full Stripe refund, slot freed, the 24-hour rule checked on the server (checklist #12)
+- [x] R4.1 Patient cancels up to 24 hours before: full Stripe refund, slot freed, the 24-hour rule checked on the server (checklist #12)
 - [ ] R4.2 Owner cancels any booking with a full refund (checklist #13)
 - [ ] R4.3 Cancellation and refund email (checklist #14)
 - [ ] R4.4 Day-before reminder job, daily Vercel cron: sent once per booking, never for a cancelled one, test with two runs at the same time (checklist #15)

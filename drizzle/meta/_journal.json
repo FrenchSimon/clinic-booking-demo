@@ -127,6 +127,13 @@
       "when": 1794998506333,
       "tag": "0017_agenda_patients",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1795000364187,
+      "tag": "0018_cancel_booking",
+      "breakpoints": true
     }
   ]
 }

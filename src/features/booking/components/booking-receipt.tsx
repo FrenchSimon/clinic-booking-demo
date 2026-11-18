@@ -38,9 +38,24 @@ const HEADLINES: Record<MyBooking["status"], { title: string; text: string }> =
     },
   };
 
+/** The headline, telling a patient's own cancellation from a late payment. */
+function headline(booking: MyBooking) {
+  if (booking.cancelledAt === null) return HEADLINES[booking.status];
+  if (booking.status === "refunded") {
+    return {
+      title: "Your booking is cancelled",
+      text: `We refunded ${formatEuros(booking.priceCents)} in full. It reaches your card in a few days.`,
+    };
+  }
+  return {
+    title: "Your booking is cancelled",
+    text: "Your refund has not gone through yet. Try again below, or contact the clinic.",
+  };
+}
+
 /** The patient's booking: what, when, where, and what happens next. */
 export function BookingReceipt({ booking }: { booking: MyBooking }) {
-  const { title, text } = HEADLINES[booking.status];
+  const { title, text } = headline(booking);
   const rows = [
     ["Session", booking.serviceName],
     ["Physio", booking.physioName ?? "Physio"],

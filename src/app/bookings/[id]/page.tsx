@@ -3,12 +3,16 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
 import { BookingReceipt } from "@/features/booking/components/booking-receipt";
+import {
+  CANCEL_ERRORS,
+  CancelSection,
+} from "@/features/booking/components/cancel-section";
 import { getMyBooking } from "@/features/booking/queries";
 import { settleOnReturn } from "@/features/booking/return";
 import { requireUser } from "@/server/auth";
 
 // Where Stripe sends the patient back after paying (R2.6), and the page of
-// one booking. Only its patient sees it.
+// one booking, where the patient can cancel it (R4.1). Only its patient sees it.
 export default function BookingPage({
   params,
   searchParams,
@@ -16,7 +20,12 @@ export default function BookingPage({
   return (
     <Suspense fallback={null}>
       {Promise.all([params, searchParams]).then(([{ id }, query]) => (
-        <Booking id={id} sessionId={query.session_id} />
+        <Booking
+          id={id}
+          sessionId={query.session_id}
+          confirming={query.cancel === "confirm"}
+          error={CANCEL_ERRORS[String(query.error)]}
+        />
       ))}
     </Suspense>
   );
@@ -27,9 +36,13 @@ const sessionIdSchema = z.string().regex(/^cs_(test|live)_[A-Za-z0-9]+$/);
 async function Booking({
   id,
   sessionId,
+  confirming,
+  error,
 }: {
   id: string;
   sessionId: string | string[] | undefined;
+  confirming: boolean;
+  error: string | undefined;
 }) {
   if (!z.uuid().safeParse(id).success) notFound();
   const user = await requireUser();
@@ -51,7 +64,17 @@ async function Booking({
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-6">
+        {error && (
+          <p role="alert" className="rounded-[14px] border bg-card p-4">
+            {error}
+          </p>
+        )}
         <BookingReceipt booking={booking} />
+        <CancelSection
+          booking={booking}
+          confirming={confirming}
+          now={new Date()}
+        />
         <Link
           href="/bookings"
           className="flex min-h-11 items-center self-center text-primary underline underline-offset-4"

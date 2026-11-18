@@ -32,3 +32,34 @@ export async function refundLatePayment(
     { idempotencyKey: `refund:${bookingId}` },
   );
 }
+
+/**
+ * Full refund of a booking the patient cancelled (R4.1). True once Stripe
+ * holds the refund, including a refund made by an earlier try.
+ */
+export async function refundCancelled(
+  client: Pick<Stripe, "refunds">,
+  bookingId: string,
+  paymentIntent: string,
+): Promise<boolean> {
+  try {
+    await client.refunds.create(
+      { payment_intent: paymentIntent, metadata: { booking_id: bookingId } },
+      // Two clicks, or a retry within a day, never refund twice.
+      { idempotencyKey: `cancel-refund:${bookingId}` },
+    );
+    return true;
+  } catch (error) {
+    // A retry after the key expired: the first refund went through.
+    return isAlreadyRefunded(error);
+  }
+}
+
+function isAlreadyRefunded(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "charge_already_refunded"
+  );
+}
