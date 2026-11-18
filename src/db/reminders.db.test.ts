@@ -103,6 +103,19 @@ describe("queueTomorrowsReminders", () => {
   });
 });
 
+describe("queueTomorrowsReminders for one clinic", () => {
+  it("leaves the other clinics alone", async () => {
+    await rolledBack(async (tx) => {
+      const { a, b } = await seed(tx, [{ startsAt: "2030-03-06T08:00:00Z" }]);
+      expect(await queueTomorrowsReminders(tx, NOW, ORIGIN, b.id)).toEqual([]);
+      expect(await remindersOf(tx, a.id)).toEqual([]);
+      expect(await queueTomorrowsReminders(tx, NOW, ORIGIN, a.id)).toHaveLength(
+        1,
+      );
+    });
+  });
+});
+
 describe("two runs of the daily job at the same moment", () => {
   it("queue one reminder, not two", async () => {
     // Real concurrency needs two connections and committed rows, so this

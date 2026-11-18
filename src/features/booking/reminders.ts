@@ -26,11 +26,14 @@ const brusselsMidnight = (now: Date, days: number) =>
  * never gets one. The dedupe key "booking_reminder:<booking id>" is unique:
  * a second run, even at the same moment, queues nothing for a booking that
  * already has its reminder. Returns the ids of the emails this run queued.
+ * With `clinicId`, only that clinic's: the demo's "Send tomorrow's reminders
+ * now" button (#21).
  */
 export async function queueTomorrowsReminders(
   db: Db,
   now: Date,
   origin: string,
+  clinicId?: string,
 ): Promise<string[]> {
   const due = await db
     .select({
@@ -53,6 +56,7 @@ export async function queueTomorrowsReminders(
         eq(bookings.status, "confirmed"),
         gte(bookings.startsAt, brusselsMidnight(now, 1)),
         lt(bookings.startsAt, brusselsMidnight(now, 2)),
+        clinicId ? eq(bookings.clinicId, clinicId) : undefined,
       ),
     );
 
