@@ -1,12 +1,15 @@
 import { ArrowUpRight } from "lucide-react";
-import { TryDemoButton } from "@/features/demo/components/try-demo-button";
+import { Suspense } from "react";
+import { DemoControls } from "@/features/demo/components/demo-controls";
 
 const SOURCE_CODE = "https://github.com/FrenchSimon/clinic-booking-demo";
 
 /**
  * Thin bar above every page, for people evaluating this demo. It frames the
  * product without being part of it: Kinora and Maison Tilleul are fictional.
- * "Try the demo" opens the visitor's own demo clinic (R5.1).
+ * "Try the demo" opens the visitor's own demo clinic (R5.1); inside it, the
+ * "View as" switch takes its place (R5.2). It depends on who is signed in,
+ * so it streams in after the rest of the page.
  */
 export function PortfolioBar() {
   return (
@@ -19,7 +22,9 @@ export function PortfolioBar() {
           Portfolio demo
           <span className="hidden sm:inline"> · fictional clinic</span>
         </p>
-        <TryDemoButton />
+        <Suspense fallback={null}>
+          <DemoControls />
+        </Suspense>
         <a
           href={SOURCE_CODE}
           target="_blank"

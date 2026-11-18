@@ -66,6 +66,8 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://kinora-booking.vercel.app/a
 
 "Try the demo", in the bar above every page, signs the visitor in with an anonymous Supabase account and creates their own copy of Maison Tilleul: three physios, three services, six patients and two weeks of paid and refunded sessions. The visitor owns that clinic, so row level security treats them like any owner. Sessions from today on are paid with real Stripe test payments, so cancelling one makes a real test refund.
 
+"View as Owner / Practitioner / Patient" then replaces the button. It changes the visitor's real role, not just the screens: the visitor swaps places with Camille Peeters (a physio) or Nora Benali (a patient), memberships and bookings included, so row level security shows them exactly what that person sees. They get the owner's place back before each switch, so at most one seeded account is out of place.
+
 It needs anonymous sign-ins: Supabase > Authentication > Sign In / Providers > "Allow anonymous sign-ins". A second Vercel cron, `/api/cron/demo-cleanup` at 03:00 UTC, deletes anonymous accounts older than 24 hours with the accounts seeded for them; their clinic and bookings go with them. Each new demo also runs that clean-up. Real accounts are never deleted: the job only matches anonymous accounts and the ones the seed marks in `app_metadata`, which users cannot change.
 
 ## License
