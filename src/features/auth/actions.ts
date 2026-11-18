@@ -84,9 +84,13 @@ export async function signUp(
   }
 
   const supabase = await createClient();
+  const { email: address, password } = parsed.data;
   const { data, error } = await supabase.auth.signUp({
-    ...parsed.data,
+    email: address,
+    password,
     options: {
+      // Proof of when the terms were accepted, kept with the account.
+      data: { terms_accepted_at: new Date().toISOString() },
       emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=${encodeURIComponent(next)}`,
     },
   });

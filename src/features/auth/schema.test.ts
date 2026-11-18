@@ -6,20 +6,36 @@ describe("signUpInput", () => {
     const parsed = signUpInput.parse({
       email: "  Anna@Example.COM ",
       password: "long enough",
+      terms: "on",
     });
     expect(parsed.email).toBe("anna@example.com");
   });
 
   it("refuses an invalid email", () => {
     expect(
-      signUpInput.safeParse({ email: "anna", password: "long enough" }).success,
+      signUpInput.safeParse({
+        email: "anna",
+        password: "long enough",
+        terms: "on",
+      }).success,
     ).toBe(false);
   });
 
   it("refuses a password under 8 characters", () => {
     expect(
-      signUpInput.safeParse({ email: "a@b.co", password: "short" }).success,
+      signUpInput.safeParse({ email: "a@b.co", password: "short", terms: "on" })
+        .success,
     ).toBe(false);
+  });
+
+  it("refuses a sign-up without the terms accepted", () => {
+    const result = signUpInput.safeParse({
+      email: "a@b.co",
+      password: "long enough",
+    });
+    expect(result.error?.issues[0]?.message).toBe(
+      "Accept the terms to create an account",
+    );
   });
 
   it("refuses a password over 72 characters", () => {

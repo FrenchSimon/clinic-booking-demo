@@ -18,7 +18,12 @@ export const logInInput = z.object({
   password: z.string().min(1, "Enter your password"),
 });
 
-export const signUpInput = z.object({ email, password });
+export const signUpInput = z.object({
+  email,
+  password,
+  // An unchecked checkbox is not sent at all, so anything but "on" is a refusal.
+  terms: z.literal("on", { error: "Accept the terms to create an account" }),
+});
 
 export const emailInput = z.object({ email });
 
