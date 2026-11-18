@@ -60,6 +60,7 @@ Checklist confirmed on: 2026-11-18
 - [x] R5.12 Demo bar on two lines: "Portfolio demo · fictional clinic", then "Read the code" and, on the right, a role menu and the Outbox with its email count; the clinic name hidden on a phone (checklist #19, #20, #21, spec in header-spec.md, asked by Simon on 2026-11-18)
 - [x] R5.13 On a booking's page, "All your bookings" (or "All bookings" for the owner) is a back link above the card on the left, and the cancel buttons are red (checklist #12, #13, asked by Simon on 2026-11-18)
 - [x] R5.14 Links to the clinic's public booking page: "Booking page" in the clinic space's top bar for the owner and the physios, and "Book a session" on the patient's bookings (checklist #8, #11, asked by Simon on 2026-11-18)
+- [ ] R5.15 The assistant's opening note asks patients not to share health details, since their messages are sent to Groq (checklist #18, asked by Simon on 2026-11-18)
 
 ## Out of scope
 
