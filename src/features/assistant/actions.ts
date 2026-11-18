@@ -6,11 +6,13 @@ import { getAvailability, getBookingPage } from "@/features/booking/public";
 import { BOOKING_DAYS } from "@/features/booking/selection";
 import { addDays, brusselsInstant } from "@/features/booking/time";
 import { SLUG_PATTERN } from "@/features/clinics/schema";
-import { rateLimit } from "@/server/rate-limit";
+import { adminDb } from "@/lib/db";
+import { clientIp, rateLimit } from "@/server/rate-limit";
 import { type Answer, answer } from "./conversation";
 import { clinicFacts } from "./facts";
 import { complete, groqConfigured } from "./groq";
 import { nextFreeSlot } from "./next-slot";
+import { takeQuestion, visitorKey } from "./quota";
 
 /** Questions kept as context: older ones are dropped, which keeps tokens low. */
 const HISTORY = 8;
@@ -29,12 +31,14 @@ const input = z.object({
     .refine((t) => t.at(-1)?.role === "user"),
 });
 
-export type AssistantResult = Answer | { error: "resting" };
+/** "limit": the visitor asked their 15 questions today (checklist #18). */
+export type AssistantResult = Answer | { error: "resting" | "limit" };
 
 /**
  * A patient's question on the public booking page. Open to visitors without
  * an account, like the page itself, so there is no requireUser(): it reads
- * only what the page shows, through withAnon(), and is rate limited.
+ * only what the page shows, through withAnon(), is rate limited, and
+ * counts every question against the visitor's daily quota before calling Groq.
  */
 export async function askAssistant(raw: unknown): Promise<AssistantResult> {
   const parsed = input.safeParse(raw);
@@ -46,6 +50,9 @@ export async function askAssistant(raw: unknown): Promise<AssistantResult> {
   if (!page) return { error: "resting" };
   const now = new Date();
   const today = brusselsToday(now);
+  // adminDb: the visitor has no account, so no RLS role can own the count.
+  const visitor = visitorKey(await clientIp(), today);
+  if (!(await takeQuestion(adminDb, visitor, today))) return { error: "limit" };
 
   try {
     return await answer({

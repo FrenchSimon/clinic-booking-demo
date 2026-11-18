@@ -15,6 +15,7 @@ import { askAssistant } from "../actions";
 import { AssistantThread, type Message } from "./assistant-thread";
 
 const FALLBACK = "The assistant is resting, you can still book below.";
+const LIMIT = `That's all the questions for today. ${FALLBACK}`;
 
 /**
  * "Questions? Ask us" and the chat it opens (checklist #18). A native
@@ -51,7 +52,11 @@ export function Assistant({ slug, clinic }: { slug: string; clinic: string }) {
       const reply: Message =
         result && "reply" in result
           ? { role: "assistant", content: result.reply, slot: result.slot }
-          : { role: "assistant", content: FALLBACK, fallback: true };
+          : {
+              role: "assistant",
+              content: result?.error === "limit" ? LIMIT : FALLBACK,
+              fallback: true,
+            };
       setMessages((current) => [...current, reply]);
     });
   }

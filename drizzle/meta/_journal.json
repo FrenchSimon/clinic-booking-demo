@@ -148,6 +148,13 @@
       "when": 1795014725414,
       "tag": "0020_hold_demo_emails",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1795030174409,
+      "tag": "0021_assistant_questions",
+      "breakpoints": true
     }
   ]
 }
