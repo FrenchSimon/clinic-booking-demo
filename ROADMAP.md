@@ -32,7 +32,7 @@ Checklist confirmed on: 2026-11-18
 
 ## R3. Dashboards (~10 %)
 
-- [ ] R3.1 Owner dashboard: today's and this week's bookings, revenue of the month, cancellations and refunds (checklist #16)
+- [x] R3.1 Owner dashboard: today's and this week's bookings, revenue of the month, cancellations and refunds (checklist #16)
 - [ ] R3.2 Owner sees the patient list (checklist #16)
 - [ ] R3.3 Practitioner agenda for the day and the week, limited to their own bookings by row level security (checklist #17)
 
