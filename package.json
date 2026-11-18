@@ -11,6 +11,7 @@
     "prepare": "husky",
     "typecheck": "SKIP_ENV_VALIDATION=1 next typegen && tsc --noEmit",
     "test": "vitest run",
+    "test:db": "vitest run --config vitest.db.config.mts",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "e2e": "playwright test",
     "db:generate": "drizzle-kit generate",

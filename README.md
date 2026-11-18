@@ -49,6 +49,7 @@ pnpm dev
 |---|---|
 | `pnpm dev` | Local server on http://localhost:3000 |
 | `pnpm check` | Typecheck, lint, unit tests |
+| `pnpm test:db` | Row level security tests against the database in `DATABASE_URL`, rolled back after each test |
 | `pnpm e2e` | Playwright journeys on a phone viewport |
 | `pnpm db:generate` | Create a migration from the tables in `src/features/*/table.ts` |
 | `pnpm db:migrate` | Apply migrations |
