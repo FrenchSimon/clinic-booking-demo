@@ -132,7 +132,9 @@ describe("hold_slot", () => {
             startsAt: SOON,
             status: "pending_payment",
           }),
-          holdExpiresAt: new Date(Date.now() - 1000),
+          // An hour ago: inside the test transaction, Postgres' now() is
+          // the time the transaction began, not the current clock.
+          holdExpiresAt: new Date(Date.now() - 3_600_000),
         })
         .returning({ id: bookings.id });
       await hold(tx, a.otherPatient, inA.serviceId, inA.physio);
@@ -153,7 +155,7 @@ describe("hold_slot", () => {
   it("refuses a past slot, a hidden service and a physio who cannot give it", async () => {
     await rolledBack(async (tx) => {
       const { a, b, inA } = await seed(tx);
-      const past = new Date(Date.now() - 60_000).toISOString();
+      const past = new Date(Date.now() - 3_600_000).toISOString();
       expect(
         await failure(hold(tx, a.patient, inA.serviceId, inA.physio, past)),
       ).toBe("slot_in_past");

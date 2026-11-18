@@ -13,6 +13,9 @@ export const env = createEnv({
     // Stripe > Developers > API keys, in test mode only: this demo never
     // takes a real payment. Optional: without it, booking stops before payment.
     STRIPE_SECRET_KEY: z.string().startsWith("sk_test_").optional(),
+    // Stripe > Developers > Webhooks > the endpoint's signing secret, or
+    // `stripe listen` locally. Without it, the webhook answers 503.
+    STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.url(),
@@ -23,6 +26,7 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,

@@ -142,7 +142,9 @@ describe("booking availability", () => {
             startsAt: "2026-12-01T10:00:00Z",
             status: "pending_payment",
           }),
-          holdExpiresAt: new Date(Date.now() - 60_000),
+          // An hour ago: inside the test transaction, Postgres' now() is
+          // the time the transaction began, not the current clock.
+          holdExpiresAt: new Date(Date.now() - 3_600_000),
         },
         bookingRow({
           ...base,

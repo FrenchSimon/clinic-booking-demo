@@ -56,6 +56,9 @@ export const bookings = pgTable(
     holdExpiresAt: timestamp("hold_expires_at", { withTimezone: true }),
     // The Stripe Checkout session that pays this booking (R2.6).
     stripeCheckoutSessionId: text("stripe_checkout_session_id"),
+    // Set by the webhook when Stripe confirms the payment (R2.7).
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -93,6 +96,17 @@ export const bookings = pgTable(
     }),
   ],
 );
+
+// Every Stripe event the webhook has handled. Stripe may send an event
+// twice: its id is the primary key, so the second delivery changes nothing.
+// RLS on and no policy: only the webhook writes here, through adminDb.
+export const stripeEvents = pgTable("stripe_events", {
+  id: text().primaryKey(),
+  type: text().notNull(),
+  receivedAt: timestamp("received_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
 
 export type Booking = typeof bookings.$inferSelect;
 export type BookingStatus = (typeof bookingStatus.enumValues)[number];
