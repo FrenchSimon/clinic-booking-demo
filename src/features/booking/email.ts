@@ -70,3 +70,25 @@ export function cancellationEmail(input: {
     footer: `${input.clinicName} · ${input.clinicAddress}`,
   };
 }
+
+/** The email a patient gets the day before their session (checklist #15). */
+export function reminderEmail(input: {
+  serviceName: string;
+  physioName: string | null;
+  clinicName: string;
+  clinicAddress: string;
+  startsAt: Date;
+  link: string;
+}): EmailContent {
+  const physio = input.physioName ?? "your physio";
+  return {
+    heading: `Your session at ${input.clinicName} is tomorrow`,
+    paragraphs: [
+      `${input.serviceName} with ${physio} on ${formatSessionTime(input.startsAt)}.`,
+      `Address: ${input.clinicAddress}.`,
+      "It is too late to cancel online. If you cannot come, please contact the clinic.",
+    ],
+    action: { label: "View my booking", url: input.link },
+    footer: `${input.clinicName} · ${input.clinicAddress}`,
+  };
+}
