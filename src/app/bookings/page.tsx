@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { buttonVariants } from "@/components/ui/button";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { BookingList } from "@/features/booking/components/booking-list";
 import { listMyBookings } from "@/features/booking/queries";
@@ -34,8 +35,21 @@ export default function MyBookingsPage() {
 async function Lists() {
   const user = await requireUser();
   const { upcoming, past } = await listMyBookings(user.id);
+  // The clinics the patient booked at, each once: the way back to booking.
+  const clinics = new Map(
+    [...upcoming, ...past].map((b) => [b.clinicSlug, b.clinicName]),
+  );
   return (
     <>
+      {[...clinics].map(([slug, name]) => (
+        <Link
+          key={slug}
+          href={`/c/${slug}`}
+          className={buttonVariants({ size: "lg", className: "self-start" })}
+        >
+          Book a session at {name}
+        </Link>
+      ))}
       <BookingList
         title="Upcoming"
         bookings={upcoming}

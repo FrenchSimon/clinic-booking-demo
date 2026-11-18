@@ -49,6 +49,7 @@ export function myBookings(tx: Tx, userId: string) {
       serviceName: services.name,
       physioName: memberships.displayName,
       clinicName: clinics.name,
+      clinicSlug: clinics.slug,
     })
     .from(bookings)
     .innerJoin(services, eq(services.id, bookings.serviceId))
