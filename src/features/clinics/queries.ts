@@ -37,3 +37,14 @@ export async function getStaffClinic(
   );
   return rows[0] ?? null;
 }
+
+/** Every role this user holds, in any clinic. Read through RLS, as the user. */
+export async function listMyRoles(userId: string): Promise<MembershipRole[]> {
+  const rows = await withRls(userId, (tx) =>
+    tx
+      .selectDistinct({ role: memberships.role })
+      .from(memberships)
+      .where(eq(memberships.userId, userId)),
+  );
+  return rows.map((row) => row.role);
+}
