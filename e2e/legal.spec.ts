@@ -13,7 +13,9 @@ for (const [path, title] of [
       .getByRole("link", { name: title.split(" ")[0] })
       .click();
 
-    await expect(page).toHaveURL(path);
+    // The dev server compiles the page on its first visit, which can take
+    // more than the default 5 seconds.
+    await expect(page).toHaveURL(path, { timeout: 15_000 });
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
     const overflow = await page.evaluate(
       () =>

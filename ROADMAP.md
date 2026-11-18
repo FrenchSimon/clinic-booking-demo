@@ -61,7 +61,7 @@ Checklist confirmed on: 2026-11-18
 - [x] R5.13 On a booking's page, "All your bookings" (or "All bookings" for the owner) is a back link above the card on the left, and the cancel buttons are red (checklist #12, #13, asked by Simon on 2026-11-18)
 - [x] R5.14 Links to the clinic's public booking page: "Booking page" in the clinic space's top bar for the owner and the physios, and "Book a session" on the patient's bookings (checklist #8, #11, asked by Simon on 2026-11-18)
 - [x] R5.15 The assistant's opening note asks patients not to share health details, since their messages are sent to Groq (checklist #18, asked by Simon on 2026-11-18)
-- [x] R5.16 The demo journey test waits for each role switch and each reminders run to finish, so it no longer fails when the dev server is slow (checklist #20, #21, asked by Simon on 2026-11-18)
+- [x] R5.16 The e2e tests wait for each role switch, reminders run and footer link to finish, so they no longer fail when the dev server is slow (checklist #20, #21, asked by Simon on 2026-11-18)
 
 ## Out of scope
 
