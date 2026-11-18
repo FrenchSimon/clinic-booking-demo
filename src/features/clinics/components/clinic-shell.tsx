@@ -25,7 +25,7 @@ export function ClinicShell({
           <div className="flex min-w-0 items-baseline gap-3">
             <Link
               href="/"
-              className="font-heading font-semibold text-2xl text-primary"
+              className="inline-flex min-h-11 items-center font-heading font-semibold text-2xl text-primary"
             >
               Kinora
             </Link>

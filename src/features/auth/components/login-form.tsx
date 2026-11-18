@@ -34,7 +34,7 @@ export function LoginForm({ next, error }: { next: string; error?: string }) {
       />
       <Link
         href="/forgot-password"
-        className="-mt-2 self-start py-2 text-muted-foreground text-sm underline"
+        className="-mt-2 inline-flex min-h-11 items-center self-start text-muted-foreground text-sm underline"
       >
         Forgot your password?
       </Link>

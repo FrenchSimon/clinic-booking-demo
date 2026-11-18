@@ -52,7 +52,7 @@ Checklist confirmed on: 2026-11-18
 - [x] R5.4 Assistant on the public page with Groq: answers from the clinic's data only, next free slot through a tool call to R2.3, no medical advice (checklist #18)
 - [x] R5.5 Assistant limits: 15 questions per visitor per day checked on the server, fallback message when the quota is reached or Groq fails (checklist #18)
 - [x] R5.6 Legal pages `/terms` and `/privacy`, terms checkbox at sign-up
-- [ ] R5.7 Mobile pass at 375 px on every page (checklist #22)
+- [x] R5.7 Mobile pass at 375 px on every page (checklist #22)
 - [ ] R5.8 README written as a short technical report: isolation, double booking, webhook replay, single reminder, assistant limits
 - [ ] R5.9 Error pages in the design: a 404 page for unknown addresses and clinics, and an error page that keeps the app usable when something fails (asked by Simon on 2026-11-18)
 - [x] R5.10 After paying or cancelling, the email notice is a visible callout under the title, with a button to the Outbox in a demo clinic, instead of a grey line (checklist #14, #21, asked by Simon on 2026-11-18)

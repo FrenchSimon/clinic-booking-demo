@@ -30,7 +30,7 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-8 sm:py-5">
           <Link
             href="/"
-            className="font-heading font-semibold text-2xl text-primary"
+            className="inline-flex min-h-11 items-center font-heading font-semibold text-2xl text-primary"
           >
             Kinora
           </Link>

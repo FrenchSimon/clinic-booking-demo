@@ -15,7 +15,7 @@ export function AuthShell({
     <main className="flex flex-1 flex-col items-center gap-6 px-4 py-8 sm:py-16">
       <Link
         href="/"
-        className="font-heading font-semibold text-2xl text-primary"
+        className="inline-flex min-h-11 items-center font-heading font-semibold text-2xl text-primary"
       >
         Kinora
       </Link>
