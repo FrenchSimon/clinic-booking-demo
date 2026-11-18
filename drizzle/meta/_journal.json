@@ -92,6 +92,20 @@
       "when": 1794980673651,
       "tag": "0012_booking_page",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794981385804,
+      "tag": "0013_booking_checkout_session",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794981387953,
+      "tag": "0014_hold_slot",
+      "breakpoints": true
     }
   ]
 }

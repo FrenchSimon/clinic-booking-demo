@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { formatEuros } from "@/features/services/schema";
+import { bookAndPay } from "../actions";
 import type { Selection } from "../selection";
+import { PayButton } from "./pay-button";
 
 const dayFormat = new Intl.DateTimeFormat("en-GB", {
   weekday: "short",
@@ -11,11 +12,16 @@ const dayFormat = new Intl.DateTimeFormat("en-GB", {
 
 /** Fixed at the bottom: what the patient picked, its price, and the next step. */
 export function SummaryBar({
+  slug,
   selection,
   physioName,
+  error,
 }: {
+  slug: string;
   selection: Selection;
   physioName: string;
+  /** Why the last attempt failed, shown above the button. */
+  error?: string;
 }) {
   const { service, day, at } = selection;
   if (!service) return null;
@@ -31,12 +37,21 @@ export function SummaryBar({
           <span>{when}</span>
           <strong>{formatEuros(service.priceCents)}</strong>
         </p>
-        {/* Payment arrives with the 15-minute hold and Stripe Checkout (R2.6). */}
-        <Button size="lg" disabled className="w-full">
-          Continue to payment
-        </Button>
+        {error && (
+          <p role="alert" className="text-destructive text-sm">
+            {error}
+          </p>
+        )}
+        <form action={bookAndPay}>
+          <input type="hidden" name="slug" value={slug} />
+          <input type="hidden" name="service" value={service.id} />
+          <input type="hidden" name="physio" value={selection.physio} />
+          <input type="hidden" name="day" value={day ?? ""} />
+          <input type="hidden" name="at" value={at ?? ""} />
+          <PayButton disabled={!day || !at} />
+        </form>
         <p className="text-center text-muted-foreground text-xs">
-          Online payment opens soon · Booking by Kinora
+          Your slot is held for 15 minutes while you pay · Booking by Kinora
         </p>
       </div>
     </div>

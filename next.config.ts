@@ -18,7 +18,8 @@ const csp = [
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  // Booking ends with a redirect to Stripe Checkout after the form is sent.
+  "form-action 'self' https://checkout.stripe.com",
   ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 

@@ -7,7 +7,9 @@ import {
   pgEnum,
   pgPolicy,
   pgTable,
+  text,
   timestamp,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 import { authenticatedRole, authUid, authUsers } from "drizzle-orm/supabase";
@@ -20,8 +22,8 @@ import { services } from "@/features/services/table";
 //
 // No insert, update or delete policy: the Supabase Data API lets a signed-in
 // user write directly within the policies, so nobody writes here as
-// themselves. Holds go through a checked function (R2.6), and Stripe's
-// webhook confirms them (R2.7).
+// themselves. Holds go through private.hold_slot() (drizzle/0014), and
+// Stripe's webhook confirms them (R2.7).
 
 export const bookingStatus = pgEnum("booking_status", [
   "pending_payment", // held for 15 minutes while the patient pays
@@ -52,6 +54,8 @@ export const bookings = pgTable(
     priceCents: integer("price_cents").notNull(),
     status: bookingStatus().notNull().default("pending_payment"),
     holdExpiresAt: timestamp("hold_expires_at", { withTimezone: true }),
+    // The Stripe Checkout session that pays this booking (R2.6).
+    stripeCheckoutSessionId: text("stripe_checkout_session_id"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -70,6 +74,7 @@ export const bookings = pgTable(
     }).onDelete("cascade"),
     index("bookings_clinic_starts_idx").on(t.clinicId, t.startsAt),
     index("bookings_patient_idx").on(t.patientId),
+    unique("bookings_checkout_session_unique").on(t.stripeCheckoutSessionId),
     check("bookings_time_order", sql`${t.endsAt} > ${t.startsAt}`),
     check("bookings_price_range", sql`${t.priceCents} between 50 and 100000`),
     check(
