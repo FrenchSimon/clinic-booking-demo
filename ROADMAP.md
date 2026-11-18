@@ -56,6 +56,7 @@ Checklist confirmed on: 2026-11-18
 - [ ] R5.8 README written as a short technical report: isolation, double booking, webhook replay, single reminder, assistant limits
 - [ ] R5.9 Error pages in the design: a 404 page for unknown addresses and clinics, and an error page that keeps the app usable when something fails (asked by Simon on 2026-11-18)
 - [x] R5.10 After paying or cancelling, the email notice is a visible callout under the title, with a button to the Outbox in a demo clinic, instead of a grey line (checklist #14, #21, asked by Simon on 2026-11-18)
+- [x] R5.11 A demo visitor's Stripe Checkout shows their demo address, prefilled, the one their emails go to in the Outbox (checklist #21, asked by Simon on 2026-11-18)
 
 ## Out of scope
 
