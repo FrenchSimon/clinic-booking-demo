@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { MembershipRole } from "../table";
 
-export type ClinicTab = "today" | "services" | "hours";
+export type ClinicTab = "today" | "patients" | "services" | "hours";
 
 const TABS: {
   id: ClinicTab;
@@ -15,6 +15,12 @@ const TABS: {
     label: "Today",
     href: "/clinic",
     roles: ["owner", "practitioner"],
+  },
+  {
+    id: "patients",
+    label: "Patients",
+    href: "/clinic/patients",
+    roles: ["owner"],
   },
   {
     id: "services",

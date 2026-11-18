@@ -113,6 +113,13 @@
       "when": 1794984114988,
       "tag": "0015_stripe_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794997003914,
+      "tag": "0016_clinic_patients",
+      "breakpoints": true
     }
   ]
 }
