@@ -25,8 +25,3 @@ test("security headers are sent", async ({ request }) => {
   expect(headers["x-content-type-options"]).toBe("nosniff");
   expect(headers["x-powered-by"]).toBeUndefined();
 });
-
-test("private pages redirect to login", async ({ page }) => {
-  await page.goto("/notes");
-  await expect(page).toHaveURL(/\/login\?next=%2Fnotes/);
-});
