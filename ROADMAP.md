@@ -52,6 +52,7 @@ Checklist confirmed on: 2026-11-18
 - [ ] R5.6 Legal pages `/terms` and `/privacy`, terms checkbox at sign-up
 - [ ] R5.7 Mobile pass at 375 px on every page (checklist #22)
 - [ ] R5.8 README written as a short technical report: isolation, double booking, webhook replay, single reminder, assistant limits
+- [ ] R5.9 Error pages in the design: a 404 page for unknown addresses and clinics, and an error page that keeps the app usable when something fails (asked by Simon on 2026-11-18)
 
 ## Out of scope
 
