@@ -1,14 +1,15 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import { Field, FormMessage } from "@/components/field";
 import { Button } from "@/components/ui/button";
 import { type ClinicFormState, createClinic } from "../actions";
 import { DEFAULT_OPENING_HOURS, type OpeningHours, slugify } from "../schema";
 import { OpeningHoursFields } from "./opening-hours-fields";
 
-// Controlled fields: React resets uncontrolled forms after an action,
-// and an owner who made one mistake should not retype the whole clinic.
+// Controlled fields, submitted by hand: an owner who made one mistake should
+// not retype the whole clinic, and React's automatic reset after a form
+// action would put the day checkboxes back without updating their state.
 export function ClinicForm({ origin }: { origin: string }) {
   const [state, action, pending] = useActionState<ClinicFormState, FormData>(
     createClinic,
@@ -22,7 +23,15 @@ export function ClinicForm({ origin }: { origin: string }) {
   const errors = state.fieldErrors;
 
   return (
-    <form action={action} className="flex flex-col gap-5" noValidate>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        startTransition(() => action(data));
+      }}
+      className="flex flex-col gap-5"
+      noValidate
+    >
       <Field
         name="name"
         label="Clinic name"
