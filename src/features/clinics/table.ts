@@ -103,6 +103,8 @@ export const memberships = pgTable(
   (t) => [
     // One role per person and clinic.
     unique("memberships_clinic_user_unique").on(t.clinicId, t.userId),
+    // Target of composite foreign keys that keep a link inside one clinic.
+    unique("memberships_clinic_id_unique").on(t.clinicId, t.id),
     index("memberships_user_idx").on(t.userId),
     // Everyone sees their own membership. Owners and practitioners see the
     // whole clinic. Patients see the staff, never the other patients.
