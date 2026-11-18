@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { PhysioAgenda } from "@/features/agenda/components/physio-agenda";
 import { ClinicShell } from "@/features/clinics/components/clinic-shell";
 import { OpeningHoursList } from "@/features/clinics/components/opening-hours-list";
 import { getStaffClinic } from "@/features/clinics/queries";
@@ -9,8 +10,8 @@ import { TeamSection } from "@/features/invitations/components/team-section";
 import { FirstServiceHint } from "@/features/services/components/first-service-hint";
 import { requireUser } from "@/server/auth";
 
-// The clinic's Today tab: the owner's dashboard (checklist #16), then the
-// team and opening hours. Physios get their agenda here in R3.3.
+// The clinic's Today tab: the owner's dashboard (checklist #16) or the
+// physio's agenda for the day and the week (#17), then the opening hours.
 export default function ClinicPage() {
   return (
     <Suspense fallback={null}>
@@ -33,15 +34,7 @@ async function ClinicOverview() {
           <OwnerDashboard userId={user.id} clinicId={clinic.id} />
         </>
       ) : (
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-oak text-sm uppercase tracking-[0.08em]">
-            You work at
-          </p>
-          <h1 className="font-heading font-normal text-3xl sm:text-4xl">
-            {clinic.name}
-          </h1>
-          <p className="text-muted-foreground">{clinic.address}</p>
-        </div>
+        <PhysioAgenda userId={user.id} clinicId={clinic.id} />
       )}
       <section
         aria-labelledby="hours-title"
@@ -57,8 +50,7 @@ async function ClinicOverview() {
       ) : (
         <section className="flex flex-col gap-3 rounded-[18px] border bg-card p-5 sm:p-8">
           <p>
-            You are a physio at {clinic.name}. Your agenda with your sessions
-            arrives here soon.
+            You are a physio at {clinic.name}, {clinic.address}.
           </p>
           <Link
             href="/clinic/hours"
