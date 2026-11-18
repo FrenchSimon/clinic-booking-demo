@@ -18,9 +18,12 @@ export function PortfolioBar() {
         </p>
         <a
           href={SOURCE_CODE}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex min-h-11 items-center font-semibold text-demo-foreground underline underline-offset-4"
         >
           Read the code
+          <span className="sr-only"> (opens in a new tab)</span>
         </a>
       </div>
     </aside>
