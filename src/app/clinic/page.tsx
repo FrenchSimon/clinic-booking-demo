@@ -4,6 +4,7 @@ import { ClinicShell } from "@/features/clinics/components/clinic-shell";
 import { OpeningHoursList } from "@/features/clinics/components/opening-hours-list";
 import { getStaffClinic } from "@/features/clinics/queries";
 import { TeamSection } from "@/features/invitations/components/team-section";
+import { FirstServiceHint } from "@/features/services/components/first-service-hint";
 import { requireUser } from "@/server/auth";
 
 // Temporary clinic home for owners and physios: the dashboards replace it in R3.
@@ -35,6 +36,9 @@ async function ClinicOverview() {
         </h1>
         <p className="text-muted-foreground">{clinic.address}</p>
       </div>
+      {role === "owner" && (
+        <FirstServiceHint userId={user.id} clinicId={clinic.id} />
+      )}
       <section
         aria-labelledby="hours-title"
         className="flex flex-col gap-3 rounded-[18px] border bg-card p-5 sm:p-8"
