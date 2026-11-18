@@ -27,3 +27,11 @@ export function withRls<T>(
     return run(tx);
   });
 }
+
+/** Runs queries as a visitor who is not signed in (the "anon" role). */
+export function withAnon<T>(run: (tx: Tx) => Promise<T>): Promise<T> {
+  return adminDb.transaction(async (tx) => {
+    await tx.execute(sql`set local role anon`);
+    return run(tx);
+  });
+}
