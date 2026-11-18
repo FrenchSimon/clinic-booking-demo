@@ -99,3 +99,8 @@ test("a malformed invitation link shows the not-found page", async ({
   await expect(page.getByText(/could not be found/i)).toBeVisible();
   await expect(page.getByRole("button", { name: /Join/ })).toHaveCount(0);
 });
+
+test("the bookings list asks a visitor to log in", async ({ page }) => {
+  await page.goto("/bookings");
+  await expect(page).toHaveURL(/\/login/);
+});

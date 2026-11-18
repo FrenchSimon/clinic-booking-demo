@@ -99,7 +99,10 @@ async function AccountLinks() {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      <Link href="/bookings" className={buttonVariants({ variant: "ghost" })}>
+        My bookings
+      </Link>
       <Link href="/clinic" className={buttonVariants()}>
         My clinic
       </Link>
