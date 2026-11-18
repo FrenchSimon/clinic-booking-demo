@@ -11,6 +11,14 @@ import { freeSlots } from "@/features/booking/slots";
 import { addDays, brusselsInstant } from "@/features/booking/time";
 import { SLUG_PATTERN } from "@/features/clinics/schema";
 
+// What the booking action sends back in ?error= (features/booking/actions.ts).
+const BOOKING_ERRORS: Record<string, string> = {
+  taken: "Someone just took this time. Pick another one.",
+  unavailable: "This session can no longer be booked online. Pick another one.",
+  payment: "Online payment is not available right now. Try again later.",
+  busy: "Too many attempts. Wait a minute and try again.",
+};
+
 // The clinic's public booking page (checklist #8). Every choice is a link
 // that changes the address, so the page works without client JavaScript.
 export default function ClinicBookingPage({
@@ -97,7 +105,12 @@ async function Booking({
           </p>
         )}
       </main>
-      <SummaryBar selection={selection} physioName={physioName} />
+      <SummaryBar
+        slug={slug}
+        selection={selection}
+        physioName={physioName}
+        error={BOOKING_ERRORS[String(raw.error)]}
+      />
     </div>
   );
 }
