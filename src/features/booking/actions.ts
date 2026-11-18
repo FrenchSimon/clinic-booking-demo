@@ -3,9 +3,10 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { SLUG_PATTERN } from "@/features/clinics/schema";
-import { getUser } from "@/server/auth";
+import { getUser, requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
 import { stripe } from "@/server/stripe";
+import { cancelAndRefund } from "./cancellation";
 import { startCheckout } from "./checkout";
 import { findSlot, holdSlot } from "./hold";
 import { getBookingPage } from "./public";
@@ -62,4 +63,23 @@ export async function bookAndPay(formData: FormData): Promise<void> {
     backTo,
   });
   redirect(url);
+}
+
+const cancelInput = z.object({ booking: z.uuid() });
+
+/**
+ * "Cancel and refund" on the patient's booking page (checklist #12). The
+ * 24-hour rule and the patient are checked by the database, not the page.
+ */
+export async function cancelMyBooking(formData: FormData): Promise<void> {
+  const parsed = cancelInput.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect("/bookings");
+  const user = await requireUser();
+  const id = parsed.data.booking;
+  const outcome = await cancelAndRefund(user.id, id);
+  redirect(
+    outcome === "refunded"
+      ? `/bookings/${id}`
+      : `/bookings/${id}?error=${outcome}`,
+  );
 }
