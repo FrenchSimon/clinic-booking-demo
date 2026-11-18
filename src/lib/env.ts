@@ -19,6 +19,9 @@ export const env = createEnv({
     // Vercel sends it as "Authorization: Bearer <CRON_SECRET>" when it calls
     // the daily jobs (reminders, demo cleanup). Without it, they answer 503.
     CRON_SECRET: z.string().min(16).optional(),
+    // Groq > API keys (starts with gsk_), free tier. Optional: without it,
+    // the assistant on the booking page shows its fallback message.
+    GROQ_API_KEY: z.string().startsWith("gsk_").optional(),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.url(),
@@ -31,6 +34,7 @@ export const env = createEnv({
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     CRON_SECRET: process.env.CRON_SECRET,
+    GROQ_API_KEY: process.env.GROQ_API_KEY,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,

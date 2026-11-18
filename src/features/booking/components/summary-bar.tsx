@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { formatEuros } from "@/features/services/schema";
 import { bookAndPay } from "../actions";
 import type { Selection } from "../selection";
@@ -16,12 +17,15 @@ export function SummaryBar({
   selection,
   physioName,
   error,
+  floating,
 }: {
   slug: string;
   selection: Selection;
   physioName: string;
   /** Why the last attempt failed, shown above the button. */
   error?: string;
+  /** Floats just above the bar, on the right: the assistant's button. */
+  floating?: ReactNode;
 }) {
   const { service, day, at } = selection;
   if (!service) return null;
@@ -32,6 +36,13 @@ export function SummaryBar({
 
   return (
     <div className="fixed inset-x-0 bottom-0 border-t bg-card">
+      {floating && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-full">
+          <div className="mx-auto flex w-full max-w-xl justify-end px-4 pb-4">
+            <div className="pointer-events-auto">{floating}</div>
+          </div>
+        </div>
+      )}
       <div className="mx-auto flex w-full max-w-xl flex-col gap-2.5 px-4 py-4">
         <p className="flex justify-between gap-4">
           <span>{when}</span>

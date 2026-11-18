@@ -1,0 +1,67 @@
+"use server";
+
+import { z } from "zod";
+import { brusselsToday } from "@/features/availability/schema";
+import { getAvailability, getBookingPage } from "@/features/booking/public";
+import { BOOKING_DAYS } from "@/features/booking/selection";
+import { addDays, brusselsInstant } from "@/features/booking/time";
+import { SLUG_PATTERN } from "@/features/clinics/schema";
+import { rateLimit } from "@/server/rate-limit";
+import { type Answer, answer } from "./conversation";
+import { clinicFacts } from "./facts";
+import { complete, groqConfigured } from "./groq";
+import { nextFreeSlot } from "./next-slot";
+
+/** Questions kept as context: older ones are dropped, which keeps tokens low. */
+const HISTORY = 8;
+
+const input = z.object({
+  slug: z.string().regex(SLUG_PATTERN),
+  turns: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().trim().min(1).max(500),
+      }),
+    )
+    .min(1)
+    .max(40)
+    .refine((t) => t.at(-1)?.role === "user"),
+});
+
+export type AssistantResult = Answer | { error: "resting" };
+
+/**
+ * A patient's question on the public booking page. Open to visitors without
+ * an account, like the page itself, so there is no requireUser(): it reads
+ * only what the page shows, through withAnon(), and is rate limited.
+ */
+export async function askAssistant(raw: unknown): Promise<AssistantResult> {
+  const parsed = input.safeParse(raw);
+  if (!parsed.success) return { error: "resting" };
+  if (!groqConfigured()) return { error: "resting" };
+  if (!(await rateLimit("assistant", 10))) return { error: "resting" };
+
+  const page = await getBookingPage(parsed.data.slug);
+  if (!page) return { error: "resting" };
+  const now = new Date();
+  const today = brusselsToday(now);
+
+  try {
+    return await answer({
+      facts: clinicFacts(page, today),
+      turns: parsed.data.turns.slice(-HISTORY),
+      complete,
+      findSlot: async (args) => {
+        const availability = await getAvailability(
+          page.id,
+          brusselsInstant(today, "00:00"),
+          brusselsInstant(addDays(today, BOOKING_DAYS), "00:00"),
+        );
+        return nextFreeSlot(page, availability, args, now);
+      },
+    });
+  } catch {
+    return { error: "resting" };
+  }
+}

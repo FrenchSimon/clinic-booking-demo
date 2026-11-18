@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { Assistant } from "@/features/assistant/components/assistant";
 import { brusselsToday } from "@/features/availability/schema";
 import { PhysioStep } from "@/features/booking/components/physio-step";
 import { ServiceStep } from "@/features/booking/components/service-step";
@@ -81,7 +82,7 @@ async function Booking({
           <p className="text-muted-foreground text-sm">{page.address}</p>
         </div>
       </header>
-      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 pt-5 pb-56">
+      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 pt-5 pb-76">
         {selection.service ? (
           <>
             <ServiceStep
@@ -110,6 +111,7 @@ async function Booking({
         selection={selection}
         physioName={physioName}
         error={BOOKING_ERRORS[String(raw.error)]}
+        floating={<Assistant slug={slug} clinic={page.name} />}
       />
     </div>
   );
