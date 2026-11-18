@@ -22,7 +22,10 @@ async function ClinicOverview() {
   const { clinic, role } = mine;
 
   return (
-    <ClinicShell clinicName={clinic.name}>
+    <ClinicShell
+      clinicName={clinic.name}
+      tabs={{ current: "today", owner: role === "owner" }}
+    >
       <div className="flex flex-col gap-1">
         <p className="font-semibold text-oak text-sm uppercase tracking-[0.08em]">
           {role === "owner" ? "Your clinic" : "You work at"}

@@ -2,3 +2,4 @@
 export * from "@/features/clinics/table";
 export * from "@/features/email/table";
 export * from "@/features/invitations/table";
+export * from "@/features/services/table";

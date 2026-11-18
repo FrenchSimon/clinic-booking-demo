@@ -1,13 +1,16 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { type ClinicTab, ClinicTabs } from "./clinic-tabs";
 
-/** Frame of the clinic space. The tabs (Today, Agenda…) arrive with the dashboard (R3). */
+/** Frame of the clinic space: top bar, then the tabs once the clinic exists. */
 export function ClinicShell({
   clinicName,
+  tabs,
   children,
 }: {
   clinicName?: string;
+  tabs?: { current: ClinicTab; owner: boolean };
   children: ReactNode;
 }) {
   return (
@@ -31,6 +34,7 @@ export function ClinicShell({
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8 sm:px-8">
+        {tabs && <ClinicTabs {...tabs} />}
         {children}
       </main>
     </div>
