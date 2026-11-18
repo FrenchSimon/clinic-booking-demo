@@ -49,8 +49,11 @@ describe("deleteExpiredDemos", () => {
     await rolledBack(async (tx) => {
       const { clinicId } = await demo(tx);
       const later = new Date(Date.now() + 23 * HOUR);
-      expect(await deleteExpiredDemos(tx, later)).toBe(0);
-      expect((await count(tx, clinicId)).clinics).toBe(1);
+      // Not a count of deleted accounts: real demos started more than an
+      // hour ago may be in the database, and would be deleted (then rolled
+      // back). Only this one must stay.
+      await deleteExpiredDemos(tx, later);
+      expect(await count(tx, clinicId)).toEqual({ clinics: 1, bookings: 16 });
     });
   });
 
