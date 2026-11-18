@@ -1,5 +1,7 @@
 import "server-only";
 import { sql } from "drizzle-orm";
+import { deletePastQuestionCounts } from "@/features/assistant/quota";
+import { brusselsToday } from "@/features/availability/schema";
 import { isCronRequest } from "@/features/booking/reminders-cron";
 import { adminDb } from "@/lib/db";
 import { env } from "@/lib/env";
@@ -29,7 +31,10 @@ export async function deleteExpiredDemos(
   return rows.length;
 }
 
-/** Answers the daily cron call: checks the secret, then deletes. */
+/**
+ * Answers the daily cron call: checks the secret, then deletes the expired
+ * demos and the assistant's question counts of past days (checklist #18).
+ */
 export async function handleDemoCleanupCron(
   request: Request,
 ): Promise<Response> {
@@ -39,6 +44,11 @@ export async function handleDemoCleanupCron(
     return new Response("Unauthorized", { status: 401 });
   }
   // adminDb: a job with no signed-in user, and auth.users is not reachable
-  // through row level security.
-  return Response.json({ deleted: await deleteExpiredDemos(adminDb) });
+  // through row level security, nor is the assistant's count (no policy).
+  const deleted = await deleteExpiredDemos(adminDb);
+  const questionCounts = await deletePastQuestionCounts(
+    adminDb,
+    brusselsToday(),
+  );
+  return Response.json({ deleted, questionCounts });
 }
