@@ -22,8 +22,9 @@ import { services } from "@/features/services/table";
 //
 // No insert, update or delete policy: the Supabase Data API lets a signed-in
 // user write directly within the policies, so nobody writes here as
-// themselves. Holds go through private.hold_slot() (drizzle/0014), and
-// Stripe's webhook confirms them (R2.7).
+// themselves. Holds go through private.hold_slot() (drizzle/0014), Stripe's
+// webhook confirms them (R2.7), and patients cancel through
+// private.cancel_booking() (drizzle/0018).
 
 export const bookingStatus = pgEnum("booking_status", [
   "pending_payment", // held for 15 minutes while the patient pays
@@ -59,6 +60,9 @@ export const bookings = pgTable(
     // Set by the webhook when Stripe confirms the payment (R2.7).
     stripePaymentIntentId: text("stripe_payment_intent_id"),
     paidAt: timestamp("paid_at", { withTimezone: true }),
+    // Set when the patient cancels (R4.1): a refunded booking with this date
+    // was cancelled, one without it was paid after its slot was taken.
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
