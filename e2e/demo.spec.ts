@@ -21,7 +21,9 @@ test("Try the demo opens a filled clinic of one's own", async ({ page }) => {
   await page.waitForURL("**/clinic", { timeout: 30_000 });
 
   await expect(page.getByText("This demo clinic is yours alone")).toBeVisible();
-  await expect(page.getByText("Maison Tilleul").first()).toBeVisible();
+  // On a phone the clinic name is hidden in the header (DESIGN.md): it is
+  // still the page's clinic.
+  await expect(page.getByText("Maison Tilleul").first()).toBeAttached();
   await expect(page.getByText("Camille Peeters").first()).toBeVisible();
 
   // Checklist #20: the role menu takes the button's place and changes the
