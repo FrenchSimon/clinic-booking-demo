@@ -15,7 +15,7 @@ export function ServicePage({
   return (
     <ClinicShell
       clinicName={clinicName}
-      tabs={{ current: "services", owner: true }}
+      tabs={{ current: "services", role: "owner" }}
     >
       <div className="flex flex-col gap-1">
         <Link

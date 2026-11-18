@@ -19,7 +19,7 @@ Checklist confirmed on: 2026-11-18
 ## R2. Main journey: book and pay (~30 %)
 
 - [x] R2.1 Owner manages services: name, duration, price, practitioners who offer it (checklist #5)
-- [ ] R2.2 Practitioner sets weekly hours and days off (checklist #6)
+- [x] R2.2 Practitioner sets weekly hours and days off (checklist #6)
 - [ ] R2.3 Free-slot calculation from hours, days off, service duration and bookings, with unit tests (checklist #7)
 - [ ] R2.4 No double booking: database exclusion constraint on the practitioner's time range, concurrency test (checklist #7)
 - [ ] R2.5 Public clinic page: choose a service, a practitioner or "any", then a free slot (checklist #8)

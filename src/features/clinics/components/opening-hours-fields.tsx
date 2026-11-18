@@ -7,10 +7,21 @@ type Props = {
   value: OpeningHours;
   onChange: (value: OpeningHours) => void;
   errors?: Partial<Record<string, string>>;
+  /** Keys of the errors: "openingHours" reads "openingHours.mon.to". */
+  errorPrefix?: string;
+  legend?: string;
+  closedLabel?: string;
 };
 
 /** One row per weekday: open or closed, then the opening and closing times. */
-export function OpeningHoursFields({ value, onChange, errors }: Props) {
+export function OpeningHoursFields({
+  value,
+  onChange,
+  errors,
+  errorPrefix = "openingHours",
+  legend = "Opening hours",
+  closedLabel = "Closed",
+}: Props) {
   const toggle = (day: Day, open: boolean) =>
     onChange({
       ...value,
@@ -24,12 +35,12 @@ export function OpeningHoursFields({ value, onChange, errors }: Props) {
 
   return (
     <fieldset className="flex flex-col gap-1">
-      <legend className="mb-2 font-medium text-sm">Opening hours</legend>
+      <legend className="mb-2 font-medium text-sm">{legend}</legend>
       {DAYS.map((day) => {
         const hours = value[day];
         const error =
-          errors?.[`openingHours.${day}.to`] ??
-          errors?.[`openingHours.${day}.from`];
+          errors?.[`${errorPrefix}.${day}.to`] ??
+          errors?.[`${errorPrefix}.${day}.from`];
         return (
           <div
             key={day}
@@ -51,7 +62,7 @@ export function OpeningHoursFields({ value, onChange, errors }: Props) {
                   <Input
                     type="time"
                     name={`${day}.from`}
-                    aria-label={`${DAY_LABELS[day]} opens at`}
+                    aria-label={`${DAY_LABELS[day]} from`}
                     value={hours.from}
                     onChange={(e) => setTime(day, "from", e.target.value)}
                     aria-invalid={Boolean(error)}
@@ -61,7 +72,7 @@ export function OpeningHoursFields({ value, onChange, errors }: Props) {
                   <Input
                     type="time"
                     name={`${day}.to`}
-                    aria-label={`${DAY_LABELS[day]} closes at`}
+                    aria-label={`${DAY_LABELS[day]} until`}
                     value={hours.to}
                     onChange={(e) => setTime(day, "to", e.target.value)}
                     aria-invalid={Boolean(error)}
@@ -69,7 +80,9 @@ export function OpeningHoursFields({ value, onChange, errors }: Props) {
                   />
                 </div>
               ) : (
-                <span className="text-muted-foreground text-sm">Closed</span>
+                <span className="text-muted-foreground text-sm">
+                  {closedLabel}
+                </span>
               )}
             </div>
             {error && <p className="text-destructive text-sm">{error}</p>}

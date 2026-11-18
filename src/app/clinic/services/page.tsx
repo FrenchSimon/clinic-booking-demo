@@ -25,7 +25,7 @@ async function Services() {
   return (
     <ClinicShell
       clinicName={clinic.name}
-      tabs={{ current: "services", owner: true }}
+      tabs={{ current: "services", role: "owner" }}
     >
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">

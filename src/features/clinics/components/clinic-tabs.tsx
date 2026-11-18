@@ -1,30 +1,42 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import type { MembershipRole } from "../table";
 
-export type ClinicTab = "today" | "services";
+export type ClinicTab = "today" | "services" | "hours";
 
 const TABS: {
   id: ClinicTab;
   label: string;
   href: string;
-  ownerOnly: boolean;
+  roles: MembershipRole[];
 }[] = [
-  { id: "today", label: "Today", href: "/clinic", ownerOnly: false },
+  {
+    id: "today",
+    label: "Today",
+    href: "/clinic",
+    roles: ["owner", "practitioner"],
+  },
   {
     id: "services",
     label: "Services",
     href: "/clinic/services",
-    ownerOnly: true,
+    roles: ["owner"],
+  },
+  {
+    id: "hours",
+    label: "My hours",
+    href: "/clinic/hours",
+    roles: ["practitioner"],
   },
 ];
 
-/** Pill tabs of the clinic space. On a phone they scroll sideways. */
+/** Pill tabs of the clinic space, by role. On a phone they scroll sideways. */
 export function ClinicTabs({
   current,
-  owner,
+  role,
 }: {
   current: ClinicTab;
-  owner: boolean;
+  role: MembershipRole;
 }) {
   return (
     <nav
@@ -32,7 +44,7 @@ export function ClinicTabs({
       className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0"
     >
       <ul className="flex gap-1.5">
-        {TABS.filter((t) => owner || !t.ownerOnly).map((t) => (
+        {TABS.filter((t) => t.roles.includes(role)).map((t) => (
           <li key={t.id}>
             <Link
               href={t.href}

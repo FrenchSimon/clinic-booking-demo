@@ -96,12 +96,12 @@ export function slugify(name: string): string {
     .replace(/-+$/, "");
 }
 
-/** Reads the clinic form: one checkbox and two time fields per day. */
-export function clinicFromForm(formData: FormData): unknown {
-  const openingHours: Record<string, unknown> = {};
+/** Reads one checkbox and two time fields per day, named "mon.open", "mon.from"… */
+export function openingHoursFromForm(formData: FormData): unknown {
+  const hours: Record<string, unknown> = {};
   for (const day of DAYS) {
     const open = formData.get(`${day}.open`) === "on";
-    openingHours[day] = open
+    hours[day] = open
       ? {
           open,
           from: String(formData.get(`${day}.from`) ?? ""),
@@ -109,10 +109,15 @@ export function clinicFromForm(formData: FormData): unknown {
         }
       : { open };
   }
+  return hours;
+}
+
+/** Reads the clinic form. */
+export function clinicFromForm(formData: FormData): unknown {
   return {
     name: formData.get("name") ?? "",
     slug: formData.get("slug") ?? "",
     address: formData.get("address") ?? "",
-    openingHours,
+    openingHours: openingHoursFromForm(formData),
   };
 }
