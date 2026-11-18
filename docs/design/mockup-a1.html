@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A1 · Newsreader + Inter</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2F5D46}a:hover{color:#1E2B24}
+</style>
+</helmet>
+<div style="width: 2940px; height: 1050px; box-sizing: border-box; padding: 48px; background: #E9E2D4; font-family: 'Inter', system-ui, sans-serif; color: #1E2B24; display: flex; flex-direction: column; gap: 32px">
+
+  <div style="display: flex; align-items: baseline; gap: 24px">
+    <h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 600; font-size: 44px">A1 · Newsreader + Inter</h1>
+    <p style="margin: 0; font-size: 20px; color: #4A524C">Editorial and literary. A bookish serif over a crisp, neutral sans: serious, trustworthy, very legible in the dashboard.</p>
+  </div>
+
+  <div style="display: flex; gap: 48px; align-items: flex-start">
+
+    <!-- 1. Kinora home -->
+    <section aria-label="Kinora home" style="width: 960px; height: 844px; box-sizing: border-box; background: #F7F3EB; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column">
+      <header style="display: flex; align-items: center; justify-content: space-between; padding: 24px 48px; border-bottom: 1px solid #DDD3C2">
+        <span style="font-family: 'Newsreader', Georgia, serif; font-size: 26px; font-weight: 600; color: #2F5D46">Kinora</span>
+        <nav style="display: flex; align-items: center; gap: 28px; font-size: 16px">
+          <a href="#how" style="text-decoration: none; color: #1E2B24">How it works</a>
+          <a href="#code" style="text-decoration: none; color: #1E2B24">Source code</a>
+          <a href="#demo" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 22px; border-radius: 999px; background: #2F5D46; color: #FFFFFF; text-decoration: none; font-weight: 600">Try the demo</a>
+        </nav>
+      </header>
+      <div style="padding: 72px 48px 40px; display: flex; flex-direction: column; gap: 24px; max-width: 700px">
+        <p style="margin: 0; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: #7A5232; font-weight: 600">For small physiotherapy clinics</p>
+        <h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 60px; line-height: 1.05">Patients book and pay online. You get your evenings back.</h2>
+        <p style="margin: 0; font-size: 20px; line-height: 1.5; color: #4A524C">Services, physios and free slots on one page. Cancellations refund themselves, reminders go out the day before.</p>
+        <div style="display: flex; gap: 16px; margin-top: 8px">
+          <a href="#demo" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 28px; border-radius: 999px; background: #2F5D46; color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 17px">Try the demo, no sign-up</a>
+          <a href="#code" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 28px; border-radius: 999px; border: 1.5px solid #2F5D46; color: #2F5D46; text-decoration: none; font-weight: 600; font-size: 17px">Read the code</a>
+        </div>
+      </div>
+      <div id="how" style="margin-top: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid #DDD3C2">
+        <div style="padding: 32px 48px; border-right: 1px solid #DDD3C2; display: flex; flex-direction: column; gap: 8px">
+          <span style="width: 32px; height: 4px; background: #9A6A43; border-radius: 2px"></span>
+          <strong style="font-family: 'Newsreader', Georgia, serif; font-size: 22px; font-weight: 600">Paid when booked</strong>
+          <span style="font-size: 16px; color: #4A524C; line-height: 1.45">Card payment with Stripe. A slot is held 15 minutes, never sold twice.</span>
+        </div>
+        <div style="padding: 32px 36px; border-right: 1px solid #DDD3C2; display: flex; flex-direction: column; gap: 8px">
+          <span style="width: 32px; height: 4px; background: #9A6A43; border-radius: 2px"></span>
+          <strong style="font-family: 'Newsreader', Georgia, serif; font-size: 22px; font-weight: 600">Refunded on its own</strong>
+          <span style="font-size: 16px; color: #4A524C; line-height: 1.45">Cancel up to 24 hours before: full refund, slot freed.</span>
+        </div>
+        <div style="padding: 32px 36px; display: flex; flex-direction: column; gap: 8px">
+          <span style="width: 32px; height: 4px; background: #9A6A43; border-radius: 2px"></span>
+          <strong style="font-family: 'Newsreader', Georgia, serif; font-size: 22px; font-weight: 600">Reminded once</strong>
+          <span style="font-size: 16px; color: #4A524C; line-height: 1.45">One email the day before. Never two, never for a cancelled visit.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Owner dashboard -->
+    <section aria-label="Owner dashboard" style="width: 960px; height: 844px; box-sizing: border-box; background: #F7F3EB; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 32px; background: #1E2B24; color: #F3EEE4; font-size: 14px">
+        <span>Demo clinic · resets in 23 h</span>
+        <div role="group" aria-label="View as" style="display: flex; align-items: center; gap: 4px">
+          <span style="margin-right: 8px; color: #C9C2B3">View as</span>
+          <button type="button" aria-pressed="true" style="min-height: 36px; padding: 0 14px; border-radius: 999px; border: 0; background: #F3EEE4; color: #1E2B24; font: inherit; font-weight: 600">Owner</button>
+          <button type="button" aria-pressed="false" style="min-height: 36px; padding: 0 14px; border-radius: 999px; border: 0; background: transparent; color: #F3EEE4; font: inherit">Practitioner</button>
+          <button type="button" aria-pressed="false" style="min-height: 36px; padding: 0 14px; border-radius: 999px; border: 0; background: transparent; color: #F3EEE4; font: inherit">Patient</button>
+        </div>
+      </div>
+      <header style="display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; border-bottom: 1px solid #DDD3C2">
+        <div style="display: flex; align-items: baseline; gap: 12px">
+          <span style="font-family: 'Newsreader', Georgia, serif; font-size: 22px; font-weight: 600; color: #2F5D46">Kinora</span>
+          <span style="color: #4A524C">Maison Tilleul</span>
+        </div>
+        <nav style="display: flex; gap: 6px; font-size: 15px">
+          <a href="#" aria-current="page" style="padding: 10px 16px; border-radius: 999px; background: #E3EAE3; color: #1E2B24; text-decoration: none; font-weight: 600">Today</a>
+          <a href="#" style="padding: 10px 16px; color: #1E2B24; text-decoration: none">Agenda</a>
+          <a href="#" style="padding: 10px 16px; color: #1E2B24; text-decoration: none">Patients</a>
+          <a href="#" style="padding: 10px 16px; color: #1E2B24; text-decoration: none">Services</a>
+          <a href="#" style="padding: 10px 16px; color: #1E2B24; text-decoration: none">Outbox</a>
+        </nav>
+      </header>
+      <div style="padding: 28px 32px; display: flex; flex-direction: column; gap: 24px">
+        <h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 34px">Good morning. Tuesday 24 November.</h2>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+          <div style="background: #FFFFFF; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; color: #4A524C">Today</span><strong style="font-family: 'Newsreader', Georgia, serif; font-size: 34px; font-weight: 600">9</strong><span style="font-size: 14px; color: #4A524C">bookings</span></div>
+          <div style="background: #FFFFFF; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; color: #4A524C">This week</span><strong style="font-family: 'Newsreader', Georgia, serif; font-size: 34px; font-weight: 600">41</strong><span style="font-size: 14px; color: #4A524C">bookings</span></div>
+          <div style="background: #FFFFFF; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; color: #4A524C">Revenue, November</span><strong style="font-family: 'Newsreader', Georgia, serif; font-size: 34px; font-weight: 600">€6,240</strong><span style="font-size: 14px; color: #4A524C">paid by card</span></div>
+          <div style="background: #FFFFFF; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; color: #4A524C">Cancelled</span><strong style="font-family: 'Newsreader', Georgia, serif; font-size: 34px; font-weight: 600">4</strong><span style="font-size: 14px; color: #4A524C">€195.00 refunded</span></div>
+        </div>
+        <div style="background: #FFFFFF; border-radius: 14px; overflow: hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #EDE6D9">
+            <strong style="font-size: 17px">Today's sessions</strong>
+            <a href="#" style="font-size: 15px">Open the agenda</a>
+          </div>
+          <div style="display: grid; grid-template-columns: 90px 1fr 1fr 1fr 160px; padding: 10px 20px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #4A524C; background: #FBF8F2; border-bottom: 1px solid #EDE6D9"><span>Time</span><span>Patient</span><span>Session</span><span>Physio</span><span>Status</span></div>
+          <div style="display: grid; grid-template-columns: 90px 1fr 1fr 1fr 160px; padding: 14px 20px; font-size: 15px; border-bottom: 1px solid #EDE6D9; align-items: center"><strong>08:30</strong><span>Anna Verbeke</span><span style="color: #4A524C">Initial assessment</span><span style="color: #4A524C">Camille</span><span style="justify-self: start; padding: 4px 12px; border-radius: 999px; background: #E3EAE3; color: #24493A; font-size: 13px; font-weight: 600">Confirmed</span></div>
+          <div style="display: grid; grid-template-columns: 90px 1fr 1fr 1fr 160px; padding: 14px 20px; font-size: 15px; border-bottom: 1px solid #EDE6D9; align-items: center"><strong>09:30</strong><span>Marc Lambert</span><span style="color: #4A524C">Follow-up session</span><span style="color: #4A524C">Thomas</span><span style="justify-self: start; padding: 4px 12px; border-radius: 999px; background: #E3EAE3; color: #24493A; font-size: 13px; font-weight: 600">Confirmed</span></div>
+          <div style="display: grid; grid-template-columns: 90px 1fr 1fr 1fr 160px; padding: 14px 20px; font-size: 15px; border-bottom: 1px solid #EDE6D9; align-items: center"><strong>10:00</strong><span>Sofia Haddad</span><span style="color: #4A524C">Sports rehab</span><span style="color: #4A524C">Inès</span><span style="justify-self: start; padding: 4px 12px; border-radius: 999px; background: #F3E6D6; color: #6B4526; font-size: 13px; font-weight: 600">Pending payment</span></div>
+          <div style="display: grid; grid-template-columns: 90px 1fr 1fr 1fr 160px; padding: 14px 20px; font-size: 15px; border-bottom: 1px solid #EDE6D9; align-items: center"><strong>11:00</strong><span>Pieter De Smet</span><span style="color: #4A524C">Follow-up session</span><span style="color: #4A524C">Camille</span><span style="justify-self: start; padding: 4px 12px; border-radius: 999px; background: #ECEAE6; color: #4A4A48; font-size: 13px; font-weight: 600">Refunded</span></div>
+          <div style="display: grid; grid-template-columns: 90px 1fr 1fr 1fr 160px; padding: 14px 20px; font-size: 15px; align-items: center"><strong>14:00</strong><span>Julie Martin</span><span style="color: #4A524C">Dry needling</span><span style="color: #4A524C">Thomas</span><span style="justify-self: start; padding: 4px 12px; border-radius: 999px; background: #E3EAE3; color: #24493A; font-size: 13px; font-weight: 600">Confirmed</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Maison Tilleul booking, phone -->
+    <section aria-label="Maison Tilleul booking page on a phone" style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F3EB; border-radius: 36px; overflow: hidden; display: flex; flex-direction: column; position: relative; border: 8px solid #1E2B24">
+      <div style="padding: 22px 20px 14px; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #DDD3C2">
+        <span style="font-family: 'Newsreader', Georgia, serif; font-size: 26px; font-weight: 600; color: #2F5D46">Maison Tilleul</span>
+        <span style="font-size: 14px; color: #4A524C">Physiotherapy · Brussels</span>
+      </div>
+      <div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; flex: 1; overflow: hidden">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #7A5232; font-weight: 600">1 · Session</span>
+          <button type="button" aria-pressed="true" style="display: flex; justify-content: space-between; align-items: center; min-height: 56px; padding: 0 16px; border-radius: 14px; border: 2px solid #2F5D46; background: #FFFFFF; font: inherit; color: #1E2B24; text-align: left"><span><strong style="display: block; font-size: 16px">Follow-up session</strong><span style="font-size: 14px; color: #4A524C">30 min</span></span><strong style="font-size: 16px">€45.00</strong></button>
+          <button type="button" aria-pressed="false" style="display: flex; justify-content: space-between; align-items: center; min-height: 56px; padding: 0 16px; border-radius: 14px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24; text-align: left"><span><strong style="display: block; font-size: 16px">Initial assessment</strong><span style="font-size: 14px; color: #4A524C">45 min</span></span><strong style="font-size: 16px">€60.00</strong></button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #7A5232; font-weight: 600">2 · Physio</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <button type="button" aria-pressed="true" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 0; background: #2F5D46; color: #FFFFFF; font: inherit; font-weight: 600">Any</button>
+            <button type="button" aria-pressed="false" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #C9BFAD; background: transparent; color: #1E2B24; font: inherit">Camille</button>
+            <button type="button" aria-pressed="false" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #C9BFAD; background: transparent; color: #1E2B24; font: inherit">Thomas</button>
+            <button type="button" aria-pressed="false" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #C9BFAD; background: transparent; color: #1E2B24; font: inherit">Inès</button>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #7A5232; font-weight: 600">3 · Day and time</span>
+          <div style="display: flex; gap: 6px">
+            <button type="button" style="flex: 1; min-height: 58px; border-radius: 12px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24"><span style="display: block; font-size: 12px; color: #4A524C">Mon</span><strong>23</strong></button>
+            <button type="button" aria-pressed="true" style="flex: 1; min-height: 58px; border-radius: 12px; border: 0; background: #2F5D46; font: inherit; color: #FFFFFF"><span style="display: block; font-size: 12px">Tue</span><strong>24</strong></button>
+            <button type="button" style="flex: 1; min-height: 58px; border-radius: 12px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24"><span style="display: block; font-size: 12px; color: #4A524C">Wed</span><strong>25</strong></button>
+            <button type="button" style="flex: 1; min-height: 58px; border-radius: 12px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24"><span style="display: block; font-size: 12px; color: #4A524C">Thu</span><strong>26</strong></button>
+            <button type="button" style="flex: 1; min-height: 58px; border-radius: 12px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24"><span style="display: block; font-size: 12px; color: #4A524C">Fri</span><strong>27</strong></button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24">08:30</button>
+            <button type="button" aria-pressed="true" style="min-height: 44px; border-radius: 10px; border: 2px solid #2F5D46; background: #E3EAE3; font: inherit; font-weight: 600; color: #1E2B24">09:30</button>
+            <button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24">10:30</button>
+            <button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24">11:00</button>
+            <button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24">14:00</button>
+            <button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #DDD3C2; background: #FFFFFF; font: inherit; color: #1E2B24">16:30</button>
+          </div>
+        </div>
+      </div>
+      <button type="button" aria-haspopup="dialog" style="position: absolute; right: 16px; bottom: 160px; display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 20px 0 16px; border-radius: 999px; border: 0; background: #1E2B24; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600; box-shadow: 0 6px 18px rgba(30, 43, 36, 0.28)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
+        Questions? Ask us
+      </button>
+      <div style="padding: 16px 20px 20px; background: #FFFFFF; border-top: 1px solid #DDD3C2; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; font-size: 15px"><span>Tue 24 Nov · 09:30 · Any physio</span><strong>€45.00</strong></div>
+        <a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 999px; background: #2F5D46; color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 17px">Continue to payment</a>
+        <span style="font-size: 12px; color: #4A524C; text-align: center">Free cancellation up to 24 h before · Booking by Kinora</span>
+      </div>
+    </section>
+
+    <!-- 4. Maison Tilleul assistant, phone (patient side only) -->
+    <section aria-label="Maison Tilleul assistant on the public booking page" style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F3EB; border-radius: 36px; overflow: hidden; display: flex; flex-direction: column; border: 8px solid #1E2B24">
+      <div style="padding: 14px 12px 12px 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #DDD3C2">
+        <button type="button" aria-label="Back to booking" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; border: 0; background: transparent; color: #1E2B24"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-family: 'Newsreader', Georgia, serif; font-size: 22px; font-weight: 600; color: #2F5D46">Ask Maison Tilleul</span>
+          <span style="font-size: 13px; color: #4A524C">Prices, opening hours and free slots</span>
+        </div>
+      </div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow: hidden">
+        <p style="margin: 0 0 4px; padding: 10px 12px; border-radius: 12px; background: #EFE8DB; font-size: 13px; line-height: 1.45; color: #4A524C">I answer from the clinic's own information only. I can't give medical advice, and I can't see anyone's bookings.</p>
+        <div style="align-self: flex-end; max-width: 80%; padding: 10px 14px; border-radius: 18px 18px 4px 18px; background: #2F5D46; color: #FFFFFF; font-size: 15px; line-height: 1.4">Is there anything earlier on Wednesday?</div>
+        <div style="align-self: flex-start; max-width: 86%; padding: 10px 14px; border-radius: 18px 18px 18px 4px; background: #FFFFFF; border: 1px solid #DDD3C2; color: #1E2B24; font-size: 15px; line-height: 1.4; display: flex; flex-direction: column; gap: 10px">
+          <span>Wednesday 25 has a free slot at 08:00 with Inès.</span>
+          <a href="#" style="display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 12px; background: #E3EAE3; color: #1E2B24; text-decoration: none"><span><strong style="display: block; font-size: 15px">Wed 25 · 08:00 · Inès</strong><span style="font-size: 13px; color: #4A524C">Book and pay on the booking page</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2F5D46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a>
+        </div>
+        <div style="align-self: flex-end; max-width: 80%; padding: 10px 14px; border-radius: 18px 18px 4px 18px; background: #2F5D46; color: #FFFFFF; font-size: 15px; line-height: 1.4">My back hurts, is it serious?</div>
+        <div style="align-self: flex-start; max-width: 86%; padding: 10px 14px; border-radius: 18px 18px 18px 4px; background: #FFFFFF; border: 1px solid #DDD3C2; color: #1E2B24; font-size: 15px; line-height: 1.4; display: flex; flex-direction: column; gap: 10px">
+          <span>I can't judge that, only a physio can. An initial assessment takes 45 min and costs €60.00.</span>
+          <a href="#" style="align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #2F5D46; color: #2F5D46; text-decoration: none; font-weight: 600; font-size: 15px">See free slots</a>
+        </div>
+        <div style="align-self: flex-end; max-width: 80%; padding: 10px 14px; border-radius: 18px 18px 4px 18px; background: #2F5D46; color: #FFFFFF; font-size: 15px; line-height: 1.4">Can I cancel?</div>
+        <div style="align-self: flex-start; max-width: 86%; padding: 10px 14px; border-radius: 18px 18px 18px 4px; background: #FFFFFF; border: 1px solid #DDD3C2; color: #1E2B24; font-size: 15px; line-height: 1.4; display: flex; flex-direction: column; gap: 10px"><span>Yes, up to 24 hours before your session, with a full refund to your card.</span></div>
+      </div>
+      <form aria-label="Ask a question" style="padding: 12px 12px 16px; background: #FFFFFF; border-top: 1px solid #DDD3C2; display: flex; flex-direction: column; gap: 8px">
+        <label for="a1-chat" style="font-size: 13px; color: #4A524C">Your question</label>
+        <div style="display: flex; gap: 8px">
+          <input id="a1-chat" type="text" placeholder="Are you open on Saturday?" style="flex: 1; min-width: 0; min-height: 48px; box-sizing: border-box; padding: 0 16px; border-radius: 999px; border: 1px solid #DDD3C2; background: #FBF8F2; font: inherit; font-size: 15px; color: #1E2B24">
+          <button type="submit" aria-label="Send" style="width: 48px; height: 48px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; border: 0; background: #2F5D46; color: #FFFFFF"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </form>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2940,"height":1050}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
