@@ -7,10 +7,11 @@ type Tx = Parameters<Parameters<typeof withRls>[1]>[0];
 export type CancelError = "too_late" | "not_cancellable";
 
 /**
- * Cancels the patient's own paid booking through private.cancel_booking()
- * (drizzle/0018), which checks the 24-hour rule (checklist #12). Returns the
- * payment to refund, or why the booking cannot be cancelled. Runs inside a
- * withRls() transaction, as the patient.
+ * Cancels a paid booking through private.cancel_booking(): its patient up
+ * to 24 hours before (drizzle/0018, checklist #12), the clinic's owner at
+ * any time (drizzle/0019, #13). Returns the payment to refund, or why the
+ * booking cannot be cancelled. Runs inside a withRls() transaction, as the
+ * user who cancels.
  */
 export async function cancelInDb(
   tx: Tx,
