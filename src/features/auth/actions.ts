@@ -4,8 +4,15 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
-import { logInInput, safeNext, signUpInput } from "./schema";
+import {
+  emailInput,
+  logInInput,
+  newPasswordInput,
+  safeNext,
+  signUpInput,
+} from "./schema";
 
 export type FormState = {
   error?: string;
@@ -97,5 +104,51 @@ export async function signUp(
 export async function logOut(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  redirect("/");
+}
+
+export async function requestPasswordReset(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const email = String(formData.get("email") ?? "");
+  if (!(await rateLimit("auth:reset", 3))) return { error: TOO_MANY };
+
+  const parsed = emailInput.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) {
+    return { fieldErrors: fieldErrors(parsed.error), values: { email } };
+  }
+
+  const supabase = await createClient();
+  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo: `${await siteOrigin()}/auth/confirm?next=/reset-password`,
+  });
+  // Same answer whether or not the account exists.
+  return {
+    message: `If an account exists for ${parsed.data.email}, we sent a link to choose a new password.`,
+  };
+}
+
+export async function updatePassword(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  // The reset link signs the user in with a short recovery session.
+  await requireUser();
+
+  const parsed = newPasswordInput.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+  if (error) {
+    const message =
+      error.code === "same_password"
+        ? "Choose a password you have not used before."
+        : "We could not update the password. Ask for a new link and try again.";
+    return { error: message };
+  }
   redirect("/");
 }

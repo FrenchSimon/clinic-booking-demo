@@ -32,6 +32,12 @@ export function LoginForm({ next, error }: { next: string; error?: string }) {
         required
         error={state.fieldErrors?.password}
       />
+      <Link
+        href="/forgot-password"
+        className="-mt-2 self-start py-2 text-muted-foreground text-sm underline"
+      >
+        Forgot your password?
+      </Link>
       <FormMessage error={state.error} />
       <Button type="submit" disabled={pending} className="min-h-11 w-full">
         {pending ? "Logging in…" : "Log in"}
