@@ -29,6 +29,7 @@ Checklist confirmed on: 2026-11-18
 - [x] R2.9 Booking confirmation email (checklist #14)
 - [x] R2.10 Patient sees upcoming and past bookings (checklist #11)
 - [x] R2.11 After logging in without a page to return to, a patient lands on their bookings and staff on their clinic, instead of every user being sent to create a clinic (checklist #1, #11, asked by Simon on 2026-11-18)
+- [x] R2.12 Right after paying or cancelling, the booking page says a confirmation email is on its way to the patient's address (checklist #14, asked by Simon on 2026-11-18)
 
 ## R3. Dashboards (~10 %)
 
@@ -40,14 +41,14 @@ Checklist confirmed on: 2026-11-18
 
 - [x] R4.1 Patient cancels up to 24 hours before: full Stripe refund, slot freed, the 24-hour rule checked on the server (checklist #12)
 - [x] R4.2 Owner cancels any booking with a full refund (checklist #13)
-- [ ] R4.3 Cancellation and refund email (checklist #14)
+- [x] R4.3 Cancellation and refund email (checklist #14)
 - [ ] R4.4 Day-before reminder job, daily Vercel cron: sent once per booking, never for a cancelled one, test with two runs at the same time (checklist #15)
 
 ## R5. Demo mode, assistant and polish (~25 %)
 
 - [ ] R5.1 "Try the demo": anonymous session, own clinic seeded with practitioners, patients, services and paid, cancelled and refunded bookings, deleted after 24 hours (checklist #19)
 - [ ] R5.2 "View as owner / practitioner / patient" bar that changes the visitor's real role in their demo clinic (checklist #20)
-- [ ] R5.3 Outbox page instead of real emails in demo clinics, "Send tomorrow's reminders now" button, test card 4242 shown at checkout (checklist #21)
+- [ ] R5.3 Outbox page instead of real emails in demo clinics, "Send tomorrow's reminders now" button, test card 4242 shown at checkout, and the booking page points to the Outbox instead of saying an email is on its way (checklist #21)
 - [ ] R5.4 Assistant on the public page with Groq: answers from the clinic's data only, next free slot through a tool call to R2.3, no medical advice (checklist #18)
 - [ ] R5.5 Assistant limits: 15 questions per visitor per day checked on the server, fallback message when the quota is reached or Groq fails (checklist #18)
 - [ ] R5.6 Legal pages `/terms` and `/privacy`, terms checkbox at sign-up

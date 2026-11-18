@@ -41,3 +41,32 @@ export function confirmationEmail(input: {
     footer: `${input.clinicName} · ${input.clinicAddress}`,
   };
 }
+
+/**
+ * The email a patient gets once a cancelled session is refunded (checklist
+ * #14), whether they cancelled it (#12) or the clinic did (#13).
+ */
+export function cancellationEmail(input: {
+  serviceName: string;
+  physioName: string | null;
+  clinicName: string;
+  clinicAddress: string;
+  startsAt: Date;
+  priceCents: number;
+  byClinic: boolean;
+  link: string;
+}): EmailContent {
+  const physio = input.physioName ?? "your physio";
+  const session = `${input.serviceName} with ${physio} on ${formatSessionTime(input.startsAt)}`;
+  return {
+    heading: `Your session at ${input.clinicName} is cancelled`,
+    paragraphs: [
+      input.byClinic
+        ? `${input.clinicName} cancelled your session: ${session}.`
+        : `You cancelled your session: ${session}.`,
+      `Your payment of ${formatEuros(input.priceCents)} is refunded in full to your card. It usually shows on your account within 5 to 10 business days.`,
+    ],
+    action: { label: "View my booking", url: input.link },
+    footer: `${input.clinicName} · ${input.clinicAddress}`,
+  };
+}
