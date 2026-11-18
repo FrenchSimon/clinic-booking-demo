@@ -1,0 +1,5 @@
+# Format the staged files and put the fixes back in the commit.
+pnpm exec biome check --write --staged --no-errors-on-unmatched
+git update-index --again
+pnpm typecheck
+pnpm test
