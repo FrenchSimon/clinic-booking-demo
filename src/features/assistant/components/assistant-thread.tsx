@@ -31,7 +31,8 @@ export function AssistantThread({
     <div aria-live="polite" className="flex flex-col gap-2.5">
       <p className="mb-1 rounded-xl bg-surface px-3 py-2.5 text-muted-foreground text-sm">
         I answer from the clinic's own information only. I can't give medical
-        advice, and I can't see anyone's bookings.
+        advice, and I can't see anyone's bookings. Please don't share health
+        details here: your messages are sent to an AI service.
       </p>
       {messages.map((m, i) =>
         m.role === "user" ? (
