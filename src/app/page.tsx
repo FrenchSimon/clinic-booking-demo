@@ -4,8 +4,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { getUser } from "@/server/auth";
 
-const SOURCE_CODE = "https://github.com/FrenchSimon/clinic-booking-demo";
-
 const FEATURES = [
   {
     title: "Paid when booked",
@@ -21,8 +19,8 @@ const FEATURES = [
   },
 ];
 
-// Kinora home, from the approved mockup (DESIGN.md, screen 1).
-// "Try the demo" joins the calls to action with the demo mode (R5.1).
+// Kinora home, from the approved mockup (DESIGN.md, screen 1). The links for
+// people evaluating the demo live in the portfolio bar, not in the product.
 export default function Home() {
   return (
     <div className="flex flex-1 flex-col">
@@ -35,12 +33,6 @@ export default function Home() {
             Kinora
           </Link>
           <nav aria-label="Main" className="flex items-center gap-2 sm:gap-6">
-            <a
-              href={SOURCE_CODE}
-              className="hidden py-2 text-foreground no-underline sm:inline"
-            >
-              Source code
-            </a>
             <Suspense fallback={null}>
               <AccountLinks />
             </Suspense>
@@ -64,12 +56,6 @@ export default function Home() {
             <Link href="/signup" className={buttonVariants({ size: "lg" })}>
               Create a clinic account
             </Link>
-            <a
-              href={SOURCE_CODE}
-              className={buttonVariants({ size: "lg", variant: "outline" })}
-            >
-              Read the code
-            </a>
           </div>
         </section>
 

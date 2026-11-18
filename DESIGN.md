@@ -52,6 +52,7 @@ Always a label, never a color alone.
 
 ## Navigation
 
+- Portfolio bar (a change from the mockup, decided after approval): a thin dark bar above every page, "Portfolio demo · fictional clinic" with "Read the code", and "Try the demo" once the demo mode exists. It speaks to people evaluating the demo, so the product pages below never link to the source code. In a demo clinic it merges with the demo bar.
 - Clinic space: top bar with the Kinora logo and the clinic name, then pill tabs (Today, Agenda, Patients, Services, Outbox), the current one in soft green with `aria-current="page"`. On a phone the tabs scroll sideways.
 - Demo clinics: a dark bar on top with "Demo clinic · resets in …" and the "View as Owner / Practitioner / Patient" switch, using `aria-pressed`.
 - Public booking page: the clinic's name only, Kinora appears as "Booking by Kinora" in the footer. One column on a phone, steps 1 Session, 2 Physio, 3 Day and time, then a summary bar fixed at the bottom with "Continue to payment".
@@ -59,7 +60,7 @@ Always a label, never a color alone.
 
 ## Screens in the mockup
 
-1. **Kinora home**: hero, two calls to action ("Try the demo, no sign-up", "Read the code"), three feature columns (paid when booked, refunded on its own, reminded once).
+1. **Kinora home**: hero, one product call to action ("Create a clinic account"), three feature columns (paid when booked, refunded on its own, reminded once). The mockup's "Try the demo" and "Read the code" moved to the portfolio bar.
 2. **Owner dashboard**: demo bar, tabs, four stat cards, "Today's sessions" table with a header row Time · Patient · Session · Physio · Status and status pills. No AI chat here.
 3. **Maison Tilleul booking page, phone**: the three steps, the summary bar, and a floating "Questions? Ask us" button above it.
 4. **Maison Tilleul assistant, phone**: the chat (checklist item 18).
