@@ -25,3 +25,18 @@ test("security headers are sent", async ({ request }) => {
   expect(headers["x-content-type-options"]).toBe("nosniff");
   expect(headers["x-powered-by"]).toBeUndefined();
 });
+
+test("every page shows the portfolio bar with the source code", async ({
+  page,
+}) => {
+  for (const path of ["/", "/login"]) {
+    await page.goto(path);
+    const bar = page.getByRole("complementary", { name: "About this demo" });
+    await expect(
+      bar.getByRole("link", { name: "Read the code" }),
+    ).toHaveAttribute(
+      "href",
+      "https://github.com/FrenchSimon/clinic-booking-demo",
+    );
+  }
+});

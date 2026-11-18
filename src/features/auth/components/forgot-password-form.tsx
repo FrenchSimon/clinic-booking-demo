@@ -27,7 +27,7 @@ export function ForgotPasswordForm() {
         error={state.fieldErrors?.email}
       />
       <FormMessage error={state.error} />
-      <Button type="submit" disabled={pending} className="min-h-11 w-full">
+      <Button type="submit" size="lg" disabled={pending} className="w-full">
         {pending ? "Sending…" : "Send the link"}
       </Button>
       <Link href="/login" className="text-muted-foreground text-sm underline">

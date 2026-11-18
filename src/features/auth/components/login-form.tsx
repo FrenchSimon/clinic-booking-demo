@@ -39,12 +39,12 @@ export function LoginForm({ next, error }: { next: string; error?: string }) {
         Forgot your password?
       </Link>
       <FormMessage error={state.error} />
-      <Button type="submit" disabled={pending} className="min-h-11 w-full">
+      <Button type="submit" size="lg" disabled={pending} className="w-full">
         {pending ? "Logging in…" : "Log in"}
       </Button>
       <p className="text-muted-foreground text-sm">
         No account yet?{" "}
-        <Link href="/signup" className="text-foreground underline">
+        <Link href="/signup" className="font-medium text-primary underline">
           Sign up
         </Link>
       </p>
