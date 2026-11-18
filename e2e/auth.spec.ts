@@ -41,7 +41,8 @@ test("an invalid email link sends back to login with a message", async ({
 }) => {
   await page.goto("/auth/confirm?token_hash=nope&type=recovery");
   await expect(page).toHaveURL(/\/login\?error=link/);
-  await expect(page.getByRole("alert")).toContainText("invalid or has expired");
+  // Next.js adds its own empty role="alert" route announcer, so match the text.
+  await expect(page.getByText(/invalid or has expired/)).toBeVisible();
 });
 
 test("forgot password checks the email before sending anything", async ({
