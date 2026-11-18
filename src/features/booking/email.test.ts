@@ -3,6 +3,7 @@ import {
   cancellationEmail,
   confirmationEmail,
   formatSessionTime,
+  reminderEmail,
 } from "./email";
 
 describe("formatSessionTime", () => {
@@ -79,6 +80,35 @@ describe("cancellationEmail", () => {
     });
     expect(email.paragraphs[0]).toBe(
       "Maison Tilleul cancelled your session: Follow-up with your physio on Tuesday 1 December at 10:00.",
+    );
+  });
+});
+
+describe("reminderEmail", () => {
+  const base = {
+    serviceName: "Follow-up",
+    physioName: "Thomas",
+    clinicName: "Maison Tilleul",
+    clinicAddress: "Rue Exemple 12, 1000 Brussels",
+    startsAt: new Date("2026-12-01T09:00:00Z"),
+    link: "https://kinora-booking.vercel.app/bookings/b1",
+  };
+
+  it("says what, when and where, and that online cancelling is closed", () => {
+    const email = reminderEmail(base);
+    expect(email.heading).toBe("Your session at Maison Tilleul is tomorrow");
+    expect(email.paragraphs).toEqual([
+      "Follow-up with Thomas on Tuesday 1 December at 10:00.",
+      "Address: Rue Exemple 12, 1000 Brussels.",
+      "It is too late to cancel online. If you cannot come, please contact the clinic.",
+    ]);
+    expect(email.action?.url).toBe(base.link);
+  });
+
+  it("still reads well when the physio has no name yet", () => {
+    const email = reminderEmail({ ...base, physioName: null });
+    expect(email.paragraphs[0]).toBe(
+      "Follow-up with your physio on Tuesday 1 December at 10:00.",
     );
   });
 });
