@@ -4,7 +4,7 @@ import { logOut } from "../actions";
 export function LogoutButton() {
   return (
     <form action={logOut}>
-      <Button type="submit" variant="outline" className="min-h-11">
+      <Button type="submit" variant="outline">
         Log out
       </Button>
     </form>

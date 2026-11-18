@@ -36,12 +36,12 @@ export function SignupForm() {
         error={state.fieldErrors?.password}
       />
       <FormMessage error={state.error} />
-      <Button type="submit" disabled={pending} className="min-h-11 w-full">
+      <Button type="submit" size="lg" disabled={pending} className="w-full">
         {pending ? "Creating your account…" : "Create account"}
       </Button>
       <p className="text-muted-foreground text-sm">
         Already have an account?{" "}
-        <Link href="/login" className="text-foreground underline">
+        <Link href="/login" className="font-medium text-primary underline">
           Log in
         </Link>
       </p>

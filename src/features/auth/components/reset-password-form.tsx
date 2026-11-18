@@ -23,7 +23,7 @@ export function ResetPasswordForm() {
         error={state.fieldErrors?.password}
       />
       <FormMessage error={state.error} />
-      <Button type="submit" disabled={pending} className="min-h-11 w-full">
+      <Button type="submit" size="lg" disabled={pending} className="w-full">
         {pending ? "Saving…" : "Save the new password"}
       </Button>
     </form>
