@@ -6,6 +6,7 @@ import { ClinicShell } from "@/features/clinics/components/clinic-shell";
 import { OpeningHoursList } from "@/features/clinics/components/opening-hours-list";
 import { getStaffClinic } from "@/features/clinics/queries";
 import { OwnerDashboard } from "@/features/dashboard/components/owner-dashboard";
+import { DemoNotice } from "@/features/demo/components/demo-notice";
 import { TeamSection } from "@/features/invitations/components/team-section";
 import { FirstServiceHint } from "@/features/services/components/first-service-hint";
 import { requireUser } from "@/server/auth";
@@ -28,6 +29,7 @@ async function ClinicOverview() {
 
   return (
     <ClinicShell clinicName={clinic.name} tabs={{ current: "today", role }}>
+      {user.is_anonymous && <DemoNotice startedAt={user.created_at} />}
       {role === "owner" ? (
         <>
           <FirstServiceHint userId={user.id} clinicId={clinic.id} />
