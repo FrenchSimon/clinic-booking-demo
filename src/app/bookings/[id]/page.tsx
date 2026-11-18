@@ -2,14 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
-import {
-  BookingReceipt,
-  type EmailNotice,
-} from "@/features/booking/components/booking-receipt";
+import { BookingReceipt } from "@/features/booking/components/booking-receipt";
 import {
   CANCEL_ERRORS,
   CancelSection,
 } from "@/features/booking/components/cancel-section";
+import type { EmailNotice } from "@/features/booking/components/email-notice";
 import { getMyBooking } from "@/features/booking/queries";
 import { settleOnReturn } from "@/features/booking/return";
 import { requireUser } from "@/server/auth";

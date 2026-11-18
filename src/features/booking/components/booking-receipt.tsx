@@ -2,6 +2,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { formatEuros } from "@/features/services/schema";
 import type { MyBooking } from "../queries";
+import { EmailCallout, type EmailNotice } from "./email-notice";
 import { StatusPill } from "./status-pill";
 
 const when = new Intl.DateTimeFormat("en-GB", {
@@ -53,18 +54,6 @@ function headline(booking: MyBooking) {
   };
 }
 
-/**
- * Which email the patient was just sent, shown once after paying or
- * cancelling. In a demo clinic (`to` null) it waits in the Outbox instead.
- */
-export type EmailNotice = { kind: "booked" | "cancelled"; to: string | null };
-
-// "On its way", not "sent": the email goes out after this page, and may fail.
-const NOTICES: Record<EmailNotice["kind"], string> = {
-  booked: "A confirmation is on its way to",
-  cancelled: "A confirmation of the cancellation and refund is on its way to",
-};
-
 /** The patient's booking: what, when, where, and what happens next. */
 export function BookingReceipt({
   booking,
@@ -87,7 +76,7 @@ export function BookingReceipt({
         <StatusPill status={booking.status} />
         <h1 className="font-heading font-normal text-3xl">{title}</h1>
         <p className="text-muted-foreground">{text}</p>
-        {notice && <EmailLine notice={notice} />}
+        {notice && <EmailCallout notice={notice} />}
       </div>
       <dl className="flex flex-col">
         {rows.map(([label, value]) => (
@@ -102,38 +91,6 @@ export function BookingReceipt({
       </dl>
       <NextStep booking={booking} />
     </div>
-  );
-}
-
-// A demo sends no email (checklist #21): it points to the Outbox instead.
-const DEMO_NOTICES: Record<EmailNotice["kind"], string> = {
-  booked: "Your confirmation email is in the",
-  cancelled: "Your cancellation and refund email is in the",
-};
-
-function EmailLine({ notice }: { notice: EmailNotice }) {
-  if (notice.to === null) {
-    return (
-      <p className="text-muted-foreground">
-        {DEMO_NOTICES[notice.kind]}{" "}
-        <Link
-          href="/outbox"
-          className="text-primary underline underline-offset-4"
-        >
-          Outbox
-        </Link>
-        : no real email leaves a demo clinic.
-      </p>
-    );
-  }
-  return (
-    <p className="text-muted-foreground">
-      {NOTICES[notice.kind]}{" "}
-      {/* The address moves to the next line whole, not cut at a dash. */}
-      <span className="inline-block max-w-full break-all text-foreground">
-        {notice.to}.
-      </span>
-    </p>
   );
 }
 
