@@ -29,6 +29,13 @@
       "when": 1794967503668,
       "tag": "0003_clinic_owner_trigger",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794971932508,
+      "tag": "0004_clinic_address_and_hours",
+      "breakpoints": true
     }
   ]
 }
