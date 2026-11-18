@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import type { MembershipRole } from "../table";
 import { type ClinicTab, ClinicTabs } from "./clinic-tabs";
 
 /** Frame of the clinic space: top bar, then the tabs once the clinic exists. */
@@ -10,7 +11,7 @@ export function ClinicShell({
   children,
 }: {
   clinicName?: string;
-  tabs?: { current: ClinicTab; owner: boolean };
+  tabs?: { current: ClinicTab; role: MembershipRole };
   children: ReactNode;
 }) {
   return (

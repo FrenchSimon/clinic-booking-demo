@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ClinicShell } from "@/features/clinics/components/clinic-shell";
@@ -23,10 +24,7 @@ async function ClinicOverview() {
   const { clinic, role } = mine;
 
   return (
-    <ClinicShell
-      clinicName={clinic.name}
-      tabs={{ current: "today", owner: role === "owner" }}
-    >
+    <ClinicShell clinicName={clinic.name} tabs={{ current: "today", role }}>
       <div className="flex flex-col gap-1">
         <p className="font-semibold text-oak text-sm uppercase tracking-[0.08em]">
           {role === "owner" ? "Your clinic" : "You work at"}
@@ -51,10 +49,18 @@ async function ClinicOverview() {
       {role === "owner" ? (
         <TeamSection userId={user.id} clinicId={clinic.id} />
       ) : (
-        <p className="rounded-[18px] border bg-card p-5 sm:p-8">
-          You are a physio at {clinic.name}. Your agenda with your sessions
-          arrives here soon.
-        </p>
+        <section className="flex flex-col gap-3 rounded-[18px] border bg-card p-5 sm:p-8">
+          <p>
+            You are a physio at {clinic.name}. Your agenda with your sessions
+            arrives here soon.
+          </p>
+          <Link
+            href="/clinic/hours"
+            className="flex min-h-11 items-center self-start text-primary underline underline-offset-4"
+          >
+            Set my hours and days off
+          </Link>
+        </section>
       )}
       <p className="text-muted-foreground text-sm">
         Booking page address: /c/{clinic.slug}
