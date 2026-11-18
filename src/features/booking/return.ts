@@ -1,8 +1,8 @@
 import "server-only";
-import { adminDb } from "@/lib/db";
+import { siteOrigin } from "@/server/site-origin";
 import { stripe } from "@/server/stripe";
-import { settlePaidCheckout } from "./payment";
-import { paidSession, refundLatePayment } from "./stripe-session";
+import { settleAndNotify } from "./settle";
+import { paidSession } from "./stripe-session";
 
 /**
  * When the patient comes back from Stripe, asks Stripe whether the session
@@ -28,16 +28,13 @@ export async function settleOnReturn(
   const paid = paidSession(session);
   if (!paid || session.metadata?.booking_id !== booking.id) return false;
 
-  // adminDb, as in the webhook: the caller read the booking through RLS, so
-  // it is the patient's own, and Stripe confirmed the payment. The event id
-  // makes a reload, or the webhook arriving after, a no-op.
-  const result = await adminDb.transaction((tx) =>
-    settlePaidCheckout(
-      tx,
-      { eventId: `return:${sessionId}`, eventType: "checkout.return", ...paid },
-      (bookingId, paymentIntent) =>
-        refundLatePayment(client, bookingId, paymentIntent),
-    ),
+  // The caller read the booking through RLS, so it is the patient's own,
+  // and Stripe confirmed the payment. The event id makes a reload, or the
+  // webhook arriving after, a no-op.
+  const result = await settleAndNotify(
+    client,
+    { eventId: `return:${sessionId}`, eventType: "checkout.return", ...paid },
+    await siteOrigin(),
   );
   return result === "confirmed" || result === "refunded";
 }

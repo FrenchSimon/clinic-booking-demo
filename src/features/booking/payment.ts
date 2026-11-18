@@ -8,7 +8,7 @@ import { bookings, stripeEvents } from "./table";
 // runs in the caller's transaction, so the event is recorded if and only if
 // the booking was settled: a failure lets Stripe retry the same event.
 
-type Tx = Parameters<
+export type Tx = Parameters<
   Parameters<PostgresJsDatabase<typeof schema>["transaction"]>[0]
 >[0];
 

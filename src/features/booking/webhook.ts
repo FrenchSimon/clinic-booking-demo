@@ -1,10 +1,10 @@
 import "server-only";
 import type Stripe from "stripe";
-import { adminDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { stripe } from "@/server/stripe";
-import { type PaidCheckout, settlePaidCheckout } from "./payment";
-import { paidSession, refundLatePayment } from "./stripe-session";
+import type { PaidCheckout } from "./payment";
+import { settleAndNotify } from "./settle";
+import { paidSession } from "./stripe-session";
 
 // Events that mean a Checkout session is paid. Cards are paid at once;
 // methods like Klarna confirm later with async_payment_succeeded.
@@ -35,13 +35,10 @@ export async function handleStripeWebhook(request: Request): Promise<Response> {
   const paid = paidCheckout(event);
   if (!paid) return Response.json({ received: true });
 
-  // adminDb: Stripe calls this, not a signed-in user, and the signature
-  // above is the access check. One transaction: settled and recorded together.
-  const result = await adminDb.transaction((tx) =>
-    settlePaidCheckout(tx, paid, (bookingId, paymentIntent) =>
-      refundLatePayment(client, bookingId, paymentIntent),
-    ),
-  );
+  // Stripe calls this, not a signed-in user: the signature above is the
+  // access check. The email links to the site Stripe called.
+  const origin = new URL(request.url).origin;
+  const result = await settleAndNotify(client, paid, origin);
   return Response.json({ received: true, result });
 }
 
