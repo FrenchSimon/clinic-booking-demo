@@ -29,7 +29,8 @@ export function splitBookings<T extends HistoryRow>(rows: T[], now: Date) {
   return { upcoming, past };
 }
 
-function lapsedHold(row: HistoryRow, now: Date) {
+/** A hold whose 15 minutes are over: never paid, so not a booking. */
+export function lapsedHold(row: HistoryRow, now: Date) {
   return (
     row.status === "pending_payment" &&
     (row.holdExpiresAt === null || row.holdExpiresAt <= now)
