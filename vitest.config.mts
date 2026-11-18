@@ -7,6 +7,8 @@ export default defineConfig({
   },
   test: {
     include: ["src/**/*.test.ts"],
+    // Database tests run with pnpm test:db (vitest.db.config.mts).
+    exclude: ["src/**/*.db.test.ts"],
     environment: "node",
   },
 });
