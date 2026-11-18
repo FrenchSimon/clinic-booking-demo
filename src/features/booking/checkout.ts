@@ -1,5 +1,6 @@
 import "server-only";
 import { sql } from "drizzle-orm";
+import { DEMO_VISITOR_EMAIL } from "@/features/email/outbox";
 import { withRls } from "@/lib/db";
 import { siteOrigin } from "@/server/site-origin";
 import { stripe } from "@/server/stripe";
@@ -53,9 +54,10 @@ export async function startCheckout(input: {
           },
         },
       ],
-      // An anonymous demo visitor has an empty address, which Stripe
-      // refuses: Checkout then asks for one.
-      customer_email: input.user.email || undefined,
+      // An anonymous demo visitor has no address (an empty one, which
+      // Stripe refuses): Checkout shows the one their emails go to in the
+      // Outbox instead, read-only, so the two always match (#21).
+      customer_email: input.user.email || DEMO_VISITOR_EMAIL,
       client_reference_id: bookingId,
       metadata: { booking_id: bookingId },
       payment_intent_data: { metadata: { booking_id: bookingId } },
