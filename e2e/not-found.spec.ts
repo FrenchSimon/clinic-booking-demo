@@ -3,13 +3,15 @@ import { expect, test } from "@playwright/test";
 // An unknown address answers 404 before anything renders. An unknown clinic
 // is found out inside the streamed booking page (cacheComponents), after
 // the 200 has gone out: Next.js then adds a noindex tag instead.
-for (const [path, title, status] of [
-  ["/no-such-page", "This page does not exist", 404],
-  ["/c/no-such-clinic", "No clinic books at this address", 200],
+// Looking a clinic up needs the database, which CI does not have.
+for (const [path, title, status, needsDb] of [
+  ["/no-such-page", "This page does not exist", 404, false],
+  ["/c/no-such-clinic", "No clinic books at this address", 200, true],
 ] as const) {
   test(`${path} shows the not-found page with a way back home`, async ({
     page,
   }) => {
+    test.skip(needsDb && Boolean(process.env.CI), "Needs a real database");
     const response = await page.goto(path);
     expect(response?.status()).toBe(status);
     // The dev server compiles the page on its first visit.
