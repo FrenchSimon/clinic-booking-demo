@@ -13,7 +13,7 @@ Checked on 18 November 2026. A box is ticked only for what was seen working; the
 
 - [x] CI green on `main`
 - [x] `pnpm e2e` passes: every file passes; in a full local run the dev server's first compiles can time out the two longest journeys, which then pass on their own (CI is green).
-- [ ] Lighthouse mobile: performance and accessibility at 90 or more. Accessibility 100 on every page measured. Performance 92 to 99 locally with the CPU slowdown scaled to the test machine, 67 to 84 with the default slowdown on that slow machine: to confirm on https://pagespeed.web.dev.
+- [x] Lighthouse mobile: performance and accessibility at 90 or more. PageSpeed Insights, mobile, 18 November 2026: 100 in performance, accessibility, best practices and SEO on both the home page (LCP 0.9 s, TBT 40 ms, CLS 0) and a demo clinic's booking page (LCP 0.9 s, TBT 10 ms, CLS 0).
 - [x] No `console.log`, no unused code, no `TODO` left without a roadmap task
 
 ## Handover
@@ -21,5 +21,5 @@ Checked on 18 November 2026. A box is ticked only for what was seen working; the
 - [x] `HANDOVER.md`: live URL, repository, how to run locally, environment variable names (never values)
 - [x] `README.md` up to date, with a mobile screenshot
 - [ ] Every account (GitHub, Supabase, Vercel, and Sentry if used) owned by the client. Not applicable: portfolio demo, every account is the developer's.
-- [ ] Release tagged `v1.0.0`
+- [x] Release tagged `v1.0.0`
 - [ ] Developer access removed at the end of the support period. Not applicable: portfolio demo.
