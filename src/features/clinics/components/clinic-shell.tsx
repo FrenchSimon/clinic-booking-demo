@@ -1,16 +1,20 @@
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import type { MembershipRole } from "../table";
 import { type ClinicTab, ClinicTabs } from "./clinic-tabs";
 
-/** Frame of the clinic space: top bar, then the tabs once the clinic exists. */
+/**
+ * Frame of the clinic space: top bar, then the tabs once the clinic exists.
+ * The top bar links to the clinic's public booking page, the one patients use.
+ */
 export function ClinicShell({
-  clinicName,
+  clinic,
   tabs,
   children,
 }: {
-  clinicName?: string;
+  clinic?: { name: string; slug: string };
   tabs?: { current: ClinicTab; role: MembershipRole };
   children: ReactNode;
 }) {
@@ -25,13 +29,24 @@ export function ClinicShell({
             >
               Kinora
             </Link>
-            {clinicName && (
+            {clinic && (
               <span className="hidden truncate text-muted-foreground sm:inline">
-                {clinicName}
+                {clinic.name}
               </span>
             )}
           </div>
-          <LogoutButton />
+          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+            {clinic && (
+              <Link
+                href={`/c/${clinic.slug}`}
+                className="flex min-h-11 items-center gap-1 whitespace-nowrap font-semibold text-primary"
+              >
+                Booking page
+                <ArrowUpRight aria-hidden className="size-4" />
+              </Link>
+            )}
+            <LogoutButton />
+          </div>
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8 sm:px-8">

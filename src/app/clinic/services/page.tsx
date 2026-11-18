@@ -23,10 +23,7 @@ async function Services() {
   const services = await listServices(user.id, clinic.id);
 
   return (
-    <ClinicShell
-      clinicName={clinic.name}
-      tabs={{ current: "services", role: "owner" }}
-    >
+    <ClinicShell clinic={clinic} tabs={{ current: "services", role: "owner" }}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="font-heading font-normal text-3xl sm:text-4xl">

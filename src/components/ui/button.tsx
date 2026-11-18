@@ -17,6 +17,11 @@ const buttonStyles = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        // An action that cannot be undone, like cancelling a paid booking.
+        danger:
+          "bg-destructive text-primary-foreground hover:bg-destructive/85 focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
+        "danger-outline":
+          "border-destructive bg-transparent text-destructive hover:bg-destructive/10 focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
       },
       size: {
         default:

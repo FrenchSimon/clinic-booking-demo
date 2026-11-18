@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
+import { BackLink } from "@/components/back-link";
 import { ClinicBookingCard } from "@/features/clinic-bookings/components/clinic-booking-card";
 import {
   OWNER_CANCEL_ERRORS,
@@ -48,10 +48,8 @@ async function Booking({
   if (!booking) notFound();
 
   return (
-    <ClinicShell
-      clinicName={clinic.name}
-      tabs={{ current: "bookings", role: "owner" }}
-    >
+    <ClinicShell clinic={clinic} tabs={{ current: "bookings", role: "owner" }}>
+      <BackLink href="/clinic/bookings" label="All bookings" />
       {error && (
         <p role="alert" className="rounded-[14px] border bg-card p-4">
           {error}
@@ -59,12 +57,6 @@ async function Booking({
       )}
       <ClinicBookingCard booking={booking} />
       <OwnerCancelSection booking={booking} confirming={confirming} />
-      <Link
-        href="/clinic/bookings"
-        className="flex min-h-11 items-center self-center text-primary underline underline-offset-4"
-      >
-        All bookings
-      </Link>
     </ClinicShell>
   );
 }
