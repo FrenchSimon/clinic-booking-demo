@@ -65,6 +65,7 @@ export async function signUp(
   const email = String(formData.get("email") ?? "");
   if (!(await rateLimit("auth:signup", 5))) return { error: TOO_MANY };
 
+  const next = safeNext(formData.get("next"), "/clinic");
   const parsed = signUpInput.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { fieldErrors: fieldErrors(parsed.error), values: { email } };
@@ -74,7 +75,7 @@ export async function signUp(
   const { data, error } = await supabase.auth.signUp({
     ...parsed.data,
     options: {
-      emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=/clinic`,
+      emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=${encodeURIComponent(next)}`,
     },
   });
   if (error) {
@@ -90,7 +91,7 @@ export async function signUp(
       message: `Almost there: we sent a confirmation link to ${parsed.data.email}.`,
     };
   }
-  redirect("/clinic");
+  redirect(next);
 }
 
 export async function logOut(): Promise<void> {

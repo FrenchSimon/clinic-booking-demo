@@ -70,3 +70,32 @@ test("the clinic space needs a signed-in user", async ({ page }) => {
     await expect(page).toHaveURL(/\/login\?next=%2Fclinic/);
   }
 });
+
+test("an invitation link asks a visitor to sign up or log in", async ({
+  page,
+}) => {
+  const token = "A".repeat(43);
+  await page.goto(`/invite/${token}`);
+  await expect(
+    page.getByRole("heading", { name: "You're invited" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Create my account" }),
+  ).toHaveAttribute(
+    "href",
+    `/signup?next=${encodeURIComponent(`/invite/${token}`)}`,
+  );
+  await page.getByRole("link", { name: "Create my account" }).click();
+  await expect(page.locator('input[name="next"]')).toHaveValue(
+    `/invite/${token}`,
+  );
+});
+
+test("a malformed invitation link shows the not-found page", async ({
+  page,
+}) => {
+  // The page streams, so the status is already sent; R5.9 brings the custom 404.
+  await page.goto("/invite/not-a-token");
+  await expect(page.getByText(/could not be found/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: /Join/ })).toHaveCount(0);
+});
