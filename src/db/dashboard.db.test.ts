@@ -2,7 +2,7 @@
 // in the range, a physio only their own, and nobody reads another clinic's.
 import { afterAll, describe, expect, it, vi } from "vitest";
 import { bookings } from "@/features/booking/table";
-import { bookable, bookingRow } from "./booking-seed";
+import { bookable, bookingRow, membershipId } from "./booking-seed";
 import { seedTwoClinics } from "./test-seed";
 import { asUser, closeTestDb, rolledBack, type Tx } from "./test-support";
 
@@ -62,6 +62,10 @@ describe("clinicBookings", () => {
         "refunded",
       ]);
       expect(rows[0]?.serviceName).toBe("Follow-up");
+      const patientMembership = await membershipId(tx, a.id, a.patient);
+      expect(
+        rows.every((r) => r.patientMembershipId === patientMembership),
+      ).toBe(true);
     });
   });
 
