@@ -8,7 +8,7 @@ import { emails } from "@/features/email/table";
 import { invitations } from "@/features/invitations/table";
 import { one, type Tx } from "./test-support";
 
-async function createUser(tx: Tx) {
+export async function createUser(tx: Tx) {
   const id = randomUUID();
   await tx.execute(
     sql`insert into auth.users (id, email, aud, role)
