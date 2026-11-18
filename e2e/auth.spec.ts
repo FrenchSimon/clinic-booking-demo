@@ -104,9 +104,12 @@ test("an invitation link asks a visitor to sign up or log in", async ({
 test("a malformed invitation link shows the not-found page", async ({
   page,
 }) => {
-  // The page streams, so the status is already sent; R5.9 brings the custom 404.
+  // The page streams, so the status is already sent: the 404 is the page.
   await page.goto("/invite/not-a-token");
-  await expect(page.getByText(/could not be found/i)).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "This page does not exist",
+    { timeout: 15_000 },
+  );
   await expect(page.getByRole("button", { name: /Join/ })).toHaveCount(0);
 });
 
