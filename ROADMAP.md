@@ -21,7 +21,7 @@ Checklist confirmed on: 2026-11-18
 - [x] R2.1 Owner manages services: name, duration, price, practitioners who offer it (checklist #5)
 - [x] R2.2 Practitioner sets weekly hours and days off (checklist #6)
 - [x] R2.3 Free-slot calculation from hours, days off, service duration and bookings, with unit tests (checklist #7)
-- [ ] R2.4 No double booking: database exclusion constraint on the practitioner's time range, concurrency test (checklist #7)
+- [x] R2.4 No double booking: database exclusion constraint on the practitioner's time range, concurrency test (checklist #7)
 - [ ] R2.5 Public clinic page: choose a service, a practitioner or "any", then a free slot (checklist #8)
 - [ ] R2.6 Slot held for 15 minutes, Stripe Checkout session in test mode; expired holds free the slot (checklist #9)
 - [ ] R2.7 Stripe webhook confirms the booking, idempotent on the event id, replay test (checklist #10)
