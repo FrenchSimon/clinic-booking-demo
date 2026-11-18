@@ -9,8 +9,8 @@ import { bookings } from "./table";
 export type CancelOutcome = "refunded" | CancelError | "refund_failed";
 
 /**
- * The patient cancels their booking and gets their payment back in full
- * (checklist #12). The booking is cancelled first, so the slot is free even
+ * The patient (checklist #12) or the clinic's owner (#13) cancels a booking,
+ * and the patient gets their payment back in full. The booking is cancelled first, so the slot is free even
  * if Stripe fails; asking again then retries the refund only.
  */
 export async function cancelAndRefund(
@@ -32,8 +32,8 @@ export async function cancelAndRefund(
   if (!refunded) return "refund_failed";
 
   // adminDb: nobody updates a booking as themselves (see table.ts). The
-  // patient's own cancellation went through RLS above, and Stripe has just
-  // confirmed the refund.
+  // cancellation went through RLS above, as the patient or the owner, and
+  // Stripe has just confirmed the refund.
   await adminDb
     .update(bookings)
     .set({ status: "refunded" })

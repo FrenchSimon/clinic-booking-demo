@@ -1,6 +1,7 @@
 // Checklist #12: a patient cancels their own paid booking up to 24 hours
 // before, through private.cancel_booking() (drizzle/0018), and the slot is
-// free again at once. Nobody else cancels it, and never closer than 24 hours.
+// free again at once. Checklist #13: the clinic's owner cancels any paid
+// booking of the clinic, at any time (drizzle/0019). Nobody else cancels it.
 import { eq } from "drizzle-orm";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import { bookings } from "@/features/booking/table";
@@ -103,10 +104,33 @@ describe("private.cancel_booking", () => {
     });
   });
 
-  it("refuses anyone but the booking's patient", async () => {
+  it("lets the clinic's owner cancel at any time, even within 24 hours", async () => {
     await rolledBack(async (tx) => {
-      const { a, b, bookingId } = await seed(tx, 48);
-      for (const user of [a.otherPatient, a.practitioner, a.owner, b.owner]) {
+      const { a, bookingId } = await seed(tx, 2);
+      for (let i = 0; i < 2; i++) {
+        const result = await asUser(tx, a.owner, (db) =>
+          cancelInDb(db, bookingId),
+        );
+        expect(result).toEqual({ paymentIntentId: "pi_test_cancel" });
+      }
+      expect((await statusOf(tx, bookingId)).status).toBe("cancelled");
+    });
+  });
+
+  it("refuses the owner a booking that is not paid", async () => {
+    await rolledBack(async (tx) => {
+      const { a, bookingId } = await seed(tx, 48, "pending_payment");
+      const result = await asUser(tx, a.owner, (db) =>
+        cancelInDb(db, bookingId),
+      );
+      expect(result).toEqual({ error: "not_cancellable" });
+    });
+  });
+
+  it("refuses anyone but the booking's patient and the clinic's owner", async () => {
+    await rolledBack(async (tx) => {
+      const { a, b, outsider, bookingId } = await seed(tx, 48);
+      for (const user of [a.otherPatient, a.practitioner, b.owner, outsider]) {
         const result = await asUser(tx, user, (db) =>
           cancelInDb(db, bookingId),
         );

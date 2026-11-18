@@ -134,6 +134,13 @@
       "when": 1795000364187,
       "tag": "0018_cancel_booking",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795001778993,
+      "tag": "0019_owner_cancel_booking",
+      "breakpoints": true
     }
   ]
 }
