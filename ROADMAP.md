@@ -54,7 +54,7 @@ Checklist confirmed on: 2026-11-18
 - [x] R5.6 Legal pages `/terms` and `/privacy`, terms checkbox at sign-up
 - [x] R5.7 Mobile pass at 375 px on every page (checklist #22)
 - [x] R5.8 README written as a short technical report: isolation, double booking, webhook replay, single reminder, assistant limits
-- [ ] R5.9 Error pages in the design: a 404 page for unknown addresses and clinics, and an error page that keeps the app usable when something fails (asked by Simon on 2026-11-18)
+- [x] R5.9 Error pages in the design: a 404 page for unknown addresses and clinics, and an error page that keeps the app usable when something fails (asked by Simon on 2026-11-18)
 - [x] R5.10 After paying or cancelling, the email notice is a visible callout under the title, with a button to the Outbox in a demo clinic, instead of a grey line (checklist #14, #21, asked by Simon on 2026-11-18)
 - [x] R5.11 A demo visitor's Stripe Checkout shows their demo address, prefilled, the one their emails go to in the Outbox (checklist #21, asked by Simon on 2026-11-18)
 - [x] R5.12 Demo bar on two lines: "Portfolio demo · fictional clinic", then "Read the code" and, on the right, a role menu and the Outbox with its email count; the clinic name hidden on a phone (checklist #19, #20, #21, spec in header-spec.md, asked by Simon on 2026-11-18)
