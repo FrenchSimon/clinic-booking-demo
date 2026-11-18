@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import { PortfolioBar } from "@/components/portfolio-bar";
+import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
 
 // Fonts from DESIGN.md: Newsreader for headings and numbers, Inter for the interface.
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <PortfolioBar />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
