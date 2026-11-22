@@ -15,3 +15,27 @@ export function isExclusionViolation(error: unknown): boolean {
   }
   return false;
 }
+
+/** True when Postgres ended the transaction to break a deadlock (SQLSTATE 40P01). */
+export function isDeadlock(error: unknown): boolean {
+  let current = error;
+  while (current instanceof Error) {
+    if ("code" in current && current.code === "40P01") return true;
+    current = current.cause;
+  }
+  return false;
+}
+
+/**
+ * Runs the transaction again, once, if Postgres ended it to break a deadlock:
+ * the retry sees the other transaction's committed result, as the Postgres
+ * docs advise. Any other error, or a second deadlock, is thrown.
+ */
+export async function retryOnDeadlock<T>(run: () => Promise<T>): Promise<T> {
+  try {
+    return await run();
+  } catch (error) {
+    if (!isDeadlock(error)) throw error;
+    return run();
+  }
+}
