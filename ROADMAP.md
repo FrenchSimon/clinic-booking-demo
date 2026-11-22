@@ -66,7 +66,7 @@ Checklist confirmed on: 2026-11-18
 ## R6. After delivery
 
 - [x] R6.1 CI runs the database tests (`pnpm test:db`) on every push, against a local Supabase started in the job, so the isolation, webhook replay and double booking proofs are visible on GitHub (asked by Simon on 2026-11-22)
-- [ ] R6.2 When two patients hold the same slot at the same moment, Postgres can end one of them with a deadlock instead of the exclusion error: retry the hold once, so the second patient sees "slot taken" instead of an error page (found by R6.1, checklist #9, asked by Simon on 2026-11-22)
+- [x] R6.2 When two patients hold the same slot at the same moment, Postgres can end one of them with a deadlock instead of the exclusion error: retry the hold once, so the second patient sees "slot taken" instead of an error page (found by R6.1, checklist #9, asked by Simon on 2026-11-22)
 
 ## Out of scope
 

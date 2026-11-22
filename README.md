@@ -54,7 +54,7 @@ A booking app that takes money has five places where "it works on my machine" is
 
 **Why.** A constraint holds whatever the timing, the number of servers or the code path. Locks or a "check then insert" in the app would each need to be right in every place that books.
 
-**Proof.** `src/db/double-booking.db.test.ts` opens two connections that insert the same slot and wait before committing, so the two transactions overlap: exactly one succeeds, the other gets SQLSTATE `23P01`. It also checks a one-minute overlap is refused and an expired hold cannot come back over a newer booking.
+**Proof.** `src/db/double-booking.db.test.ts` opens two connections that insert the same slot and wait before committing, so the two transactions overlap: exactly one succeeds, the other is refused. It usually gets SQLSTATE `23P01`, but the CI once caught Postgres ending it with a deadlock (`40P01`) instead, which the booking page would have shown as an error. The slot hold now runs again once after a deadlock, so the retry sees the other booking and the patient gets "slot taken" (`src/lib/pg-errors.test.ts`). It also checks a one-minute overlap is refused and an expired hold cannot come back over a newer booking.
 
 ### 3. Stripe webhook replay
 
