@@ -1,6 +1,7 @@
 import "server-only";
 import { sql } from "drizzle-orm";
 import { withRls } from "@/lib/db";
+import { retryOnDeadlock } from "@/lib/pg-errors";
 import {
   type BookingPage,
   getAvailability,
@@ -55,9 +56,13 @@ export async function holdSlot(
   startsAt: Date,
 ): Promise<{ id: string } | { error: "taken" | "unavailable" }> {
   try {
-    const rows = await withRls(userId, (tx) =>
-      tx.execute<{ id: string }>(
-        sql`select private.hold_slot(${serviceId}, ${membershipId}, ${startsAt.toISOString()}) as id`,
+    // Two patients holding the same slot at once can end in a deadlock
+    // instead of 23P01: the retry then gets the real answer.
+    const rows = await retryOnDeadlock(() =>
+      withRls(userId, (tx) =>
+        tx.execute<{ id: string }>(
+          sql`select private.hold_slot(${serviceId}, ${membershipId}, ${startsAt.toISOString()}) as id`,
+        ),
       ),
     );
     const id = rows[0]?.id;

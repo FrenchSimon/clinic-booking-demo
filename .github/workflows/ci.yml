@@ -57,6 +57,31 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  db:
+    # The isolation, webhook replay and double booking proofs (pnpm test:db),
+    # against a throwaway local Supabase: Postgres with the auth schema and roles.
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+      SKIP_ENV_VALIDATION: "1"
+      HUSKY: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: pnpm install --frozen-lockfile
+      # Only Postgres and Auth are needed: skip the other services to save time.
+      - run: supabase init --force
+      - run: supabase start -x studio,imgproxy,storage-api,realtime,edge-runtime,logflare,vector,mailpit,postgres-meta
+      - run: pnpm db:migrate
+      - run: pnpm test:db
+
   secrets:
     runs-on: ubuntu-latest
     steps:

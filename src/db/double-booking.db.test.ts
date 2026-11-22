@@ -154,7 +154,10 @@ describe("two patients booking at the same moment", () => {
 
       const failed = results.filter((r) => r.status === "rejected");
       expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
-      expect(failed.map((r) => sqlState(r.reason))).toEqual(["23P01"]);
+      // The loser gets the exclusion error, or a deadlock when Postgres ends
+      // it first (seen in CI): holdSlot() retries that case once (R6.2).
+      expect(failed).toHaveLength(1);
+      expect(["23P01", "40P01"]).toContain(sqlState(failed[0]?.reason));
       const saved = await testDb
         .select({ id: bookings.id })
         .from(bookings)
