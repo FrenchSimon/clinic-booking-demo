@@ -63,6 +63,10 @@ Checklist confirmed on: 2026-11-18
 - [x] R5.15 The assistant's opening note asks patients not to share health details, since their messages are sent to Groq (checklist #18, asked by Simon on 2026-11-18)
 - [x] R5.16 The e2e tests wait for each role switch, reminders run and footer link to finish, so they no longer fail when the dev server is slow (checklist #20, #21, asked by Simon on 2026-11-18)
 
+## R6. After delivery
+
+- [ ] R6.1 CI runs the database tests (`pnpm test:db`) on every push, against a local Supabase started in the job, so the isolation, webhook replay and double booking proofs are visible on GitHub (asked by Simon on 2026-11-22)
+
 ## Out of scope
 
 Requested but not part of the confirmed checklist. Listed here so nothing is forgotten, built only through a new order.
