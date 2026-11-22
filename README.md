@@ -30,11 +30,11 @@ Next.js 16 (App Router, Server Actions) · React 19 · TypeScript · Tailwind CS
 - **Mobile first.** Every screen is designed at 375 px, then widened. Pages render on the server, so phones download little JavaScript.
 - **Every input is validated on the server** with Zod, and every action checks the signed-in user.
 - **One folder per feature** in `src/features/`, so a new feature does not touch the others.
-- **Small, readable commits**, each tied to a roadmap task. CI runs the typecheck, lint, tests, build and a secret scan on every push.
+- **Small, readable commits**, each tied to a roadmap task. CI runs the typecheck, lint, tests, build, the Playwright journeys, the database tests on a local Supabase and a secret scan on every push.
 
 ## Technical report
 
-A booking app that takes money has five places where "it works on my machine" is not enough. For each one: the risk, what Kinora does, why, and the test that proves it. The `*.db.test.ts` files run against a real Postgres with `pnpm test:db`; each test is rolled back, except the concurrency tests, which need committed rows and delete them afterwards.
+A booking app that takes money has five places where "it works on my machine" is not enough. For each one: the risk, what Kinora does, why, and the test that proves it. The `*.db.test.ts` files run against a real Postgres with `pnpm test:db`, locally and in CI on every push; each test is rolled back, except the concurrency tests, which need committed rows and delete them afterwards.
 
 ### 1. Clinic isolation
 

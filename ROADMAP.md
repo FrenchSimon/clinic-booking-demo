@@ -65,7 +65,7 @@ Checklist confirmed on: 2026-11-18
 
 ## R6. After delivery
 
-- [ ] R6.1 CI runs the database tests (`pnpm test:db`) on every push, against a local Supabase started in the job, so the isolation, webhook replay and double booking proofs are visible on GitHub (asked by Simon on 2026-11-22)
+- [x] R6.1 CI runs the database tests (`pnpm test:db`) on every push, against a local Supabase started in the job, so the isolation, webhook replay and double booking proofs are visible on GitHub (asked by Simon on 2026-11-22)
 
 ## Out of scope
 
