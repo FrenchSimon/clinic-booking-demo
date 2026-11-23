@@ -68,6 +68,14 @@ Checklist confirmed on: 2026-11-18
 - [x] R6.1 CI runs the database tests (`pnpm test:db`) on every push, against a local Supabase started in the job, so the isolation, webhook replay and double booking proofs are visible on GitHub (asked by Simon on 2026-11-22)
 - [x] R6.2 When two patients hold the same slot at the same moment, Postgres can end one of them with a deadlock instead of the exclusion error: retry the hold once, so the second patient sees "slot taken" instead of an error page (found by R6.1, checklist #9, asked by Simon on 2026-11-22)
 
+## R7. French version
+
+Asked by Simon on 2026-11-23: the portfolio's French space links to Kinora in French. English stays the default.
+
+- [ ] R7.1 Language switch: "FR / EN" on the right of the portfolio bar's first line, the choice kept in a `lang` cookie for a year, `?lang=fr` or `?lang=en` on any address sets it, `<html lang>` follows, English without a cookie
+- [ ] R7.2 Every screen in French: pages, forms and their errors, status and error pages, page titles, the portfolio bar and the role menu, with dates, times and prices formatted for the language
+- [ ] R7.3 Emails and the Outbox in the patient's language, also from the reminder job; the assistant answers in the visitor's language; a new demo clinic is seeded in the visitor's language
+
 ## Out of scope
 
 Requested but not part of the confirmed checklist. Listed here so nothing is forgotten, built only through a new order.
