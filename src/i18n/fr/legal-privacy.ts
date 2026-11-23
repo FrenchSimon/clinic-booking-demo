@@ -21,7 +21,7 @@ export const privacySections: typeof en = [
             "Votre compte\u00a0: adresse e-mail et mot de passe, haché pour ne jamais pouvoir être relu. Une démo lancée avec «\u00a0Essayer la démo\u00a0» ne demande aucune adresse e-mail\u00a0: elle utilise des adresses inventées qui ne reçoivent jamais de courrier.",
           ],
           [
-            "Ce que vous saisissez\u00a0: les informations du cabinet, les séances proposées, les horaires, les réservations, les annulations et les noms des kinés et des patients.",
+            "Ce que vous saisissez\u00a0: les informations du cabinet, les prestations proposées, les horaires, les réservations, les annulations et les noms des kinés et des patients.",
           ],
           [
             "Les e-mails que l’application rédige au sujet des réservations, conservés dans la boîte d’envoi du cabinet.",

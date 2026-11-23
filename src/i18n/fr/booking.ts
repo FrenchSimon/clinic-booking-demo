@@ -5,7 +5,7 @@ export const booking: typeof en = {
   errors: {
     taken: "Quelqu’un vient de prendre ce créneau. Choisissez-en un autre.",
     unavailable:
-      "Cette séance ne peut plus être réservée en ligne. Choisissez-en une autre.",
+      "Cette prestation ne peut plus être réservée en ligne. Choisissez-en une autre.",
     payment:
       "Le paiement en ligne n’est pas disponible pour le moment. Réessayez plus tard.",
     busy: "Trop de tentatives. Patientez une minute, puis réessayez.",
@@ -13,7 +13,7 @@ export const booking: typeof en = {
   anyPhysio: "Peu importe le kiné",
   notOpen:
     "La réservation en ligne n’est pas encore ouverte chez {clinic}. Revenez bientôt.",
-  steps: { session: "Séance", physio: "Kiné", time: "Jour et heure" },
+  steps: { session: "Prestation", physio: "Kiné", time: "Jour et heure" },
   any: "Peu importe",
   minutes: "{minutes}\u00a0min",
   noTime: "Aucun créneau libre dans les deux prochaines semaines.",

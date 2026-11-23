@@ -6,20 +6,20 @@ const nb = "\u00a0";
 export const team: typeof en = {
   services: {
     title: "Prestations",
-    intro: "Les séances que les patients réservent et paient en ligne.",
+    intro: "Les prestations que les patients réservent et paient en ligne.",
     add: "Ajouter une prestation",
     allServices: "← Toutes les prestations",
     empty:
-      "Aucune prestation pour l’instant. Ajoutez les séances que les patients peuvent réserver, avec leur durée et leur prix.",
+      "Aucune prestation pour l’instant. Ajoutez les prestations que les patients peuvent réserver, avec leur durée et leur prix.",
     hidden: "Masquée",
     noPhysio: `Aucun kiné pour l’instant${nb}: les patients ne peuvent pas la réserver`,
     minutes: "{minutes} min",
     firstTitle: "Ajoutez votre première prestation",
     firstText:
-      "Les patients réservent un type de séance, comme un bilan initial, avec sa durée et son prix. Ajoutez les séances que vous proposez et les kinés qui les donnent.",
+      "Les patients réservent une prestation, comme un bilan initial, avec sa durée et son prix. Ajoutez les prestations que vous proposez et les kinés qui les donnent.",
   },
   serviceForm: {
-    name: "Nom de la séance",
+    name: "Nom de la prestation",
     namePlaceholder: "Bilan initial",
     length: "Durée en minutes",
     lengthHint: "De 10 à 240, par tranches de 5.",
@@ -42,7 +42,7 @@ export const team: typeof en = {
     duplicate: "Vous avez déjà une prestation qui porte ce nom.",
   },
   serviceValidation: {
-    nameMissing: "Indiquez le nom de la séance",
+    nameMissing: "Indiquez le nom de la prestation",
     nameTooLong: "60 caractères maximum",
     lengthMissing: "Indiquez la durée en minutes",
     lengthWhole: "Indiquez un nombre entier de minutes",

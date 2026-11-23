@@ -9,7 +9,7 @@ export const home: typeof en = {
   title:
     "Vos patients réservent et paient en ligne. Vous retrouvez vos soirées.",
   intro:
-    "Les séances, les kinés et les créneaux libres sur une seule page. Les annulations se remboursent toutes seules, les rappels partent la veille.",
+    "Les prestations, les kinés et les créneaux libres sur une seule page. Les annulations se remboursent toutes seules, les rappels partent la veille.",
   cta: "Créer un compte cabinet",
   featuresLabel: "Ce que fait Kinora",
   features: [

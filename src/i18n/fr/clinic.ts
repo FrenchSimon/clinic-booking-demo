@@ -10,7 +10,7 @@ export const clinic: typeof en = {
       today: "Aujourd’hui",
       bookings: "Réservations",
       patients: "Patients",
-      services: "Séances",
+      services: "Prestations",
       hours: "Mes horaires",
     },
   },
@@ -39,7 +39,7 @@ export const clinic: typeof en = {
   setup: {
     title: "Créez votre cabinet",
     intro:
-      "Vos patients verront ces informations sur votre page de réservation. Vous pourrez ensuite ajouter vos kinés et vos séances.",
+      "Vos patients verront ces informations sur votre page de réservation. Vous pourrez ensuite ajouter vos kinés et vos prestations.",
     name: "Nom du cabinet",
     slug: "Adresse de la page de réservation",
     slugPreview: "Vos patients réserveront sur {origin}/c/{slug}",
