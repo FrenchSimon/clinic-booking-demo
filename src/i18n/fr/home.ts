@@ -1,0 +1,3 @@
+import type { home as en } from "../en/home";
+
+export const home: typeof en = {};

@@ -13,11 +13,13 @@ import type { MembershipRole } from "@/features/clinics/table";
 import { cn } from "@/lib/utils";
 import { type DemoState, viewAs } from "../actions";
 
-const ROLES: { role: MembershipRole; label: string }[] = [
-  { role: "owner", label: "Owner" },
-  { role: "practitioner", label: "Practitioner" },
-  { role: "patient", label: "Patient" },
-];
+const ROLES: MembershipRole[] = ["owner", "practitioner", "patient"];
+
+type RoleMenuStrings = {
+  viewAs: string;
+  switching: string;
+  roles: Record<MembershipRole, string>;
+};
 
 /**
  * "View the demo as" (checklist #20): a menu of the three roles. Each one
@@ -25,7 +27,13 @@ const ROLES: { role: MembershipRole; label: string }[] = [
  * role they hold now. Closes on a click outside, Escape or a choice; the
  * arrow keys move between roles.
  */
-export function RoleMenu({ current }: { current: MembershipRole }) {
+export function RoleMenu({
+  current,
+  t,
+}: {
+  current: MembershipRole;
+  t: RoleMenuStrings;
+}) {
   const [state, action, pending] = useActionState<DemoState, FormData>(
     viewAs,
     {},
@@ -35,11 +43,11 @@ export function RoleMenu({ current }: { current: MembershipRole }) {
   const button = useRef<HTMLButtonElement>(null);
   const items = useRef<(HTMLButtonElement | null)[]>([]);
   const menuId = useId();
-  const label = ROLES.find((r) => r.role === current)?.label ?? "Owner";
+  const label = t.roles[current];
 
   useEffect(() => {
     if (!open) return;
-    items.current[ROLES.findIndex((r) => r.role === current)]?.focus();
+    items.current[ROLES.indexOf(current)]?.focus();
     const outside = (e: PointerEvent) => {
       if (!root.current?.contains(e.target as Node)) setOpen(false);
     };
@@ -74,15 +82,15 @@ export function RoleMenu({ current }: { current: MembershipRole }) {
         onClick={() => setOpen((o) => !o)}
         className="relative inline-flex min-h-10 items-center gap-1.5 rounded-full border before:absolute before:inset-x-0 before:-inset-y-0.5 before:content-[''] border-demo-foreground/35 px-3 font-semibold disabled:opacity-80 sm:px-3.5"
       >
-        <span className="sr-only">View the demo as </span>
-        {pending ? "Switching…" : label}
+        <span className="sr-only">{t.viewAs} </span>
+        {pending ? t.switching : label}
         <ChevronDown aria-hidden="true" className="size-4" />
       </button>
       <form action={action} hidden={!open}>
         <div
           id={menuId}
           role="menu"
-          aria-label="View the demo as"
+          aria-label={t.viewAs}
           onKeyDown={onKeyDown}
           className="absolute top-[calc(100%+6px)] right-0 z-50 flex w-[230px] flex-col rounded-[14px] border bg-card p-1.5 text-foreground shadow-[0_8px_24px_rgba(30,43,36,0.16)]"
         >
@@ -90,9 +98,9 @@ export function RoleMenu({ current }: { current: MembershipRole }) {
             aria-hidden="true"
             className="px-3 py-1.5 text-muted-foreground text-xs"
           >
-            View the demo as
+            {t.viewAs}
           </span>
-          {ROLES.map(({ role, label }, i) => (
+          {ROLES.map((role, i) => (
             <button
               key={role}
               ref={(el) => {
@@ -110,7 +118,7 @@ export function RoleMenu({ current }: { current: MembershipRole }) {
                 role === current ? "bg-accent font-semibold" : "hover:bg-muted",
               )}
             >
-              {label}
+              {t.roles[role]}
               {role === current && (
                 <Check aria-hidden="true" className="size-4" />
               )}
