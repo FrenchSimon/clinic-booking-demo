@@ -20,8 +20,8 @@ export async function SummaryBar({
   /** Why the last attempt failed, shown above the button. */
   error?: string;
   /**
-   * The assistant's button: just above the bar on the right, or inside the
-   * bar's right margin on wide screens.
+   * The assistant's button, against the window's right edge: just above the
+   * bar, or inside its right margin on wide screens.
    */
   floating?: ReactNode;
 }) {
@@ -42,13 +42,13 @@ export async function SummaryBar({
 
   return (
     <div className="sticky bottom-0 border-t bg-card">
-      {/* On a phone the button floats above the bar, over the end of the page.
-          From 1280 px (xl) the side margins are wider than the button, even
-          with the longer French label, so it moves into the bar's empty right
-          margin, clear of the slots and the summary. */}
+      {/* Always against the right edge of the window, never centred with the
+          content. Below 1280 px it floats just above the bar; from 1280 px (xl)
+          the side margins are wider than the button, even with the longer
+          French label, so it sits inside the bar's empty right margin. */}
       {floating && (
         <div className="pointer-events-none absolute inset-x-0 bottom-full xl:top-0 xl:bottom-0">
-          <div className="mx-auto flex h-full w-full max-w-xl items-end justify-end px-4 pb-4 xl:max-w-none xl:items-center xl:px-8 xl:pb-0">
+          <div className="flex h-full w-full items-end justify-end px-4 pb-4 xl:items-center xl:px-8 xl:pb-0">
             <div className="pointer-events-auto">{floating}</div>
           </div>
         </div>
