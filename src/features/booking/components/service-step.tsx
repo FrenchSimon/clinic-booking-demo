@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { formatEuros } from "@/features/services/schema";
+import { fill } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 import { cn } from "@/lib/utils";
 import type { PublicService } from "../public";
 import { type Selection, selectionHref } from "../selection";
 import { Step } from "./step";
 
-export function ServiceStep({
+export async function ServiceStep({
   slug,
   services,
   selection,
@@ -14,8 +16,9 @@ export function ServiceStep({
   services: PublicService[];
   selection: Selection;
 }) {
+  const { locale, t } = await getDictionary();
   return (
-    <Step number={1} title="Session">
+    <Step number={1} title={t.booking.steps.session}>
       <ul className="flex flex-col gap-2">
         {services.map((s) => {
           const current = s.id === selection.service?.id;
@@ -33,10 +36,10 @@ export function ServiceStep({
                 <span>
                   <strong className="block">{s.name}</strong>
                   <span className="text-muted-foreground text-sm">
-                    {s.durationMinutes} min
+                    {fill(t.booking.minutes, { minutes: s.durationMinutes })}
                   </span>
                 </span>
-                <strong>{formatEuros(s.priceCents)}</strong>
+                <strong>{formatEuros(s.priceCents, locale)}</strong>
               </Link>
             </li>
           );

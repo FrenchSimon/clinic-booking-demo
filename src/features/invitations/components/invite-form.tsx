@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { type InviteFormState, invitePractitioner } from "../actions";
 
 // Controlled fields: kept after an error, cleared after a sent invitation.
-export function InviteForm() {
+export function InviteForm({
+  t,
+}: {
+  t: { name: string; email: string; sending: string; send: string };
+}) {
   const [state, action, pending] = useActionState<InviteFormState, FormData>(
     invitePractitioner,
     {},
@@ -26,7 +30,7 @@ export function InviteForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Field
           name="name"
-          label="Physio's name"
+          label={t.name}
           autoComplete="off"
           required
           value={name}
@@ -35,7 +39,7 @@ export function InviteForm() {
         />
         <Field
           name="email"
-          label="Their email"
+          label={t.email}
           type="email"
           inputMode="email"
           autoComplete="off"
@@ -47,7 +51,7 @@ export function InviteForm() {
       </div>
       <FormMessage error={state.error} message={state.message} />
       <Button type="submit" disabled={pending} className="self-start">
-        {pending ? "Sending…" : "Send the invitation"}
+        {pending ? t.sending : t.send}
       </Button>
     </form>
   );

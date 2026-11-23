@@ -1,25 +1,31 @@
 import { StatusPill } from "@/features/booking/components/status-pill";
 import { formatEuros } from "@/features/services/schema";
+import { dateFormat } from "@/i18n/format";
+import { getDictionary } from "@/i18n/server";
 import type { ClinicBooking } from "../queries";
 
-const when = new Intl.DateTimeFormat("en-GB", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  hour: "2-digit",
-  minute: "2-digit",
-  hourCycle: "h23",
-  timeZone: "Europe/Brussels",
-});
-
 /** What the owner sees of one booking: status, who, what, when and price. */
-export function ClinicBookingCard({ booking }: { booking: ClinicBooking }) {
+export async function ClinicBookingCard({
+  booking,
+}: {
+  booking: ClinicBooking;
+}) {
+  const { locale, t } = await getDictionary();
+  const r = t.clinic.bookings.rows;
+  const when = dateFormat(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
   const rows = [
-    ["Patient", booking.patientEmail ?? "Staff booking"],
-    ["Session", booking.serviceName],
-    ["Physio", booking.physioName ?? "Physio"],
-    ["When", when.format(booking.startsAt)],
-    ["Price", formatEuros(booking.priceCents)],
+    [r.patient, booking.patientEmail ?? t.clinic.common.staffBooking],
+    [r.session, booking.serviceName],
+    [r.physio, booking.physioName ?? t.clinic.common.physio],
+    [r.when, when.format(booking.startsAt)],
+    [r.price, formatEuros(booking.priceCents, locale)],
   ];
   return (
     <div className="flex flex-col gap-5 rounded-[18px] border bg-card p-5 sm:p-8">

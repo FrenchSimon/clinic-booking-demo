@@ -1,19 +1,7 @@
+import { dateFormat } from "@/i18n/format";
+import { getDictionary } from "@/i18n/server";
 import { getAgenda } from "../queries";
 import { SessionList } from "./session-list";
-
-const longDay = new Intl.DateTimeFormat("en-GB", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
-});
-
-const shortDay = new Intl.DateTimeFormat("en-GB", {
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-});
 
 const noon = (date: string) => new Date(`${date}T12:00:00Z`);
 
@@ -26,11 +14,26 @@ export async function PhysioAgenda({
   clinicId: string;
 }) {
   const { date, today, week } = await getAgenda(userId, clinicId);
+  const { locale, t } = await getDictionary();
+  const a = t.clinic.agenda;
+  // Calendar days: their noon in UTC, so no time zone moves them.
+  const longDay = dateFormat(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  });
+  const shortDay = dateFormat(locale, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
   return (
     <>
       <div className="flex flex-col gap-1">
         <p className="font-semibold text-oak text-sm uppercase tracking-[0.08em]">
-          My agenda
+          {a.label}
         </p>
         <h1 className="font-heading font-normal text-3xl sm:text-4xl">
           {longDay.format(noon(date))}
@@ -44,11 +47,11 @@ export async function PhysioAgenda({
           id="agenda-today-title"
           className="border-divider border-b px-4 py-4 font-semibold text-[17px] sm:px-5"
         >
-          Today
+          {a.today}
         </h2>
         {today.length === 0 ? (
           <p className="px-4 py-5 text-muted-foreground sm:px-5">
-            No session booked with you today.
+            {a.noneToday}
           </p>
         ) : (
           <SessionList sessions={today} />
@@ -62,11 +65,11 @@ export async function PhysioAgenda({
           id="agenda-week-title"
           className="border-divider border-b px-4 py-4 font-semibold text-[17px] sm:px-5"
         >
-          This week
+          {a.thisWeek}
         </h2>
         {week.length === 0 ? (
           <p className="px-4 py-5 text-muted-foreground sm:px-5">
-            No other session booked with you this week.
+            {a.noneThisWeek}
           </p>
         ) : (
           week.map((day) => (

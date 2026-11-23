@@ -4,10 +4,13 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { Field, FormMessage } from "@/components/field";
 import { Button } from "@/components/ui/button";
+import type { Dictionary } from "@/i18n/dictionaries";
 import { type FormState, signUp } from "../actions";
 import { TermsCheckbox } from "./terms-checkbox";
 
-export function SignupForm({ next }: { next: string }) {
+type Strings = Pick<Dictionary["auth"], "fields" | "signup">;
+
+export function SignupForm({ next, t }: { next: string; t: Strings }) {
   const [state, action, pending] = useActionState<FormState, FormData>(
     signUp,
     {},
@@ -20,7 +23,7 @@ export function SignupForm({ next }: { next: string }) {
       <input type="hidden" name="next" value={next} />
       <Field
         name="email"
-        label="Email"
+        label={t.fields.email}
         type="email"
         inputMode="email"
         autoComplete="email"
@@ -30,25 +33,25 @@ export function SignupForm({ next }: { next: string }) {
       />
       <Field
         name="password"
-        label="Password"
+        label={t.fields.password}
         type="password"
         autoComplete="new-password"
         minLength={8}
         required
         error={state.fieldErrors?.password}
       />
-      <TermsCheckbox error={state.fieldErrors?.terms} />
+      <TermsCheckbox error={state.fieldErrors?.terms} t={t.signup} />
       <FormMessage error={state.error} />
       <Button type="submit" size="lg" disabled={pending} className="w-full">
-        {pending ? "Creating your account…" : "Create account"}
+        {pending ? t.signup.pending : t.signup.submit}
       </Button>
       <p className="text-muted-foreground text-sm">
-        Already have an account?{" "}
+        {t.signup.haveAccount}{" "}
         <Link
           href={`/login?next=${encodeURIComponent(next)}`}
           className="font-medium text-primary underline"
         >
-          Log in
+          {t.signup.logIn}
         </Link>
       </p>
     </form>

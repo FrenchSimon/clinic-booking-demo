@@ -4,9 +4,12 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { Field, FormMessage } from "@/components/field";
 import { Button } from "@/components/ui/button";
+import type { Dictionary } from "@/i18n/dictionaries";
 import { type FormState, requestPasswordReset } from "../actions";
 
-export function ForgotPasswordForm() {
+type Strings = Pick<Dictionary["auth"], "fields" | "forgot">;
+
+export function ForgotPasswordForm({ t }: { t: Strings }) {
   const [state, action, pending] = useActionState<FormState, FormData>(
     requestPasswordReset,
     {},
@@ -18,7 +21,7 @@ export function ForgotPasswordForm() {
     <form action={action} className="flex flex-col gap-4" noValidate>
       <Field
         name="email"
-        label="Email"
+        label={t.fields.email}
         type="email"
         inputMode="email"
         autoComplete="email"
@@ -28,13 +31,13 @@ export function ForgotPasswordForm() {
       />
       <FormMessage error={state.error} />
       <Button type="submit" size="lg" disabled={pending} className="w-full">
-        {pending ? "Sending…" : "Send the link"}
+        {pending ? t.forgot.pending : t.forgot.submit}
       </Button>
       <Link
         href="/login"
         className="inline-flex min-h-11 items-center self-start text-muted-foreground text-sm underline"
       >
-        Back to log in
+        {t.forgot.back}
       </Link>
     </form>
   );

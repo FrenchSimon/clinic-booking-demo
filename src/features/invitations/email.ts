@@ -1,20 +1,28 @@
 import type { EmailContent } from "@/features/email/layout";
+import { dictionaries } from "@/i18n/dictionaries";
+import { fill, type Locale } from "@/i18n/locale";
 
+/** The invitation a new physio gets, in the inviting owner's language. */
 export function invitationEmail(input: {
   physioName: string;
   clinicName: string;
   clinicAddress: string;
   email: string;
   link: string;
+  locale?: Locale;
 }): EmailContent {
+  const locale = input.locale ?? "en";
+  const t = dictionaries[locale].emails;
+  const clinic = input.clinicName;
   return {
-    heading: `Join ${input.clinicName} on Kinora`,
+    heading: fill(t.invitation.heading, { clinic }),
     paragraphs: [
-      `Hello ${input.physioName},`,
-      `${input.clinicName} uses Kinora for online booking and invites you to join as a physio. You will see your sessions in your own agenda.`,
-      `Create your account or log in with ${input.email}. The link works for 7 days.`,
+      fill(t.invitation.hello, { name: input.physioName }),
+      fill(t.invitation.invites, { clinic }),
+      fill(t.invitation.account, { email: input.email }),
     ],
-    action: { label: "Accept the invitation", url: input.link },
-    footer: `${input.clinicName} · ${input.clinicAddress}`,
+    action: { label: t.invitation.accept, url: input.link },
+    footer: fill(t.footer, { clinic, address: input.clinicAddress }),
+    locale,
   };
 }

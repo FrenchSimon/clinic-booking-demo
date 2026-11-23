@@ -1,6 +1,9 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { dateFormat } from "@/i18n/format";
+import type { Locale } from "@/i18n/locale";
 import type { ProposedSlot } from "../next-slot";
+import type { ChatStrings } from "./assistant-chat";
 
 export type Message = {
   role: "user" | "assistant";
@@ -10,29 +13,24 @@ export type Message = {
   fallback?: boolean;
 };
 
-const dayFormat = new Intl.DateTimeFormat("en-GB", {
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-});
-
 /** The conversation, newest at the bottom. */
 export function AssistantThread({
   messages,
   pending,
   onPickSlot,
+  locale,
+  t,
 }: {
   messages: Message[];
   pending: boolean;
   onPickSlot: () => void;
+  locale: Locale;
+  t: ChatStrings;
 }) {
   return (
     <div aria-live="polite" className="flex flex-col gap-2.5">
       <p className="mb-1 rounded-xl bg-surface px-3 py-2.5 text-muted-foreground text-sm">
-        I answer from the clinic's own information only. I can't give medical
-        advice, and I can't see anyone's bookings. Please don't share health
-        details here: your messages are sent to an AI service.
+        {t.note}
       </p>
       {messages.map((m, i) =>
         m.role === "user" ? (
@@ -51,13 +49,20 @@ export function AssistantThread({
             className="flex max-w-[86%] flex-col gap-2.5 self-start rounded-[18px_18px_18px_4px] border bg-card px-3.5 py-2.5"
           >
             <p className="whitespace-pre-wrap break-words">{m.content}</p>
-            {m.slot && <SlotCard slot={m.slot} onPick={onPickSlot} />}
+            {m.slot && (
+              <SlotCard
+                slot={m.slot}
+                onPick={onPickSlot}
+                locale={locale}
+                bookOnPage={t.bookOnPage}
+              />
+            )}
           </div>
         ),
       )}
       {pending && (
         <p className="self-start rounded-[18px_18px_18px_4px] border bg-card px-3.5 py-2.5 text-muted-foreground">
-          Looking it up…
+          {t.thinking}
         </p>
       )}
     </div>
@@ -68,11 +73,20 @@ export function AssistantThread({
 function SlotCard({
   slot,
   onPick,
+  locale,
+  bookOnPage,
 }: {
   slot: ProposedSlot;
   onPick: () => void;
+  locale: Locale;
+  bookOnPage: string;
 }) {
-  const day = dayFormat.format(new Date(`${slot.day}T12:00:00Z`));
+  // Noon UTC is the same day in Brussels.
+  const day = dateFormat(locale, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(new Date(`${slot.day}T12:00:00Z`));
   const physio = slot.physio.split(" ")[0];
   return (
     <Link
@@ -86,7 +100,7 @@ function SlotCard({
           {day} · {slot.time} · {physio}
         </strong>
         <span className="text-muted-foreground text-sm">
-          {slot.service} · Book and pay on the booking page
+          {slot.service} · {bookOnPage}
         </span>
       </span>
       <ChevronRight aria-hidden className="size-5 shrink-0 text-primary" />

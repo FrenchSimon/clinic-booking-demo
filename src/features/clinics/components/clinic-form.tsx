@@ -3,14 +3,35 @@
 import { startTransition, useActionState, useState } from "react";
 import { Field, FormMessage } from "@/components/field";
 import { Button } from "@/components/ui/button";
+import { fill } from "@/i18n/locale";
 import { type ClinicFormState, createClinic } from "../actions";
 import { DEFAULT_OPENING_HOURS, type OpeningHours, slugify } from "../schema";
-import { OpeningHoursFields } from "./opening-hours-fields";
+import { type HoursStrings, OpeningHoursFields } from "./opening-hours-fields";
+
+export type ClinicFormStrings = {
+  name: string;
+  slug: string;
+  slugPreview: string;
+  slugPlaceholder: string;
+  address: string;
+  addressHint: string;
+  addressPlaceholder: string;
+  submit: string;
+  pending: string;
+};
 
 // Controlled fields, submitted by hand: an owner who made one mistake should
 // not retype the whole clinic, and React's automatic reset after a form
 // action would put the day checkboxes back without updating their state.
-export function ClinicForm({ origin }: { origin: string }) {
+export function ClinicForm({
+  origin,
+  t,
+  hours: hoursStrings,
+}: {
+  origin: string;
+  t: ClinicFormStrings;
+  hours: HoursStrings;
+}) {
   const [state, action, pending] = useActionState<ClinicFormState, FormData>(
     createClinic,
     {},
@@ -34,7 +55,7 @@ export function ClinicForm({ origin }: { origin: string }) {
     >
       <Field
         name="name"
-        label="Clinic name"
+        label={t.name}
         autoComplete="organization"
         required
         value={name}
@@ -47,7 +68,7 @@ export function ClinicForm({ origin }: { origin: string }) {
       <div className="flex flex-col gap-1.5">
         <Field
           name="slug"
-          label="Booking page address"
+          label={t.slug}
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
@@ -60,21 +81,26 @@ export function ClinicForm({ origin }: { origin: string }) {
           error={errors?.slug}
         />
         <p className="break-all text-muted-foreground text-sm">
-          Patients will book at {origin}/c/{slug || "your-clinic"}
+          {fill(t.slugPreview, { origin, slug: slug || t.slugPlaceholder })}
         </p>
       </div>
       <Field
         name="address"
-        label="Street address"
-        hint="Street, number, postcode and city, as patients will see it."
+        label={t.address}
+        hint={t.addressHint}
         autoComplete="street-address"
-        placeholder="Rue Exemple 12, 1000 Brussels"
+        placeholder={t.addressPlaceholder}
         required
         value={address}
         onChange={(e) => setAddress(e.target.value)}
         error={errors?.address}
       />
-      <OpeningHoursFields value={hours} onChange={setHours} errors={errors} />
+      <OpeningHoursFields
+        value={hours}
+        onChange={setHours}
+        errors={errors}
+        strings={hoursStrings}
+      />
       <FormMessage error={state.error} />
       <Button
         type="submit"
@@ -82,7 +108,7 @@ export function ClinicForm({ origin }: { origin: string }) {
         disabled={pending}
         className="w-full sm:w-auto"
       >
-        {pending ? "Creating your clinic…" : "Create the clinic"}
+        {pending ? t.pending : t.submit}
       </Button>
     </form>
   );

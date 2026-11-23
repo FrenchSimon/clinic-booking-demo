@@ -1,18 +1,13 @@
 import type { ReactNode } from "react";
 import { formatEuros } from "@/features/services/schema";
+import { INTL_LOCALE } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 import { bookAndPay } from "../actions";
 import type { Selection } from "../selection";
 import { PayButton } from "./pay-button";
 
-const dayFormat = new Intl.DateTimeFormat("en-GB", {
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-});
-
 /** Fixed at the bottom: what the patient picked, its price, and the next step. */
-export function SummaryBar({
+export async function SummaryBar({
   slug,
   selection,
   physioName,
@@ -29,10 +24,18 @@ export function SummaryBar({
 }) {
   const { service, day, at } = selection;
   if (!service) return null;
+  const { locale, t } = await getDictionary();
+  // A calendar day: formatted in UTC so it never shifts.
+  const dayFormat = new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
   const when =
     day && at
       ? `${dayFormat.format(new Date(`${day}T12:00:00Z`))} · ${at} · ${physioName}`
-      : "Pick a day and a time";
+      : t.booking.pickTime;
 
   return (
     <div className="sticky bottom-0 border-t bg-card">
@@ -46,7 +49,9 @@ export function SummaryBar({
       <div className="mx-auto flex w-full max-w-xl flex-col gap-2.5 px-4 py-4">
         <p className="flex justify-between gap-4">
           <span>{when}</span>
-          <strong>{formatEuros(service.priceCents)}</strong>
+          <strong className="whitespace-nowrap">
+            {formatEuros(service.priceCents, locale)}
+          </strong>
         </p>
         {error && (
           <p role="alert" className="text-destructive text-sm">
@@ -59,17 +64,21 @@ export function SummaryBar({
           <input type="hidden" name="physio" value={selection.physio} />
           <input type="hidden" name="day" value={day ?? ""} />
           <input type="hidden" name="at" value={at ?? ""} />
-          <PayButton disabled={!day || !at} />
+          <PayButton
+            disabled={!day || !at}
+            label={t.booking.pay}
+            pendingLabel={t.booking.holding}
+          />
         </form>
         <p className="text-center text-muted-foreground text-xs">
-          Test mode, no real payment: pay with card{" "}
+          {t.booking.testCard}{" "}
           <span className="whitespace-nowrap font-semibold text-foreground">
             4242 4242 4242 4242
           </span>
-          , any future date and any CVC.
+          {t.booking.testCardEnd}
         </p>
         <p className="text-center text-muted-foreground text-xs">
-          Your slot is held for 15 minutes while you pay · Booking by Kinora
+          {t.booking.held}
         </p>
       </div>
     </div>

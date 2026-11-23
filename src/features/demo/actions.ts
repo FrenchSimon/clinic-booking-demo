@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { landingPath } from "@/features/auth/landing";
 import { queueTomorrowsReminders } from "@/features/booking/reminders";
+import { getRequestDictionary } from "@/i18n/server";
 import { adminDb } from "@/lib/db";
 import { createClient } from "@/lib/supabase/server";
 import { getUser, requireUser } from "@/server/auth";
@@ -37,16 +38,15 @@ async function visitorId(): Promise<string | null> {
  * the sign-in, like logIn(); the rate limit guards it instead.
  */
 export async function startDemo(_prev: DemoState): Promise<DemoState> {
+  const { locale, t } = await getRequestDictionary();
   if (!(await rateLimit("demo:start", 3))) {
-    return { error: "Too many demos started. Wait a minute and try again." };
+    return { error: t.bar.errors.tooManyDemos };
   }
   const visitor = await visitorId();
-  if (!visitor) {
-    return { error: "The demo is unavailable right now. Try again later." };
-  }
+  if (!visitor) return { error: t.bar.errors.demoUnavailable };
   const role = await getDemoRole(visitor);
   if (!role) {
-    await createDemoClinic(visitor);
+    await createDemoClinic(visitor, locale);
     // adminDb inside: the clean-up job, run on each new visitor as well as
     // daily, so expired demos never wait long for the cron.
     after(() => deleteExpiredDemos(adminDb));
@@ -64,9 +64,10 @@ export async function viewAs(
   formData: FormData,
 ): Promise<DemoState> {
   const user = await requireUser();
+  const { t } = await getRequestDictionary();
   const parsed = viewAsInput.safeParse({ role: formData.get("role") });
   if (!user.is_anonymous || !parsed.success) {
-    return { error: "This switch only works in a demo clinic." };
+    return { error: t.bar.errors.demoOnly };
   }
   const { role } = parsed.data;
   // adminDb: the switch moves memberships and bookings between the visitor
@@ -75,7 +76,7 @@ export async function viewAs(
   const done = await adminDb.transaction((tx) =>
     switchDemoRole(tx, user.id, role),
   );
-  if (!done) return { error: "Your demo clinic has ended. Start a new one." };
+  if (!done) return { error: t.bar.errors.demoEnded };
   // The bar lives in the root layout, which a redirect does not re-render.
   refresh();
   redirect(landingPath([role]));
@@ -94,7 +95,10 @@ export async function sendDemoReminders(
 ): Promise<RemindersState> {
   const user = await requireUser();
   const clinic = user.is_anonymous ? await getDemoClinic(user.id) : null;
-  if (!clinic) return { error: "This button only works in a demo clinic." };
+  if (!clinic) {
+    const { t } = await getRequestDictionary();
+    return { error: t.bar.errors.remindersDemoOnly };
+  }
   const origin = await siteOrigin();
   // adminDb: like the daily job, it reads the patients' addresses, which no
   // policy shows a visitor, and queues as the clinic whatever the visitor's

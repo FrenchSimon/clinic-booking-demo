@@ -1,12 +1,8 @@
+import { dateFormat } from "@/i18n/format";
+import { fill } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 import { getTeam } from "../queries";
 import { InviteForm } from "./invite-form";
-
-const dateFormat = new Intl.DateTimeFormat("en-GB", {
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-  timeZone: "Europe/Brussels",
-});
 
 /** Owners only: the clinic's physios, open invitations and the invite form. */
 export async function TeamSection({
@@ -18,6 +14,13 @@ export async function TeamSection({
 }) {
   const team = await getTeam(userId, clinicId);
   const empty = team.physios.length === 0 && team.pending.length === 0;
+  const { locale, t } = await getDictionary();
+  const p = t.team.physios;
+  const until = dateFormat(locale, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
 
   return (
     <section
@@ -25,23 +28,20 @@ export async function TeamSection({
       className="flex flex-col gap-5 rounded-[18px] border bg-card p-5 sm:p-8"
     >
       <h2 id="team-title" className="font-heading font-semibold text-xl">
-        Physios
+        {p.title}
       </h2>
       {empty ? (
-        <p className="text-muted-foreground">
-          No physio yet. Invite the people who treat patients here: each one
-          gets an email to create their account.
-        </p>
+        <p className="text-muted-foreground">{p.empty}</p>
       ) : (
         <ul className="flex flex-col">
-          {team.physios.map((p) => (
+          {team.physios.map((physio) => (
             <li
-              key={p.id}
+              key={physio.id}
               className="flex items-center justify-between gap-4 border-divider border-b py-3 last:border-b-0"
             >
-              <span>{p.name}</span>
+              <span>{physio.name}</span>
               <span className="rounded-full bg-status-confirmed px-3 py-1 font-semibold text-status-confirmed-foreground text-xs">
-                Active
+                {p.active}
               </span>
             </li>
           ))}
@@ -57,15 +57,17 @@ export async function TeamSection({
                 </span>
               </span>
               <span className="rounded-full bg-status-pending px-3 py-1 font-semibold text-status-pending-foreground text-xs">
-                Invited · until {dateFormat.format(i.expiresAt)}
+                {fill(p.invitedUntil, { date: until.format(i.expiresAt) })}
               </span>
             </li>
           ))}
         </ul>
       )}
       <div className="border-t pt-5">
-        <h3 className="mb-3 font-semibold">Invite a physio</h3>
-        <InviteForm />
+        <h3 className="mb-3 font-semibold">{p.invite}</h3>
+        <InviteForm
+          t={{ name: p.name, email: p.email, sending: p.sending, send: p.send }}
+        />
       </div>
     </section>
   );

@@ -129,3 +129,12 @@ describe("clinicFacts", () => {
     );
   });
 });
+
+describe("in French", () => {
+  it("gives the facts' dates, weekdays and prices in French", () => {
+    const facts = clinicFacts(page, "2026-11-24", "fr");
+    expect(facts).toContain("Today: mardi 24 novembre 2026 (2026-11-24)");
+    expect(facts).toContain("- dimanche: closed");
+    expect(facts).toMatch(/Initial assessment: 45 min, 60,00\s€/);
+  });
+});

@@ -1,18 +1,15 @@
 import { StatusPill } from "@/features/booking/components/status-pill";
+import { timeFormat } from "@/i18n/format";
+import { getDictionary } from "@/i18n/server";
 import type { AgendaSession } from "../queries";
-
-const time = new Intl.DateTimeFormat("en-GB", {
-  hour: "2-digit",
-  minute: "2-digit",
-  hourCycle: "h23",
-  timeZone: "Europe/Brussels",
-});
 
 /**
  * The sessions of one day: time, patient, session and status. On a phone
  * the patient and session wrap under the time, from `sm:` one line each.
  */
-export function SessionList({ sessions }: { sessions: AgendaSession[] }) {
+export async function SessionList({ sessions }: { sessions: AgendaSession[] }) {
+  const { locale, t } = await getDictionary();
+  const time = timeFormat(locale);
   return (
     <ul>
       {sessions.map((s) => (
@@ -25,7 +22,7 @@ export function SessionList({ sessions }: { sessions: AgendaSession[] }) {
             title={s.patientEmail ?? undefined}
             className="order-last w-full min-w-0 break-all sm:order-none sm:w-auto sm:truncate"
           >
-            {s.patientEmail ?? "Staff booking"}
+            {s.patientEmail ?? t.clinic.common.staffBooking}
           </span>
           <span className="order-last w-full text-muted-foreground text-sm sm:order-none sm:w-auto sm:text-base">
             {s.serviceName}

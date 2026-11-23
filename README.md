@@ -18,6 +18,7 @@ Kinora is an online booking app for small physiotherapy clinics: patients book a
 - Dashboards for the owner and the practitioner
 - An assistant that answers patient questions from the clinic's own data
 - A no-sign-up demo: your own seeded clinic and a "View as" bar to switch roles
+- English and French: a switch in the top bar, or `?lang=fr` on any address; emails go out in the language the patient booked in
 
 Progress, task by task: [ROADMAP.md](ROADMAP.md).
 
@@ -30,6 +31,7 @@ Next.js 16 (App Router, Server Actions) · React 19 · TypeScript · Tailwind CS
 - **Mobile first.** Every screen is designed at 375 px, then widened. Pages render on the server, so phones download little JavaScript.
 - **Every input is validated on the server** with Zod, and every action checks the signed-in user.
 - **One folder per feature** in `src/features/`, so a new feature does not touch the others.
+- **Two languages, the same addresses.** The proxy serves each page from `src/app/[lang]/` in the language of the `lang` cookie, so pages are still prerendered once per language. The strings live in typed dictionaries (`src/i18n/en` is the source, `src/i18n/fr` must match it key for key). A patient's language is kept on their account, so the webhook and the reminder job write to them in it.
 - **Small, readable commits**, each tied to a roadmap task. CI runs the typecheck, lint, tests, build, the Playwright journeys, the database tests on a local Supabase and a secret scan on every push.
 
 ## Technical report

@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { getOwnedClinic } from "@/features/clinics/queries";
 import { deliverEmail, queueEmail } from "@/features/email/outbox";
+import { fill } from "@/i18n/locale";
+import { translateMessage } from "@/i18n/messages";
+import { getRequestDictionary } from "@/i18n/server";
 import { withRls } from "@/lib/db";
 import { isUniqueViolation } from "@/lib/pg-errors";
 import { requireUser } from "@/server/auth";
@@ -26,22 +29,28 @@ export async function invitePractitioner(
   formData: FormData,
 ): Promise<InviteFormState> {
   const user = await requireUser();
+  const { locale, t } = await getRequestDictionary();
+  const e = t.team.inviteErrors;
   if (!(await rateLimit(`invitations:create:${user.id}`, 10))) {
-    return { error: "Too many invitations in a minute. Try again shortly." };
+    return { error: e.tooMany };
   }
   const parsed = inviteInput.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     const fieldErrors: InviteFormState["fieldErrors"] = {};
     for (const issue of parsed.error.issues) {
       const key = issue.path[0] as "name" | "email";
-      fieldErrors[key] ??= issue.message;
+      fieldErrors[key] ??= translateMessage(
+        issue.message,
+        locale,
+        (d) => d.team.inviteValidation,
+      );
     }
     return { fieldErrors };
   }
 
   // RLS also refuses a non-owner; this gives a clear message first.
   const clinic = await getOwnedClinic(user.id);
-  if (!clinic) return { error: "Only the clinic's owner can invite physios." };
+  if (!clinic) return { error: e.ownerOnly };
 
   const { name, email } = parsed.data;
   const { token, hash } = newInviteToken();
@@ -78,14 +87,13 @@ export async function invitePractitioner(
           clinicAddress: clinic.address,
           email,
           link,
+          locale,
         }),
       });
     });
   } catch (error) {
     if (isUniqueViolation(error, "invitations_open_email_unique")) {
-      return {
-        fieldErrors: { email: "This address already has an open invitation." },
-      };
+      return { fieldErrors: { email: e.alreadyInvited } };
     }
     throw error;
   }
@@ -93,5 +101,5 @@ export async function invitePractitioner(
   // Send after the response: the owner does not wait for Resend.
   if (emailId) after(() => deliverEmail(emailId));
   revalidatePath("/clinic");
-  return { message: `Invitation sent to ${name} (${email}).` };
+  return { message: fill(t.team.physios.sent, { name, email }) };
 }

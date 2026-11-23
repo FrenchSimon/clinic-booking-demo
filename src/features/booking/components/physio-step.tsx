@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { getDictionary } from "@/i18n/server";
 import { cn } from "@/lib/utils";
 import { type Selection, selectionHref } from "../selection";
 import { Step } from "./step";
 
-export function PhysioStep({
+export async function PhysioStep({
   slug,
   physios,
   selection,
@@ -13,9 +14,10 @@ export function PhysioStep({
   physios: { id: string; name: string }[];
   selection: Selection;
 }) {
-  const choices = [{ id: "any", name: "Any" }, ...physios];
+  const { t } = await getDictionary();
+  const choices = [{ id: "any", name: t.booking.any }, ...physios];
   return (
-    <Step number={2} title="Physio">
+    <Step number={2} title={t.booking.steps.physio}>
       <ul className="flex flex-wrap gap-2">
         {choices.map((p) => {
           const current = p.id === selection.physio;

@@ -1,20 +1,11 @@
+import { dateFormat, moneyFormat } from "@/i18n/format";
+import { fill } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
+
 // Rounded in stat cards, two decimals for an exact amount (DESIGN.md, formats).
-const rounded = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "EUR",
-  maximumFractionDigits: 0,
-});
-const exact = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "EUR",
-});
-const monthName = new Intl.DateTimeFormat("en-GB", {
-  month: "long",
-  timeZone: "UTC",
-});
 
 /** The owner's four figures: two on a row on a phone, four from `md:`. */
-export function StatCards({
+export async function StatCards({
   today,
   todayCount,
   weekCount,
@@ -29,24 +20,32 @@ export function StatCards({
   cancelledCount: number;
   refundedCents: number;
 }) {
-  const month = monthName.format(new Date(`${today}T12:00:00Z`));
-  const bookings = (n: number) => (n === 1 ? "booking" : "bookings");
+  const { locale, t } = await getDictionary();
+  const d = t.clinic.dashboard;
+  const month = dateFormat(locale, { month: "long", timeZone: "UTC" }).format(
+    new Date(`${today}T12:00:00Z`),
+  );
+  // French counts 0 and 1 as singular, English only 1.
+  const bookings = (n: number) =>
+    n === 1 || (locale === "fr" && n === 0) ? d.bookingOne : d.bookingMany;
+  const rounded = moneyFormat(locale, { rounded: true });
+  const exact = moneyFormat(locale);
   return (
     <dl className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-      <Card label="Today" value={String(todayCount)}>
+      <Card label={d.today} value={String(todayCount)}>
         {bookings(todayCount)}
       </Card>
-      <Card label="This week" value={String(weekCount)}>
+      <Card label={d.thisWeek} value={String(weekCount)}>
         {bookings(weekCount)}
       </Card>
       <Card
-        label={`Revenue, ${month}`}
+        label={fill(d.revenue, { month })}
         value={rounded.format(revenueCents / 100)}
       >
-        paid by card
+        {d.paidByCard}
       </Card>
-      <Card label="Cancelled" value={String(cancelledCount)}>
-        {exact.format(refundedCents / 100)} refunded
+      <Card label={d.cancelled} value={String(cancelledCount)}>
+        {fill(d.refunded, { amount: exact.format(refundedCents / 100) })}
       </Card>
     </dl>
   );

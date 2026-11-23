@@ -8,6 +8,9 @@ import {
   openingHoursFromForm,
   openingHoursSchema,
 } from "@/features/clinics/schema";
+import type { Dictionary } from "@/i18n/dictionaries";
+import { translateMessage } from "@/i18n/messages";
+import { getRequestDictionary } from "@/i18n/server";
 import { withRls } from "@/lib/db";
 import { requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
@@ -23,14 +26,14 @@ export type ScheduleFormState = {
 };
 
 /** The signed-in physio's clinic and membership, or an error to show. */
-async function physio(userId: string) {
+async function physio(userId: string, t: Dictionary["team"]) {
   if (!(await rateLimit(`availability:${userId}`, 30))) {
-    return { error: "Too many changes in a minute. Try again shortly." };
+    return { error: t.hoursErrors.tooMany };
   }
   const mine = await getStaffClinic(userId);
   const schedule = mine && (await getMySchedule(userId, mine.clinic.id));
   if (!mine || !schedule) {
-    return { error: "Only physios set working hours." };
+    return { error: t.hoursErrors.physioOnly };
   }
   return { clinic: mine.clinic, membershipId: schedule.membershipId };
 }
@@ -40,18 +43,27 @@ export async function saveWeeklyHours(
   formData: FormData,
 ): Promise<ScheduleFormState> {
   const user = await requireUser();
-  const me = await physio(user.id);
+  const { locale, t } = await getRequestDictionary();
+  const me = await physio(user.id, t.team);
   if ("error" in me) return { error: me.error };
 
   const parsed = openingHoursSchema.safeParse(openingHoursFromForm(formData));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
-      fieldErrors[`weeklyHours.${issue.path.join(".")}`] ??= issue.message;
+      fieldErrors[`weeklyHours.${issue.path.join(".")}`] ??= translateMessage(
+        issue.message,
+        locale,
+        (d) => d.clinic.validation,
+      );
     }
     return { fieldErrors };
   }
-  const outside = outsideOpeningHours(parsed.data, me.clinic.openingHours);
+  const outside = outsideOpeningHours(
+    parsed.data,
+    me.clinic.openingHours,
+    t.team,
+  );
   if (Object.keys(outside).length > 0) return { fieldErrors: outside };
 
   await withRls(user.id, (tx) =>
@@ -68,7 +80,7 @@ export async function saveWeeklyHours(
       }),
   );
   revalidatePath("/clinic", "layout");
-  return { message: "Your hours are saved." };
+  return { message: t.team.hours.saved };
 }
 
 export async function addDayOff(
@@ -76,7 +88,8 @@ export async function addDayOff(
   formData: FormData,
 ): Promise<ScheduleFormState> {
   const user = await requireUser();
-  const me = await physio(user.id);
+  const { locale, t } = await getRequestDictionary();
+  const me = await physio(user.id, t.team);
   if ("error" in me) return { error: me.error };
 
   const parsed = dayOffInput(brusselsToday()).safeParse({
@@ -86,7 +99,11 @@ export async function addDayOff(
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
-      fieldErrors[String(issue.path[0])] ??= issue.message;
+      fieldErrors[String(issue.path[0])] ??= translateMessage(
+        issue.message,
+        locale,
+        (d) => d.team.hoursValidation,
+      );
     }
     return { fieldErrors };
   }
@@ -99,13 +116,14 @@ export async function addDayOff(
     }),
   );
   revalidatePath("/clinic/hours");
-  return { message: "Day off added." };
+  return { message: t.team.hours.added };
 }
 
 export async function removeDayOff(formData: FormData): Promise<void> {
   const user = await requireUser();
   const id = z.uuid().safeParse(formData.get("id"));
-  if (!id.success || "error" in (await physio(user.id))) return;
+  const { t } = await getRequestDictionary();
+  if (!id.success || "error" in (await physio(user.id, t.team))) return;
   // RLS only lets a physio delete their own days off.
   await withRls(user.id, (tx) =>
     tx.delete(daysOff).where(eq(daysOff.id, id.data)),

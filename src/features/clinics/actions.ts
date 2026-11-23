@@ -1,6 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { translateMessage } from "@/i18n/messages";
+import { getRequestDictionary } from "@/i18n/server";
 import { withRls } from "@/lib/db";
 import { isUniqueViolation } from "@/lib/pg-errors";
 import { requireUser } from "@/server/auth";
@@ -20,15 +22,20 @@ export async function createClinic(
   formData: FormData,
 ): Promise<ClinicFormState> {
   const user = await requireUser();
+  const { locale, t } = await getRequestDictionary();
   if (!(await rateLimit(`clinics:create:${user.id}`, 5))) {
-    return { error: "Too many attempts. Wait a minute and try again." };
+    return { error: t.clinic.errors.tooMany };
   }
 
   const parsed = clinicInput.safeParse(clinicFromForm(formData));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
-      fieldErrors[issue.path.join(".")] ??= issue.message;
+      fieldErrors[issue.path.join(".")] ??= translateMessage(
+        issue.message,
+        locale,
+        (d) => d.clinic.validation,
+      );
     }
     return { fieldErrors };
   }
@@ -42,7 +49,7 @@ export async function createClinic(
   } catch (error) {
     if (isUniqueViolation(error, "clinics_slug_unique")) {
       return {
-        fieldErrors: { slug: "This address is already taken. Try another." },
+        fieldErrors: { slug: t.clinic.errors.slugTaken },
       };
     }
     throw error;

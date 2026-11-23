@@ -4,6 +4,7 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { authUsers } from "drizzle-orm/supabase";
 import type * as schema from "@/db/schema";
 import { clinics, memberships } from "@/features/clinics/table";
+import { patientLocale, storedLocale } from "@/features/email/locale";
 import {
   DEMO_VISITOR_EMAIL,
   deliverEmail,
@@ -45,6 +46,7 @@ export async function queueTomorrowsReminders(
       physioName: memberships.displayName,
       clinicName: clinics.name,
       clinicAddress: clinics.address,
+      locale: storedLocale,
     })
     .from(bookings)
     .innerJoin(authUsers, eq(authUsers.id, bookings.patientId))
@@ -69,6 +71,7 @@ export async function queueTomorrowsReminders(
       to: booking.patientEmail ?? DEMO_VISITOR_EMAIL,
       content: reminderEmail({
         ...booking,
+        locale: patientLocale(booking.locale),
         link: `${origin}/bookings/${booking.id}`,
       }),
     });

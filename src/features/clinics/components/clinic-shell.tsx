@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { getDictionary } from "@/i18n/server";
 import type { MembershipRole } from "../table";
 import { type ClinicTab, ClinicTabs } from "./clinic-tabs";
 
@@ -9,7 +10,7 @@ import { type ClinicTab, ClinicTabs } from "./clinic-tabs";
  * Frame of the clinic space: top bar, then the tabs once the clinic exists.
  * The top bar links to the clinic's public booking page, the one patients use.
  */
-export function ClinicShell({
+export async function ClinicShell({
   clinic,
   tabs,
   children,
@@ -18,6 +19,7 @@ export function ClinicShell({
   tabs?: { current: ClinicTab; role: MembershipRole };
   children: ReactNode;
 }) {
+  const { t } = await getDictionary();
   return (
     <div className="flex flex-1 flex-col">
       <header className="border-b">
@@ -41,7 +43,12 @@ export function ClinicShell({
                 href={`/c/${clinic.slug}`}
                 className="flex min-h-11 items-center gap-1 whitespace-nowrap font-semibold text-primary"
               >
-                Booking page
+                <span className="sm:hidden">
+                  {t.clinic.shell.bookingPageShort}
+                </span>
+                <span className="hidden sm:inline">
+                  {t.clinic.shell.bookingPage}
+                </span>
                 <ArrowUpRight aria-hidden className="size-4" />
               </Link>
             )}
@@ -50,7 +57,7 @@ export function ClinicShell({
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8 sm:px-8">
-        {tabs && <ClinicTabs {...tabs} />}
+        {tabs && <ClinicTabs {...tabs} t={t.clinic.shell} />}
         {children}
       </main>
     </div>

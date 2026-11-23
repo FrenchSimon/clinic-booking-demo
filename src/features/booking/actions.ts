@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { SLUG_PATTERN } from "@/features/clinics/schema";
+import { rememberLocale } from "@/features/email/locale";
+import { getRequestLocale } from "@/i18n/server";
 import { getUser, requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
 import { stripe } from "@/server/stripe";
@@ -52,6 +54,8 @@ export async function bookAndPay(formData: FormData): Promise<void> {
     slot.startsAt,
   );
   if ("error" in held) fail(held.error);
+  // The webhook, a cancellation and the reminder write in this language.
+  await rememberLocale(user, await getRequestLocale());
 
   const url = await startCheckout({
     user,

@@ -1,44 +1,77 @@
 import type { EmailContent } from "@/features/email/layout";
 import { formatEuros } from "@/features/services/schema";
+import { dictionaries } from "@/i18n/dictionaries";
+import { dateFormat, timeFormat } from "@/i18n/format";
+import { fill, type Locale } from "@/i18n/locale";
 
-// "Tuesday 1 December at 10:00", always in Brussels time (one time zone).
-const day = new Intl.DateTimeFormat("en-GB", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  timeZone: "Europe/Brussels",
-});
-const time = new Intl.DateTimeFormat("en-GB", {
-  hour: "2-digit",
-  minute: "2-digit",
-  hourCycle: "h23",
-  timeZone: "Europe/Brussels",
-});
+// Built where no request exists (the webhook, the reminder job), so each
+// email takes the patient's language instead of reading it.
 
-export function formatSessionTime(startsAt: Date): string {
-  return `${day.format(startsAt)} at ${time.format(startsAt)}`;
+/** "Tuesday 1 December at 10:00", always in Brussels time (one time zone). */
+export function formatSessionTime(
+  startsAt: Date,
+  locale: Locale = "en",
+): string {
+  const day = dateFormat(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+  return fill(dictionaries[locale].emails.sessionTime, {
+    day: day.format(startsAt),
+    time: timeFormat(locale).format(startsAt),
+  });
 }
 
-/** The email a patient gets once their session is paid (checklist #14). */
-export function confirmationEmail(input: {
+type Session = {
   serviceName: string;
   physioName: string | null;
   clinicName: string;
   clinicAddress: string;
   startsAt: Date;
-  priceCents: number;
   link: string;
-}): EmailContent {
-  const physio = input.physioName ?? "your physio";
+  locale?: Locale;
+};
+
+/** "Follow-up session with Inès on Tuesday 1 December at 10:00". */
+function describe(input: Session, locale: Locale): string {
+  const t = dictionaries[locale].emails;
+  return fill(t.session, {
+    service: input.serviceName,
+    physio: input.physioName ?? t.yourPhysio,
+    when: formatSessionTime(input.startsAt, locale),
+  });
+}
+
+/** What every booking email ends with: the link, the clinic and the language. */
+function frame(input: Session, locale: Locale) {
+  const t = dictionaries[locale].emails;
   return {
-    heading: `Your session at ${input.clinicName} is booked`,
+    action: { label: t.viewBooking, url: input.link },
+    footer: fill(t.footer, {
+      clinic: input.clinicName,
+      address: input.clinicAddress,
+    }),
+    locale,
+  };
+}
+
+/** The email a patient gets once their session is paid (checklist #14). */
+export function confirmationEmail(
+  input: Session & { priceCents: number },
+): EmailContent {
+  const locale = input.locale ?? "en";
+  const t = dictionaries[locale].emails;
+  return {
+    heading: fill(t.confirmation.heading, { clinic: input.clinicName }),
     paragraphs: [
-      `${input.serviceName} with ${physio} on ${formatSessionTime(input.startsAt)}.`,
-      `Address: ${input.clinicAddress}.`,
-      `Paid by card: ${formatEuros(input.priceCents)}. You can cancel online up to 24 hours before for a full refund.`,
+      `${describe(input, locale)}.`,
+      fill(t.address, { address: input.clinicAddress }),
+      fill(t.confirmation.paid, {
+        price: formatEuros(input.priceCents, locale),
+      }),
     ],
-    action: { label: "View my booking", url: input.link },
-    footer: `${input.clinicName} · ${input.clinicAddress}`,
+    ...frame(input, locale),
   };
 }
 
@@ -46,49 +79,37 @@ export function confirmationEmail(input: {
  * The email a patient gets once a cancelled session is refunded (checklist
  * #14), whether they cancelled it (#12) or the clinic did (#13).
  */
-export function cancellationEmail(input: {
-  serviceName: string;
-  physioName: string | null;
-  clinicName: string;
-  clinicAddress: string;
-  startsAt: Date;
-  priceCents: number;
-  byClinic: boolean;
-  link: string;
-}): EmailContent {
-  const physio = input.physioName ?? "your physio";
-  const session = `${input.serviceName} with ${physio} on ${formatSessionTime(input.startsAt)}`;
+export function cancellationEmail(
+  input: Session & { priceCents: number; byClinic: boolean },
+): EmailContent {
+  const locale = input.locale ?? "en";
+  const t = dictionaries[locale].emails;
+  const session = describe(input, locale);
   return {
-    heading: `Your session at ${input.clinicName} is cancelled`,
+    heading: fill(t.cancellation.heading, { clinic: input.clinicName }),
     paragraphs: [
       input.byClinic
-        ? `${input.clinicName} cancelled your session: ${session}.`
-        : `You cancelled your session: ${session}.`,
-      `Your payment of ${formatEuros(input.priceCents)} is refunded in full to your card. It usually shows on your account within 5 to 10 business days.`,
+        ? fill(t.cancellation.byClinic, { clinic: input.clinicName, session })
+        : fill(t.cancellation.byPatient, { session }),
+      fill(t.cancellation.refund, {
+        price: formatEuros(input.priceCents, locale),
+      }),
     ],
-    action: { label: "View my booking", url: input.link },
-    footer: `${input.clinicName} · ${input.clinicAddress}`,
+    ...frame(input, locale),
   };
 }
 
 /** The email a patient gets the day before their session (checklist #15). */
-export function reminderEmail(input: {
-  serviceName: string;
-  physioName: string | null;
-  clinicName: string;
-  clinicAddress: string;
-  startsAt: Date;
-  link: string;
-}): EmailContent {
-  const physio = input.physioName ?? "your physio";
+export function reminderEmail(input: Session): EmailContent {
+  const locale = input.locale ?? "en";
+  const t = dictionaries[locale].emails;
   return {
-    heading: `Your session at ${input.clinicName} is tomorrow`,
+    heading: fill(t.reminder.heading, { clinic: input.clinicName }),
     paragraphs: [
-      `${input.serviceName} with ${physio} on ${formatSessionTime(input.startsAt)}.`,
-      `Address: ${input.clinicAddress}.`,
-      "It is too late to cancel online. If you cannot come, please contact the clinic.",
+      `${describe(input, locale)}.`,
+      fill(t.address, { address: input.clinicAddress }),
+      t.reminder.tooLate,
     ],
-    action: { label: "View my booking", url: input.link },
-    footer: `${input.clinicName} · ${input.clinicAddress}`,
+    ...frame(input, locale),
   };
 }
