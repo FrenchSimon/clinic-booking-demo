@@ -1,7 +1,10 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import { LOCALE_COOKIE, LOCALES, type Locale } from "@/i18n/locale";
+import { LOCALE_COOKIE, type Locale } from "@/i18n/locale";
+
+// French first, as it reads in the bar: "FR | EN".
+const ORDER: Locale[] = ["fr", "en"];
 
 /**
  * "FR | EN" on the right of the portfolio bar. Each link reloads the current
@@ -25,7 +28,7 @@ export function LanguageSwitch({
 
   return (
     <nav aria-label={label} className="-mr-2 flex items-center">
-      {LOCALES.map((locale, i) => (
+      {ORDER.map((locale, i) => (
         <span key={locale} className="flex items-center">
           {i > 0 && (
             <span aria-hidden="true" className="h-4 w-px bg-demo-muted/60" />

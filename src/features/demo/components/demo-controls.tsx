@@ -29,7 +29,7 @@ export async function DemoControls({ t }: { t: Dictionary["bar"] }) {
         aria-label={
           emails > 0 ? fill(t.outboxCount, { count: emails }) : undefined
         }
-        className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-demo-foreground underline underline-offset-4"
+        className="inline-flex min-h-11 items-center gap-1 font-semibold sm:gap-1.5 text-demo-foreground underline underline-offset-4"
       >
         {t.outbox}
         {emails > 0 && (

@@ -25,7 +25,7 @@ export async function PortfolioBar() {
           <p className="text-demo-muted">{t.bar.title}</p>
           <LanguageSwitch current={locale} label={t.bar.languages} />
         </div>
-        <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-3">
+        <div className="flex flex-wrap items-center gap-x-1.5 sm:gap-x-3">
           <a
             href={SOURCE_CODE}
             target="_blank"

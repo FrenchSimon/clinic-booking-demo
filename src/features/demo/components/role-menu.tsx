@@ -80,7 +80,7 @@ export function RoleMenu({
         aria-controls={menuId}
         disabled={pending}
         onClick={() => setOpen((o) => !o)}
-        className="relative inline-flex min-h-10 items-center gap-1.5 rounded-full border before:absolute before:inset-x-0 before:-inset-y-0.5 before:content-[''] border-demo-foreground/35 px-3 font-semibold disabled:opacity-80 sm:px-3.5"
+        className="relative inline-flex min-h-10 items-center gap-1 rounded-full border before:absolute before:inset-x-0 before:-inset-y-0.5 before:content-[''] border-demo-foreground/35 px-2.5 font-semibold disabled:opacity-80 sm:gap-1.5 sm:px-3.5"
       >
         <span className="sr-only">{t.viewAs} </span>
         {pending ? t.switching : label}

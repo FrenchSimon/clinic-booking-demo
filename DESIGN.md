@@ -52,7 +52,7 @@ Always a label, never a color alone.
 
 ## Navigation
 
-- Portfolio bar (a change from the mockup, decided after approval, redrawn on 2026-11-18): a dark bar above every page, on two lines at every width. Line 1: "Portfolio demo · fictional clinic" alone, muted. Line 2: "Read the code ↗" on the left; on the right "Try the demo", or inside a demo clinic the role menu then "Outbox" with a badge counting its emails (hidden at 0). It speaks to people evaluating the demo, so the product pages below never link to the source code.
+- Portfolio bar (a change from the mockup, decided after approval, redrawn on 2026-11-18): a dark bar above every page, on two lines at every width. Line 1: "Portfolio demo · fictional clinic", muted, and on the right the language switch "FR | EN" (current one bold and underlined, `aria-current="true"`, each link 44px tall). Line 2: "Read the code ↗" on the left; on the right "Try the demo", or inside a demo clinic the role menu then "Outbox" with a badge counting its emails (hidden at 0). It speaks to people evaluating the demo, so the product pages below never link to the source code.
 - Clinic space: top bar with the Kinora logo and the clinic name, then pill tabs (Today, Agenda, Patients, Services, Outbox), the current one in soft green with `aria-current="page"`. On a phone the tabs scroll sideways.
 - Role menu (demo clinics): a pill button with the current role and a chevron ("Owner ▾", `aria-haspopup="menu"`). It opens a white panel under it, aligned right: "View the demo as", then Owner, Practitioner, Patient, at least 44px each; the current one in soft green, bold, with a check. Closed by a click outside, Escape or a choice; arrow keys move between roles. The panel is the one element with a shadow (`0 8px 24px rgba(30,43,36,.16)`): it floats over the page.
 - Clinic space top bar: on a phone, the Kinora logo and "Log out" only, the clinic name from `sm:`.
@@ -77,8 +77,9 @@ Always a label, never a color alone.
 
 ## Formats
 
-- Interface in English. Amounts in euros with two decimals in lists (`€45.00`), rounded in stat cards (`€6,240`).
-- 24-hour times (`09:30`), short dates (`Tue 24 Nov`), time zone Europe/Brussels.
+- Interface in English by default, and in French (R7). Amounts in euros with two decimals in lists (`€45.00`, `45,00 €`), rounded in stat cards (`€6,240`, `6 240 €`).
+- 24-hour times (`09:30`), short dates (`Tue 24 Nov`, `mar. 24 nov.`), time zone Europe/Brussels.
+- French: « vous », « séance », « kiné », the apostrophe ’, a no-break space before « : » and a narrow one before « ; ? ! », written as `\u00a0` and `\u202f` in the dictionaries.
 
 ## Accessibility
 

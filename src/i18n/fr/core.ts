@@ -7,7 +7,7 @@ import type {
 export const meta: typeof enMeta = {
   title: "Kinora",
   description:
-    "La réservation en ligne pour les petits cabinets de kinésithérapie : le patient réserve, paie, annule avec remboursement et reçoit un rappel.",
+    "La réservation en ligne pour les petits cabinets de kinésithérapie\u00a0: le patient réserve, paie, annule avec remboursement et reçoit un rappel.",
   suffix: " · Kinora",
 };
 
