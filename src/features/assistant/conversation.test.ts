@@ -100,7 +100,7 @@ describe("answer", () => {
     });
     const system = complete.mock.calls[0]?.[0][0];
     expect(system.role).toBe("system");
-    expect(system.content).toContain("Never give medical advice");
+    expect(system?.content).toContain("Never give medical advice");
     expect(system.content).toContain("Clinic: Maison Tilleul");
   });
 });
@@ -141,4 +141,23 @@ describe("checkedReply", () => {
 it("does not take a price for a time", () => {
   const reply = "A session costs €12.50.";
   expect(checkedReply(reply, null, "")).toBe(reply);
+});
+
+describe("in French", () => {
+  it("asks the model for French and falls back in French", async () => {
+    const complete = vi.fn(
+      async (): Promise<Completion> => ({ content: "Bonjour.", toolCalls: [] }),
+    );
+    const findSlot = vi.fn();
+    await answer({ facts: "", turns, complete, findSlot, locale: "fr" });
+    const [messages] = complete.mock.calls[0] as unknown as [
+      { content: string }[],
+    ];
+    const system = messages[0];
+    expect(system?.content).toContain("always reply in French");
+    expect(system?.content).toContain("Never give medical advice");
+    expect(checkedReply("Demain à 14h30.", null, "", "fr")).toContain(
+      "page de réservation",
+    );
+  });
 });

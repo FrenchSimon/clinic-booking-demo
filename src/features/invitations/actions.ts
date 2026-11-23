@@ -87,6 +87,7 @@ export async function invitePractitioner(
           clinicAddress: clinic.address,
           email,
           link,
+          locale,
         }),
       });
     });

@@ -2,6 +2,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { authUsers } from "drizzle-orm/supabase";
 import { clinics, memberships } from "@/features/clinics/table";
+import { patientLocale, storedLocale } from "@/features/email/locale";
 import { DEMO_VISITOR_EMAIL, queueEmail } from "@/features/email/outbox";
 import { services } from "@/features/services/table";
 import { cancellationEmail } from "./email";
@@ -32,6 +33,7 @@ export async function queueCancellationEmail(
       physioName: memberships.displayName,
       clinicName: clinics.name,
       clinicAddress: clinics.address,
+      locale: storedLocale,
     })
     .from(bookings)
     .innerJoin(authUsers, eq(authUsers.id, bookings.patientId))
@@ -48,6 +50,7 @@ export async function queueCancellationEmail(
     to: booking.patientEmail ?? DEMO_VISITOR_EMAIL,
     content: cancellationEmail({
       ...booking,
+      locale: patientLocale(booking.locale),
       byClinic: booking.patientId !== cancelledBy,
       link: `${origin}/bookings/${booking.id}`,
     }),

@@ -38,7 +38,7 @@ async function visitorId(): Promise<string | null> {
  * the sign-in, like logIn(); the rate limit guards it instead.
  */
 export async function startDemo(_prev: DemoState): Promise<DemoState> {
-  const { t } = await getRequestDictionary();
+  const { locale, t } = await getRequestDictionary();
   if (!(await rateLimit("demo:start", 3))) {
     return { error: t.bar.errors.tooManyDemos };
   }
@@ -46,7 +46,7 @@ export async function startDemo(_prev: DemoState): Promise<DemoState> {
   if (!visitor) return { error: t.bar.errors.demoUnavailable };
   const role = await getDemoRole(visitor);
   if (!role) {
-    await createDemoClinic(visitor);
+    await createDemoClinic(visitor, locale);
     // adminDb inside: the clean-up job, run on each new visitor as well as
     // daily, so expired demos never wait long for the cron.
     after(() => deleteExpiredDemos(adminDb));

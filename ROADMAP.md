@@ -74,7 +74,7 @@ Asked by Simon on 2026-11-23: the portfolio's French space links to Kinora in Fr
 
 - [x] R7.1 Language switch: "FR / EN" on the right of the portfolio bar's first line, the choice kept in a `lang` cookie for a year, `?lang=fr` or `?lang=en` on any address sets it, `<html lang>` follows, English without a cookie
 - [x] R7.2 Every screen in French: pages, forms and their errors, status and error pages, page titles, the portfolio bar and the role menu, with dates, times and prices formatted for the language
-- [ ] R7.3 Emails and the Outbox in the patient's language, also from the reminder job; the assistant answers in the visitor's language; a new demo clinic is seeded in the visitor's language
+- [x] R7.3 Emails and the Outbox in the patient's language, also from the reminder job; the assistant answers in the visitor's language; a new demo clinic is seeded in the visitor's language
 
 ## Out of scope
 

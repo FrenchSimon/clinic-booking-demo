@@ -112,3 +112,37 @@ describe("reminderEmail", () => {
     );
   });
 });
+
+describe("emails in French", () => {
+  const base = {
+    serviceName: "Séance de suivi",
+    physioName: null,
+    clinicName: "Maison Tilleul",
+    clinicAddress: "Rue du Tilleul 14, 1050 Bruxelles",
+    startsAt: new Date("2026-12-01T09:00:00Z"),
+    priceCents: 4500,
+    link: "https://kinora-booking.vercel.app/bookings/b1",
+    locale: "fr" as const,
+  };
+
+  it("writes the date, the price and the physio the French way", () => {
+    expect(formatSessionTime(base.startsAt, "fr")).toBe(
+      "mardi 1 décembre à 10:00",
+    );
+    const email = confirmationEmail(base);
+    expect(email.heading).toBe("Votre séance chez Maison Tilleul est réservée");
+    expect(email.paragraphs[0]).toBe(
+      "Séance de suivi avec votre kiné le mardi 1 décembre à 10:00.",
+    );
+    expect(email.paragraphs[2]).toMatch(/45,00\s€/);
+    expect(email.action?.label).toBe("Voir ma réservation");
+    expect(email.locale).toBe("fr");
+  });
+
+  it("says who cancelled, in French", () => {
+    const email = cancellationEmail({ ...base, byClinic: true });
+    expect(email.paragraphs[0]).toBe(
+      "Maison Tilleul a annulé votre séance\u00a0: Séance de suivi avec votre kiné le mardi 1 décembre à 10:00.",
+    );
+  });
+});

@@ -5,6 +5,8 @@ import { practitionerHours } from "@/features/availability/table";
 import { bookings } from "@/features/booking/table";
 import { clinics, memberships } from "@/features/clinics/table";
 import { servicePractitioners, services } from "@/features/services/table";
+import { dictionaries } from "@/i18n/dictionaries";
+import type { Locale } from "@/i18n/locale";
 import type { adminDb } from "@/lib/db";
 import {
   DEMO_CLINIC,
@@ -24,16 +26,24 @@ export type SeededBooking = DemoBooking & {
 /**
  * Accounts for the demo's physios and patients. Nobody can log in with them
  * (no password). app_metadata marks them, so cleanup.ts deletes them with
- * the visitor; users cannot write app_metadata. Empty tokens, not NULL:
+ * the visitor; users cannot write app_metadata. user_metadata.locale is the
+ * visitor's language, so the emails of these patients (an owner cancelling,
+ * the reminders button) are in it (features/email/locale.ts). Empty tokens, not NULL:
  * Supabase Auth cannot read a user whose token columns are NULL. created_at
  * has no default: cleanup.ts needs it to know when the demo started.
  */
-async function createDemoUsers(tx: Tx, emails: string[]): Promise<string[]> {
+async function createDemoUsers(
+  tx: Tx,
+  emails: string[],
+  locale: Locale,
+): Promise<string[]> {
   const ids = emails.map(() => randomUUID());
+  const userMeta = JSON.stringify({ locale });
   const rows = emails.map(
     (email, i) =>
       sql`(${ids[i]}, '00000000-0000-0000-0000-000000000000', 'authenticated',
-        'authenticated', ${email}, '{"kinora_demo": true}', '{}', '', '', '', '',
+        'authenticated', ${email}, '{"kinora_demo": true}', ${userMeta}::jsonb,
+        '', '', '', '',
         now(), now())`,
   );
   await tx.execute(sql`insert into auth.users (id, instance_id, aud, role,
@@ -45,10 +55,16 @@ async function createDemoUsers(tx: Tx, emails: string[]): Promise<string[]> {
 }
 
 /** Adds the team, their hours and the services they give. Returns the physios' membership ids. */
-async function addTeam(tx: Tx, clinicId: string, domain: string) {
+async function addTeam(
+  tx: Tx,
+  clinicId: string,
+  domain: string,
+  locale: Locale,
+) {
   const users = await createDemoUsers(
     tx,
     DEMO_PHYSIOS.map((p) => `${p.key}@${domain}`),
+    locale,
   );
   const physios = await tx
     .insert(memberships)
@@ -72,10 +88,23 @@ async function addTeam(tx: Tx, clinicId: string, domain: string) {
   return physioIds;
 }
 
-async function addServices(tx: Tx, clinicId: string, physioIds: string[]) {
+async function addServices(
+  tx: Tx,
+  clinicId: string,
+  physioIds: string[],
+  locale: Locale,
+) {
+  // Named in the visitor's language: a demo clinic is seeded once.
+  const names = dictionaries[locale].demo.seed.services;
   const rows = await tx
     .insert(services)
-    .values(DEMO_SERVICES.map(({ physios: _, ...s }) => ({ clinicId, ...s })))
+    .values(
+      DEMO_SERVICES.map(({ physios: _, ...s }, i) => ({
+        clinicId,
+        ...s,
+        name: names[i] ?? s.name,
+      })),
+    )
     .returning({ id: services.id });
   const serviceIds = rows.map((r) => r.id);
   await tx.insert(servicePractitioners).values(
@@ -90,10 +119,16 @@ async function addServices(tx: Tx, clinicId: string, physioIds: string[]) {
   return serviceIds;
 }
 
-async function addPatients(tx: Tx, clinicId: string, domain: string) {
+async function addPatients(
+  tx: Tx,
+  clinicId: string,
+  domain: string,
+  locale: Locale,
+) {
   const users = await createDemoUsers(
     tx,
     DEMO_PATIENTS.map((p) => `${p}@${domain}`),
+    locale,
   );
   await tx
     .insert(memberships)
@@ -107,26 +142,33 @@ async function addPatients(tx: Tx, clinicId: string, domain: string) {
  * Creates the visitor's demo clinic (checklist #19), with the visitor as its
  * owner through the trigger in drizzle/0003. Runs as the database owner:
  * bookings have no write policy, and the physios' accounts are not the
- * visitor's to create. Returns the clinic id.
+ * visitor's to create. Names and the address are in the visitor's language.
+ * Returns the clinic id.
  */
 export async function seedDemoClinic(
   tx: Tx,
   visitorId: string,
   rows: SeededBooking[],
+  locale: Locale = "en",
 ): Promise<string> {
   const id = randomBytes(4).toString("hex");
   const [clinic] = await tx
     .insert(clinics)
-    .values({ ...DEMO_CLINIC, slug: `demo-${id}`, createdBy: visitorId })
+    .values({
+      ...DEMO_CLINIC,
+      address: dictionaries[locale].demo.seed.address,
+      slug: `demo-${id}`,
+      createdBy: visitorId,
+    })
     .returning({ id: clinics.id });
   if (!clinic) throw new Error("The demo clinic was not created");
 
   // A reserved domain: these addresses never reach anyone. Kept short, so
   // the address fits a phone screen.
   const domain = `${id}.example`;
-  const physioIds = await addTeam(tx, clinic.id, domain);
-  const serviceIds = await addServices(tx, clinic.id, physioIds);
-  const patientIds = await addPatients(tx, clinic.id, domain);
+  const physioIds = await addTeam(tx, clinic.id, domain, locale);
+  const serviceIds = await addServices(tx, clinic.id, physioIds, locale);
+  const patientIds = await addPatients(tx, clinic.id, domain, locale);
 
   await tx.insert(bookings).values(
     rows.map((b) => ({

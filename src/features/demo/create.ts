@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { brusselsToday } from "@/features/availability/schema";
 import { brusselsInstant } from "@/features/booking/time";
+import type { Locale } from "@/i18n/locale";
 import { adminDb } from "@/lib/db";
 import { stripe } from "@/server/stripe";
 import { type DemoBooking, demoBookings } from "./plan";
@@ -45,9 +46,13 @@ async function payInTestMode(rows: Payable[]): Promise<Map<string, string>> {
   return paid;
 }
 
-/** Creates the visitor's demo clinic, filled and paid (checklist #19). */
+/**
+ * Creates the visitor's demo clinic, filled and paid (checklist #19), in the
+ * visitor's language.
+ */
 export async function createDemoClinic(
   visitorId: string,
+  locale: Locale,
   now = new Date(),
 ): Promise<string> {
   const startOfToday = brusselsInstant(brusselsToday(now), "00:00");
@@ -62,6 +67,7 @@ export async function createDemoClinic(
       tx,
       visitorId,
       rows.map((b) => ({ ...b, paymentIntentId: paid.get(b.id) ?? null })),
+      locale,
     ),
   );
 }

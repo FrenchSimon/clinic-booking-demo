@@ -6,6 +6,7 @@ import { getAvailability, getBookingPage } from "@/features/booking/public";
 import { BOOKING_DAYS } from "@/features/booking/selection";
 import { addDays, brusselsInstant } from "@/features/booking/time";
 import { SLUG_PATTERN } from "@/features/clinics/schema";
+import { getRequestLocale } from "@/i18n/server";
 import { adminDb } from "@/lib/db";
 import { clientIp, rateLimit } from "@/server/rate-limit";
 import { type Answer, answer } from "./conversation";
@@ -54,9 +55,12 @@ export async function askAssistant(raw: unknown): Promise<AssistantResult> {
   const visitor = visitorKey(await clientIp(), today);
   if (!(await takeQuestion(adminDb, visitor, today))) return { error: "limit" };
 
+  // The page's language, from the same cookie: the reply and the slot's date use it.
+  const locale = await getRequestLocale();
   try {
     return await answer({
-      facts: clinicFacts(page, today),
+      facts: clinicFacts(page, today, locale),
+      locale,
       turns: parsed.data.turns.slice(-HISTORY),
       complete,
       findSlot: async (args) => {
@@ -65,7 +69,7 @@ export async function askAssistant(raw: unknown): Promise<AssistantResult> {
           brusselsInstant(today, "00:00"),
           brusselsInstant(addDays(today, BOOKING_DAYS), "00:00"),
         );
-        return nextFreeSlot(page, availability, args, now);
+        return nextFreeSlot(page, availability, args, now, locale);
       },
     });
   } catch {

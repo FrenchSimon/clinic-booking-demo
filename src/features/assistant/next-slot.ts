@@ -12,6 +12,8 @@ import {
   type PhysioSchedule,
 } from "@/features/booking/slots";
 import { addDays } from "@/features/booking/time";
+import { dictionaries } from "@/i18n/dictionaries";
+import { fill, type Locale } from "@/i18n/locale";
 import { longDate } from "./facts";
 
 // The assistant's only tool: the next free slot, from the same freeSlots()
@@ -58,7 +60,7 @@ export type NextSlotArgs = z.infer<typeof nextSlotArgs>;
 /** A slot the patient can open, prefilled, on the booking page. */
 export type ProposedSlot = {
   day: string;
-  /** "Monday, 23 November 2026 at 11:00": the model repeats it, so it never names the wrong weekday. */
+  /** "Monday, 23 November 2026 at 11:00", in the visitor's language: the model repeats it, so it never names the wrong weekday. */
   when: string;
   time: string;
   physio: string;
@@ -78,6 +80,7 @@ export function nextFreeSlot(
   availability: { schedules: PhysioSchedule[]; busy: Busy[] },
   args: NextSlotArgs,
   now: Date,
+  locale: Locale = "en",
 ): NextSlotResult {
   const service = page.services.find(
     (s) => norm(s.name) === norm(args.service),
@@ -131,7 +134,10 @@ export function nextFreeSlot(
     found: true,
     slot: {
       day,
-      when: `${longDate(day)} at ${time}`,
+      when: fill(dictionaries[locale].assistant.when, {
+        date: longDate(day, locale),
+        time,
+      }),
       time,
       physio: name,
       service: service.name,
