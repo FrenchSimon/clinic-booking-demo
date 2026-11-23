@@ -4,10 +4,12 @@ import { fill } from "@/i18n/locale";
 import { getDictionary } from "@/i18n/server";
 import type { ClinicPatient } from "../queries";
 
-const COLUMNS = "sm:grid sm:grid-cols-[1fr_90px_120px_150px] sm:gap-4";
+const COLUMNS =
+  "md:grid md:grid-cols-[minmax(0,1fr)_90px_120px_150px] md:gap-4";
 
 /**
- * The clinic's patients. On a phone each one is a stacked row, from `sm:`
+ * The clinic's patients. On a phone or small tablet each one is a stacked
+ * row, from `md:`
  * a table with a header row Patient · Sessions · Last · Next.
  */
 export async function PatientList({ patients }: { patients: ClinicPatient[] }) {
@@ -51,14 +53,14 @@ export async function PatientList({ patients }: { patients: ClinicPatient[] }) {
         {patients.map((patient) => (
           <li
             key={patient.id}
-            className={`flex flex-col gap-1 border-divider border-b px-4 py-3.5 last:border-b-0 sm:items-center sm:px-5 ${COLUMNS}`}
+            className={`flex flex-col gap-1 border-divider border-b px-4 py-3.5 last:border-b-0 md:items-center md:px-5 ${COLUMNS}`}
           >
             <span className="flex min-w-0 flex-col">
               <a
                 href={`mailto:${patient.email}`}
-                className="flex min-h-11 items-center break-all font-semibold underline-offset-4 hover:underline sm:min-h-0"
+                className="flex min-h-11 flex-wrap items-center font-semibold underline-offset-4 [overflow-wrap:anywhere] hover:underline md:min-h-0"
               >
-                {patient.email}
+                <EmailText email={patient.email} />
               </a>
               <span className="text-muted-foreground text-sm">
                 {fill(p.since, { date: day.format(patient.since) })}
@@ -82,6 +84,21 @@ export async function PatientList({ patients }: { patients: ClinicPatient[] }) {
   );
 }
 
+/**
+ * Lets a long address wrap before the "@" rather than in the middle of a
+ * word; each half only breaks inside if it is wider than the column.
+ */
+function EmailText({ email }: { email: string }) {
+  const at = email.lastIndexOf("@");
+  if (at <= 0) return email;
+  return (
+    <>
+      <span>{email.slice(0, at)}</span>
+      <span>{email.slice(at)}</span>
+    </>
+  );
+}
+
 /** A value with its label on a phone, where the table header is hidden. */
 function Cell({
   label,
@@ -94,8 +111,8 @@ function Cell({
   children: ReactNode;
 }) {
   return (
-    <span className="text-muted-foreground text-sm sm:text-base">
-      <span className="sm:hidden">
+    <span className="text-muted-foreground text-sm md:text-base">
+      <span className="md:hidden">
         {label}
         {separator}
       </span>
