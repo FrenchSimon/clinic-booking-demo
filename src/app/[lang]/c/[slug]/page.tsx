@@ -11,14 +11,8 @@ import { BOOKING_DAYS, readSelection } from "@/features/booking/selection";
 import { freeSlots } from "@/features/booking/slots";
 import { addDays, brusselsInstant } from "@/features/booking/time";
 import { SLUG_PATTERN } from "@/features/clinics/schema";
-
-// What the booking action sends back in ?error= (features/booking/actions.ts).
-const BOOKING_ERRORS: Record<string, string> = {
-  taken: "Someone just took this time. Pick another one.",
-  unavailable: "This session can no longer be booked online. Pick another one.",
-  payment: "Online payment is not available right now. Try again later.",
-  busy: "Too many attempts. Wait a minute and try again.",
-};
+import { fill } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 
 // The clinic's public booking page (checklist #8). Every choice is a link
 // that changes the address, so the page works without client JavaScript.
@@ -45,6 +39,7 @@ async function Booking({
   if (!SLUG_PATTERN.test(slug)) notFound();
   const page = await getBookingPage(slug);
   if (!page) notFound();
+  const { t } = await getDictionary();
 
   const today = brusselsToday();
   const { schedules, busy } = await getAvailability(
@@ -70,7 +65,7 @@ async function Booking({
     selection.service?.physioIds.includes(p.id),
   );
   const physioName =
-    physios.find((p) => p.id === selection.physio)?.name ?? "Any physio";
+    physios.find((p) => p.id === selection.physio)?.name ?? t.booking.anyPhysio;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -101,8 +96,7 @@ async function Booking({
           </>
         ) : (
           <p className="rounded-[14px] border bg-card p-5">
-            Online booking is not open yet at {page.name}. Please come back
-            soon.
+            {fill(t.booking.notOpen, { clinic: page.name })}
           </p>
         )}
       </main>
@@ -110,7 +104,8 @@ async function Booking({
         slug={slug}
         selection={selection}
         physioName={physioName}
-        error={BOOKING_ERRORS[String(raw.error)]}
+        // What bookAndPay() sends back in ?error= (features/booking/actions.ts).
+        error={t.booking.errors[String(raw.error)]}
         floating={<Assistant slug={slug} clinic={page.name} />}
       />
     </div>

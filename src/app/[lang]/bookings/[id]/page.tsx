@@ -1,16 +1,20 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
 import { BackLink } from "@/components/back-link";
 import { BookingReceipt } from "@/features/booking/components/booking-receipt";
-import {
-  CANCEL_ERRORS,
-  CancelSection,
-} from "@/features/booking/components/cancel-section";
+import { CancelSection } from "@/features/booking/components/cancel-section";
 import type { EmailNotice } from "@/features/booking/components/email-notice";
 import { getMyBooking } from "@/features/booking/queries";
 import { settleOnReturn } from "@/features/booking/return";
+import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/server/auth";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDictionary();
+  return { title: `${t.booking.mine.pageTitle}${t.meta.suffix}` };
+}
 
 // Where Stripe sends the patient back after paying (R2.6), and the page of
 // one booking, where the patient can cancel it (R4.1). Only its patient sees it.
@@ -26,7 +30,7 @@ export default function BookingPage({
           sessionId={query.session_id}
           confirming={query.cancel === "confirm"}
           justCancelled={query.cancelled === "1"}
-          error={CANCEL_ERRORS[String(query.error)]}
+          error={String(query.error)}
         />
       ))}
     </Suspense>
@@ -49,6 +53,8 @@ async function Booking({
   error: string | undefined;
 }) {
   if (!z.uuid().safeParse(id).success) notFound();
+  const { t } = await getDictionary();
+  const message = error ? t.booking.mine.cancel.errors[error] : undefined;
   const user = await requireUser();
   let booking = await getMyBooking(user.id, id);
   if (!booking) notFound();
@@ -76,10 +82,10 @@ async function Booking({
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-6">
-        <BackLink href="/bookings" label="All your bookings" />
-        {error && (
+        <BackLink href="/bookings" label={t.booking.mine.back} />
+        {message && (
           <p role="alert" className="rounded-[14px] border bg-card p-4">
-            {error}
+            {message}
           </p>
         )}
         <BookingReceipt booking={booking} notice={notice} />
@@ -89,7 +95,7 @@ async function Booking({
           now={new Date()}
         />
         <p className="text-center text-muted-foreground text-xs">
-          Booking by Kinora
+          {t.booking.mine.bookingBy}
         </p>
       </main>
     </div>

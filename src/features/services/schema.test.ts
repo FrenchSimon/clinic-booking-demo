@@ -23,18 +23,13 @@ describe("parseEuros", () => {
     ["45,50", 4550],
     ["€ 45.00", 4500],
     [" 0.50 ", 50],
+    ["45 €", 4500],
+    ["45,00\u00a0€", 4500],
   ])("reads %s as %i cents", (input, cents) => {
     expect(parseEuros(input)).toBe(cents);
   });
 
-  it.each([
-    "",
-    "abc",
-    "45.505",
-    "-5",
-    "45 €",
-    "1.000,00",
-  ])("refuses %s", (input) => {
+  it.each(["", "abc", "45.505", "-5", "1.000,00"])("refuses %s", (input) => {
     expect(parseEuros(input)).toBeNull();
   });
 });
@@ -43,6 +38,10 @@ describe("formatEuros", () => {
   it("shows two decimals", () => {
     expect(formatEuros(4550)).toBe("€45.50");
     expect(formatEuros(6000)).toBe("€60.00");
+  });
+
+  it("writes French amounts the Belgian way", () => {
+    expect(formatEuros(4550, "fr")).toMatch(/^45,50\s€$/);
   });
 });
 

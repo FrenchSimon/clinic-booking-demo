@@ -1,13 +1,21 @@
+import type { Metadata } from "next";
 import { AuthShell } from "@/features/auth/components/auth-shell";
 import { ForgotPasswordForm } from "@/features/auth/components/forgot-password-form";
 
-export default function ForgotPasswordPage() {
+import { getDictionary } from "@/i18n/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDictionary();
+  return { title: `${t.auth.forgot.title}${t.meta.suffix}` };
+}
+
+export default async function ForgotPasswordPage() {
+  const { t } = await getDictionary();
   return (
-    <AuthShell
-      title="Forgot your password?"
-      intro="Enter your email and we will send you a link to choose a new one."
-    >
-      <ForgotPasswordForm />
+    <AuthShell title={t.auth.forgot.title} intro={t.auth.forgot.intro}>
+      <ForgotPasswordForm
+        t={{ fields: t.auth.fields, forgot: t.auth.forgot }}
+      />
     </AuthShell>
   );
 }

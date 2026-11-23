@@ -9,7 +9,20 @@ import { type ScheduleFormState, saveWeeklyHours } from "../actions";
 
 // Submitted by hand: React's automatic reset after a form action would
 // untick the day checkboxes without updating their state.
-export function WeeklyHoursForm({ initial }: { initial: OpeningHours }) {
+type WeeklyHoursStrings = {
+  legend: string;
+  notWorking: string;
+  saving: string;
+  save: string;
+};
+
+export function WeeklyHoursForm({
+  initial,
+  t,
+}: {
+  initial: OpeningHours;
+  t: WeeklyHoursStrings;
+}) {
   const [state, action, pending] = useActionState<ScheduleFormState, FormData>(
     saveWeeklyHours,
     {},
@@ -31,8 +44,8 @@ export function WeeklyHoursForm({ initial }: { initial: OpeningHours }) {
         onChange={setHours}
         errors={state.fieldErrors}
         errorPrefix="weeklyHours"
-        legend="Days and hours you see patients"
-        closedLabel="Not working"
+        legend={t.legend}
+        closedLabel={t.notWorking}
       />
       <FormMessage error={state.error} message={state.message} />
       <Button
@@ -40,7 +53,7 @@ export function WeeklyHoursForm({ initial }: { initial: OpeningHours }) {
         disabled={pending}
         className="w-full sm:w-auto sm:self-start"
       >
-        {pending ? "Saving…" : "Save my hours"}
+        {pending ? t.saving : t.save}
       </Button>
     </form>
   );

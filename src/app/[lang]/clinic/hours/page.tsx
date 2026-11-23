@@ -7,6 +7,7 @@ import { getMySchedule } from "@/features/availability/queries";
 import { brusselsToday } from "@/features/availability/schema";
 import { ClinicShell } from "@/features/clinics/components/clinic-shell";
 import { getStaffClinic } from "@/features/clinics/queries";
+import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/server/auth";
 
 export default function HoursPage() {
@@ -23,6 +24,8 @@ async function Hours() {
   const schedule = mine && (await getMySchedule(user.id, mine.clinic.id));
   if (!mine || !schedule) redirect("/clinic");
   const { clinic } = mine;
+  const { t } = await getDictionary();
+  const h = t.team.hours;
 
   return (
     <ClinicShell
@@ -31,28 +34,30 @@ async function Hours() {
     >
       <div className="flex flex-col gap-1">
         <h1 className="font-heading font-normal text-3xl sm:text-4xl">
-          My hours
+          {h.title}
         </h1>
-        <p className="text-muted-foreground">
-          Patients can only book you on these hours, within the clinic's opening
-          hours.
-        </p>
+        <p className="text-muted-foreground">{h.intro}</p>
       </div>
       <section
         aria-labelledby="week-title"
         className="flex flex-col gap-3 rounded-[18px] border bg-card p-5 sm:p-8"
       >
         <h2 id="week-title" className="font-heading font-semibold text-xl">
-          Every week
+          {h.week}
         </h2>
         {!schedule.weeklyHours && (
           <p className="rounded-[14px] bg-status-pending px-4 py-3 text-status-pending-foreground">
-            Not saved yet: patients cannot book you until you save your hours.
-            The clinic's opening hours are filled in to start from.
+            {h.notSaved}
           </p>
         )}
         <WeeklyHoursForm
           initial={schedule.weeklyHours ?? clinic.openingHours}
+          t={{
+            legend: h.legend,
+            notWorking: h.notWorking,
+            saving: h.saving,
+            save: h.save,
+          }}
         />
       </section>
       <section
@@ -60,11 +65,19 @@ async function Hours() {
         className="flex flex-col gap-4 rounded-[18px] border bg-card p-5 sm:p-8"
       >
         <h2 id="off-title" className="font-heading font-semibold text-xl">
-          Days off
+          {h.daysOff}
         </h2>
         <DaysOffList days={schedule.daysOff} />
         <div className="border-t pt-4">
-          <DayOffForm today={brusselsToday()} />
+          <DayOffForm
+            today={brusselsToday()}
+            t={{
+              firstDay: h.firstDay,
+              lastDay: h.lastDay,
+              adding: h.adding,
+              addDayOff: h.addDayOff,
+            }}
+          />
         </div>
       </section>
     </ClinicShell>

@@ -4,9 +4,20 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { Field, FormMessage } from "@/components/field";
 import { Button } from "@/components/ui/button";
+import type { Dictionary } from "@/i18n/dictionaries";
 import { type FormState, logIn } from "../actions";
 
-export function LoginForm({ next, error }: { next: string; error?: string }) {
+type Strings = Pick<Dictionary["auth"], "fields" | "login">;
+
+export function LoginForm({
+  next,
+  error,
+  t,
+}: {
+  next: string;
+  error?: string;
+  t: Strings;
+}) {
   const [state, action, pending] = useActionState<FormState, FormData>(logIn, {
     error,
   });
@@ -16,7 +27,7 @@ export function LoginForm({ next, error }: { next: string; error?: string }) {
       <input type="hidden" name="next" value={next} />
       <Field
         name="email"
-        label="Email"
+        label={t.fields.email}
         type="email"
         inputMode="email"
         autoComplete="email"
@@ -26,7 +37,7 @@ export function LoginForm({ next, error }: { next: string; error?: string }) {
       />
       <Field
         name="password"
-        label="Password"
+        label={t.fields.password}
         type="password"
         autoComplete="current-password"
         required
@@ -36,19 +47,19 @@ export function LoginForm({ next, error }: { next: string; error?: string }) {
         href="/forgot-password"
         className="-mt-2 inline-flex min-h-11 items-center self-start text-muted-foreground text-sm underline"
       >
-        Forgot your password?
+        {t.login.forgot}
       </Link>
       <FormMessage error={state.error} />
       <Button type="submit" size="lg" disabled={pending} className="w-full">
-        {pending ? "Logging in…" : "Log in"}
+        {pending ? t.login.pending : t.login.submit}
       </Button>
       <p className="text-muted-foreground text-sm">
-        No account yet?{" "}
+        {t.login.noAccount}{" "}
         <Link
           href={`/signup?next=${encodeURIComponent(next)}`}
           className="font-medium text-primary underline"
         >
-          Sign up
+          {t.login.signUp}
         </Link>
       </p>
     </form>

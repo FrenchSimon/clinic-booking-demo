@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -7,15 +8,23 @@ import { LogoutButton } from "@/features/auth/components/logout-button";
 import { AcceptForm } from "@/features/invitations/components/accept-form";
 import { previewInvitation } from "@/features/invitations/preview";
 import { TOKEN_PATTERN } from "@/features/invitations/schema";
+import { fill } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 import { getUser } from "@/server/auth";
 
 // Landing page of the invitation email. Nothing about the clinic is shown
 // before sign-in: the token alone never reveals data to an anonymous visitor.
-export default function InvitePage({
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDictionary();
+  return { title: `${t.auth.invite.title}${t.meta.suffix}` };
+}
+
+export default async function InvitePage({
   params,
 }: PageProps<"/[lang]/invite/[token]">) {
+  const { t } = await getDictionary();
   return (
-    <AuthShell title="You're invited">
+    <AuthShell title={t.auth.invite.title}>
       <Suspense fallback={null}>
         {params.then(({ token }) => (
           <Invitation token={token} />
@@ -29,25 +38,24 @@ async function Invitation({ token }: { token: string }) {
   if (!TOKEN_PATTERN.test(token)) notFound();
   const next = `/invite/${token}`;
   const user = await getUser();
+  const { t } = await getDictionary();
+  const s = t.auth.invite;
 
   if (!user) {
     return (
       <div className="flex flex-col gap-4">
-        <p>
-          A clinic invited you to join Kinora as a physio. Create your account,
-          or log in, with the email address the invitation was sent to.
-        </p>
+        <p>{s.signedOut}</p>
         <Link
           href={`/signup?next=${encodeURIComponent(next)}`}
           className={buttonVariants({ size: "lg" })}
         >
-          Create my account
+          {s.createAccount}
         </Link>
         <Link
           href={`/login?next=${encodeURIComponent(next)}`}
           className={buttonVariants({ size: "lg", variant: "outline" })}
         >
-          I already have an account
+          {s.haveAccount}
         </Link>
       </div>
     );
@@ -55,24 +63,19 @@ async function Invitation({ token }: { token: string }) {
 
   const invitation = await previewInvitation(user.id, token);
   if (!invitation) {
-    return <p role="alert">This invitation link is not valid.</p>;
+    return <p role="alert">{s.notValid}</p>;
   }
   if (invitation.status === "expired") {
     return (
-      <p role="alert">
-        This invitation from {invitation.clinicName} has expired. Ask the clinic
-        to send a new one.
-      </p>
+      <p role="alert">{fill(s.expired, { clinic: invitation.clinicName })}</p>
     );
   }
   if (invitation.status === "accepted") {
     return (
       <div className="flex flex-col gap-4">
-        <p>
-          This invitation from {invitation.clinicName} was already accepted.
-        </p>
+        <p>{fill(s.accepted, { clinic: invitation.clinicName })}</p>
         <Link href="/clinic" className={buttonVariants({ size: "lg" })}>
-          Go to my clinic
+          {s.goToClinic}
         </Link>
       </div>
     );
@@ -81,8 +84,10 @@ async function Invitation({ token }: { token: string }) {
     return (
       <div className="flex flex-col gap-4">
         <p role="alert">
-          This invitation was sent to {invitation.email}, and you are signed in
-          as {user.email}. Log out, then sign in with the invited address.
+          {fill(s.otherEmail, {
+            invited: invitation.email,
+            current: user.email ?? "",
+          })}
         </p>
         <LogoutButton />
       </div>
@@ -90,11 +95,12 @@ async function Invitation({ token }: { token: string }) {
   }
   return (
     <div className="flex flex-col gap-4">
-      <p>
-        {invitation.clinicName} invites you to join as a physio. You will see
-        your sessions in your own agenda.
-      </p>
-      <AcceptForm token={token} clinicName={invitation.clinicName} />
+      <p>{fill(s.open, { clinic: invitation.clinicName })}</p>
+      <AcceptForm
+        token={token}
+        clinicName={invitation.clinicName}
+        t={{ join: s.join, joining: s.joining }}
+      />
     </div>
   );
 }

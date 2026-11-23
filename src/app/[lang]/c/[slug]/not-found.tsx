@@ -2,27 +2,29 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StatusPage } from "@/components/status-page";
 import { buttonVariants } from "@/components/ui/button";
+import { getDictionary } from "@/i18n/server";
 
-export const metadata: Metadata = { title: "Clinic not found · Kinora" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDictionary();
+  return { title: `${t.status.clinicNotFound.label}${t.meta.suffix}` };
+}
 
 // A booking page whose clinic does not exist: a mistyped link, or a demo
 // clinic deleted after its 24 hours (checklist #19).
-export default function ClinicNotFound() {
+export default async function ClinicNotFound() {
+  const { t } = await getDictionary();
+  const s = t.status;
   return (
     <StatusPage
-      label="Clinic not found"
-      title="No clinic books at this address"
+      label={s.clinicNotFound.label}
+      title={s.clinicNotFound.title}
       actions={
         <Link href="/" className={buttonVariants({ size: "lg" })}>
-          Go to the home page
+          {s.home}
         </Link>
       }
     >
-      <p>
-        Check the link your clinic gave you: one letter is enough to change it.
-        If you were trying the demo, its clinic is deleted after 24 hours, and
-        you can start a new one from the bar above.
-      </p>
+      <p>{s.clinicNotFound.text}</p>
     </StatusPage>
   );
 }

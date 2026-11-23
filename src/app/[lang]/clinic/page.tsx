@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -9,7 +10,14 @@ import { OwnerDashboard } from "@/features/dashboard/components/owner-dashboard"
 import { DemoNotice } from "@/features/demo/components/demo-notice";
 import { TeamSection } from "@/features/invitations/components/team-section";
 import { FirstServiceHint } from "@/features/services/components/first-service-hint";
+import { fill } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/server/auth";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDictionary();
+  return { title: `${t.clinic.overview.title}${t.meta.suffix}` };
+}
 
 // The clinic's Today tab: the owner's dashboard (checklist #16) or the
 // physio's agenda for the day and the week (#17), then the opening hours.
@@ -26,6 +34,7 @@ async function ClinicOverview() {
   const mine = await getStaffClinic(user.id);
   if (!mine) redirect("/clinic/new");
   const { clinic, role } = mine;
+  const { t } = await getDictionary();
 
   return (
     <ClinicShell clinic={clinic} tabs={{ current: "today", role }}>
@@ -43,7 +52,7 @@ async function ClinicOverview() {
         className="flex flex-col gap-3 rounded-[18px] border bg-card p-5 sm:p-8"
       >
         <h2 id="hours-title" className="font-heading font-semibold text-xl">
-          Opening hours
+          {t.clinic.overview.openingHours}
         </h2>
         <OpeningHoursList hours={clinic.openingHours} />
       </section>
@@ -52,18 +61,21 @@ async function ClinicOverview() {
       ) : (
         <section className="flex flex-col gap-3 rounded-[18px] border bg-card p-5 sm:p-8">
           <p>
-            You are a physio at {clinic.name}, {clinic.address}.
+            {fill(t.clinic.overview.physioAt, {
+              clinic: clinic.name,
+              address: clinic.address,
+            })}
           </p>
           <Link
             href="/clinic/hours"
             className="flex min-h-11 items-center self-start text-primary underline underline-offset-4"
           >
-            Set my hours and days off
+            {t.clinic.overview.setMyHours}
           </Link>
         </section>
       )}
       <p className="text-muted-foreground text-sm">
-        Booking page address: /c/{clinic.slug}
+        {fill(t.clinic.overview.bookingAddress, { slug: clinic.slug })}
       </p>
     </ClinicShell>
   );

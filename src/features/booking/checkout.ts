@@ -1,6 +1,8 @@
 import "server-only";
 import { sql } from "drizzle-orm";
 import { DEMO_VISITOR_EMAIL } from "@/features/email/outbox";
+import { fill, INTL_LOCALE } from "@/i18n/locale";
+import { getRequestDictionary } from "@/i18n/server";
 import { withRls } from "@/lib/db";
 import { siteOrigin } from "@/server/site-origin";
 import { stripe } from "@/server/stripe";
@@ -11,13 +13,6 @@ import type { BookingPage, PublicService } from "./public";
 // by the webhook (R2.7), which confirms it if the slot is still free and
 // refunds it otherwise.
 const CHECKOUT_MINUTES = 30;
-
-const dayFormat = new Intl.DateTimeFormat("en-GB", {
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-});
 
 /** Creates the Stripe Checkout session of a hold and returns its URL. */
 export async function startCheckout(input: {
@@ -34,13 +29,26 @@ export async function startCheckout(input: {
   if (!client) throw new Error("STRIPE_SECRET_KEY is not set");
   const { bookingId, page, service, choice } = input;
   const physio = page.physios.find((p) => p.id === input.membershipId);
-  const day = dayFormat.format(new Date(`${choice.day}T12:00:00Z`));
-  const when = `${day} at ${choice.at} with ${physio?.name ?? "your physio"}`;
+  // Checkout speaks the visitor's language, the line item too.
+  const { locale, t } = await getRequestDictionary();
+  // A calendar day: formatted in UTC so it never shifts.
+  const day = new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(new Date(`${choice.day}T12:00:00Z`));
+  const when = fill(t.booking.checkout.when, {
+    day,
+    time: choice.at,
+    physio: physio?.name ?? t.booking.checkout.yourPhysio,
+  });
   const origin = await siteOrigin();
 
   const session = await client.checkout.sessions.create(
     {
       mode: "payment",
+      locale,
       line_items: [
         {
           quantity: 1,
@@ -65,8 +73,7 @@ export async function startCheckout(input: {
       // above the Pay button (checklist #21).
       custom_text: {
         submit: {
-          message:
-            "Test mode, no real payment: pay with card 4242 4242 4242 4242, any future date and any CVC.",
+          message: t.booking.checkout.testMode,
         },
       },
       expires_at: Math.floor(Date.now() / 1000) + CHECKOUT_MINUTES * 60,

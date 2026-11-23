@@ -1,17 +1,12 @@
 import { z } from "zod";
+import { team } from "@/i18n/en/team";
+
+const v = team.inviteValidation;
 
 // Shared by the form (instant feedback) and the Server Action (the real check).
 export const inviteInput = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "Enter the physio's name")
-    .max(60, "60 characters max"),
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .pipe(z.email("Enter a valid email address")),
+  name: z.string().trim().min(2, v.nameMissing).max(60, v.nameTooLong),
+  email: z.string().trim().toLowerCase().pipe(z.email(v.emailInvalid)),
 });
 
 export type InviteInput = z.infer<typeof inviteInput>;

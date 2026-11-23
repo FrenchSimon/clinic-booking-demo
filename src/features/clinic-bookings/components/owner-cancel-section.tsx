@@ -1,15 +1,10 @@
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { formatEuros } from "@/features/services/schema";
+import { fill } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 import { cancelClinicBooking } from "../actions";
 import type { ClinicBooking } from "../queries";
-
-// What cancelClinicBooking() sends back in ?error= (../actions.ts).
-export const OWNER_CANCEL_ERRORS: Record<string, string> = {
-  not_cancellable: "This booking can no longer be cancelled.",
-  refund_failed:
-    "The booking is cancelled, but the refund could not be made just now. Try again in a moment.",
-};
 
 /**
  * The owner cancels any paid booking with a full refund (checklist #13),
@@ -17,21 +12,21 @@ export const OWNER_CANCEL_ERRORS: Record<string, string> = {
  * happens, so one tap never cancels. A cancelled booking whose refund failed
  * gets a button to try again.
  */
-export function OwnerCancelSection({
+export async function OwnerCancelSection({
   booking,
   confirming,
 }: {
   booking: ClinicBooking;
   confirming: boolean;
 }) {
-  const price = formatEuros(booking.priceCents);
+  const { locale, t } = await getDictionary();
+  const c = t.clinic.cancel;
+  const price = formatEuros(booking.priceCents, locale);
   if (booking.cancelledAt !== null) {
     return booking.status === "cancelled" ? (
-      <CancelForm bookingId={booking.id} label="Try the refund again" />
+      <CancelForm bookingId={booking.id} label={c.retry} />
     ) : (
-      <p className="text-muted-foreground">
-        Cancelled, {price} refunded to the patient in full.
-      </p>
+      <p className="text-muted-foreground">{fill(c.done, { price })}</p>
     );
   }
   if (booking.status !== "confirmed") return null;
@@ -44,7 +39,7 @@ export function OwnerCancelSection({
           className: "self-start",
         })}
       >
-        Cancel this booking
+        {c.open}
       </Link>
     );
   }
@@ -54,19 +49,16 @@ export function OwnerCancelSection({
       className="flex flex-col gap-4 rounded-[18px] border bg-card p-5 sm:p-8"
     >
       <h2 id="cancel-title" className="font-heading font-semibold text-xl">
-        Cancel this session?
+        {c.title}
       </h2>
-      <p className="text-muted-foreground">
-        The time becomes free again, and the patient gets {price} back on their
-        card in full. It cannot be undone.
-      </p>
+      <p className="text-muted-foreground">{fill(c.explain, { price })}</p>
       <div className="flex flex-wrap items-center gap-3">
-        <CancelForm bookingId={booking.id} label="Cancel and refund" danger />
+        <CancelForm bookingId={booking.id} label={c.confirm} danger />
         <Link
           href={`/clinic/bookings/${booking.id}`}
           className={buttonVariants({ variant: "outline" })}
         >
-          Keep the booking
+          {c.keep}
         </Link>
       </div>
     </section>

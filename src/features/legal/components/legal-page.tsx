@@ -1,15 +1,15 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-/** Last time the terms or the privacy notice changed. */
-export const LEGAL_UPDATED = "18 November 2026";
-
 /** Frame of /terms and /privacy: the Kinora logo, a title, then readable text. */
 export function LegalPage({
   title,
+  updated,
   children,
 }: {
   title: string;
+  /** "Last updated on …": when the terms or the privacy notice changed. */
+  updated: string;
   children: ReactNode;
 }) {
   return (
@@ -27,9 +27,7 @@ export function LegalPage({
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 py-8 sm:px-8 sm:py-12">
         <div className="flex flex-col gap-2">
           <h1 className="font-heading font-normal text-4xl">{title}</h1>
-          <p className="text-muted-foreground text-sm">
-            Last updated on {LEGAL_UPDATED}
-          </p>
+          <p className="text-muted-foreground text-sm">{updated}</p>
         </div>
         {children}
       </main>

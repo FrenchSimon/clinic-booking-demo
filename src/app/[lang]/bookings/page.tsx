@@ -1,14 +1,23 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { BookingList } from "@/features/booking/components/booking-list";
 import { listMyBookings } from "@/features/booking/queries";
+import { fill } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/server/auth";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDictionary();
+  return { title: `${t.booking.mine.title}${t.meta.suffix}` };
+}
 
 // The patient's upcoming and past bookings (checklist #11). Only their own:
 // the query filters on them and row level security enforces it.
-export default function MyBookingsPage() {
+export default async function MyBookingsPage() {
+  const { t } = await getDictionary();
   return (
     <div className="flex flex-1 flex-col">
       <header className="border-b">
@@ -23,7 +32,9 @@ export default function MyBookingsPage() {
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-6">
-        <h1 className="font-heading font-normal text-3xl">Your bookings</h1>
+        <h1 className="font-heading font-normal text-3xl">
+          {t.booking.mine.title}
+        </h1>
         <Suspense fallback={null}>
           <Lists />
         </Suspense>
@@ -34,6 +45,8 @@ export default function MyBookingsPage() {
 
 async function Lists() {
   const user = await requireUser();
+  const { t: all } = await getDictionary();
+  const t = all.booking.mine;
   const { upcoming, past } = await listMyBookings(user.id);
   // The clinics the patient booked at, each once: the way back to booking.
   const clinics = new Map(
@@ -47,18 +60,20 @@ async function Lists() {
           href={`/c/${slug}`}
           className={buttonVariants({ size: "lg", className: "self-start" })}
         >
-          Book a session at {name}
+          {fill(t.bookAt, { clinic: name })}
         </Link>
       ))}
       <BookingList
-        title="Upcoming"
+        id="upcoming-title"
+        title={t.upcoming}
         bookings={upcoming}
-        empty="No session to come. Book one from your clinic's page."
+        empty={t.upcomingEmpty}
       />
       <BookingList
-        title="Past and cancelled"
+        id="past-and-cancelled-title"
+        title={t.past}
         bookings={past}
-        empty="Nothing here yet."
+        empty={t.pastEmpty}
       />
     </>
   );

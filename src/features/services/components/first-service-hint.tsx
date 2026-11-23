@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { getDictionary } from "@/i18n/server";
 import { hasServices } from "../queries";
 
 /** Owners only: shown on Today until the clinic has its first service. */
@@ -11,6 +12,7 @@ export async function FirstServiceHint({
   clinicId: string;
 }) {
   if (await hasServices(userId, clinicId)) return null;
+  const { t } = await getDictionary();
   return (
     <section
       aria-labelledby="first-service-title"
@@ -20,18 +22,14 @@ export async function FirstServiceHint({
         id="first-service-title"
         className="font-heading font-semibold text-xl"
       >
-        Add your first service
+        {t.team.services.firstTitle}
       </h2>
-      <p>
-        Patients book a session type, like an initial assessment, with its
-        length and price. Add the sessions you offer and the physios who give
-        them.
-      </p>
+      <p>{t.team.services.firstText}</p>
       <Link
         href="/clinic/services/new"
         className={buttonVariants({ className: "self-start" })}
       >
-        Add a service
+        {t.team.services.add}
       </Link>
     </section>
   );

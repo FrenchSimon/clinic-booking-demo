@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button";
 import { addDayOff, type ScheduleFormState } from "../actions";
 
 /** First and last day off, both included. One day: the same date twice. */
-export function DayOffForm({ today }: { today: string }) {
+type DayOffStrings = {
+  firstDay: string;
+  lastDay: string;
+  adding: string;
+  addDayOff: string;
+};
+
+export function DayOffForm({ today, t }: { today: string; t: DayOffStrings }) {
   const [state, action, pending] = useActionState<ScheduleFormState, FormData>(
     addDayOff,
     {},
@@ -26,7 +33,7 @@ export function DayOffForm({ today }: { today: string }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <Field
           name="startsOn"
-          label="First day off"
+          label={t.firstDay}
           type="date"
           min={today}
           required
@@ -39,7 +46,7 @@ export function DayOffForm({ today }: { today: string }) {
         />
         <Field
           name="endsOn"
-          label="Last day off"
+          label={t.lastDay}
           type="date"
           min={startsOn || today}
           required
@@ -55,7 +62,7 @@ export function DayOffForm({ today }: { today: string }) {
         disabled={pending}
         className="w-full sm:w-auto sm:self-start"
       >
-        {pending ? "Adding…" : "Add the day off"}
+        {pending ? t.adding : t.addDayOff}
       </Button>
     </form>
   );

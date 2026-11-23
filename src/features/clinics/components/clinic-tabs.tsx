@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Dictionary } from "@/i18n/dictionaries";
 import { cn } from "@/lib/utils";
 import type { MembershipRole } from "../table";
 
@@ -11,37 +12,31 @@ export type ClinicTab =
 
 const TABS: {
   id: ClinicTab;
-  label: string;
   href: string;
   roles: MembershipRole[];
 }[] = [
   {
     id: "today",
-    label: "Today",
     href: "/clinic",
     roles: ["owner", "practitioner"],
   },
   {
     id: "bookings",
-    label: "Bookings",
     href: "/clinic/bookings",
     roles: ["owner"],
   },
   {
     id: "patients",
-    label: "Patients",
     href: "/clinic/patients",
     roles: ["owner"],
   },
   {
     id: "services",
-    label: "Services",
     href: "/clinic/services",
     roles: ["owner"],
   },
   {
     id: "hours",
-    label: "My hours",
     href: "/clinic/hours",
     roles: ["practitioner"],
   },
@@ -51,27 +46,31 @@ const TABS: {
 export function ClinicTabs({
   current,
   role,
+  t,
 }: {
   current: ClinicTab;
   role: MembershipRole;
+  t: Dictionary["clinic"]["shell"];
 }) {
   return (
     <nav
-      aria-label="Clinic"
+      aria-label={t.tabsLabel}
       className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0"
     >
       <ul className="flex gap-1.5">
-        {TABS.filter((t) => t.roles.includes(role)).map((t) => (
-          <li key={t.id}>
+        {TABS.filter((tab) => tab.roles.includes(role)).map((tab) => (
+          <li key={tab.id}>
             <Link
-              href={t.href}
-              aria-current={t.id === current ? "page" : undefined}
+              href={tab.href}
+              aria-current={tab.id === current ? "page" : undefined}
               className={cn(
                 "flex min-h-11 items-center whitespace-nowrap rounded-full px-4",
-                t.id === current ? "bg-accent font-semibold" : "hover:bg-muted",
+                tab.id === current
+                  ? "bg-accent font-semibold"
+                  : "hover:bg-muted",
               )}
             >
-              {t.label}
+              {t.tabs[tab.id]}
             </Link>
           </li>
         ))}

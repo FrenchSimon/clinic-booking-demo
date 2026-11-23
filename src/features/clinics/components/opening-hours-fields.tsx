@@ -1,7 +1,20 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { DAY_LABELS, DAYS, type Day, type OpeningHours } from "../schema";
+import { clinic } from "@/i18n/en/clinic";
+import { fill } from "@/i18n/locale";
+import { DAYS, type Day, type OpeningHours } from "../schema";
+
+/** Day names and field labels, in the page's language: plain strings. */
+export type HoursStrings = {
+  days: Record<Day, string>;
+  closed: string;
+  from: string;
+  until: string;
+  legend: string;
+};
+
+const ENGLISH: HoursStrings = { days: clinic.days, ...clinic.hours };
 
 type Props = {
   value: OpeningHours;
@@ -9,6 +22,9 @@ type Props = {
   errors?: Partial<Record<string, string>>;
   /** Keys of the errors: "openingHours" reads "openingHours.mon.to". */
   errorPrefix?: string;
+  /** The words around the times; English when left out. */
+  strings?: HoursStrings;
+  /** Overrides strings.legend and strings.closed. */
   legend?: string;
   closedLabel?: string;
 };
@@ -19,9 +35,11 @@ export function OpeningHoursFields({
   onChange,
   errors,
   errorPrefix = "openingHours",
-  legend = "Opening hours",
-  closedLabel = "Closed",
+  strings = ENGLISH,
+  legend = strings.legend,
+  closedLabel = strings.closed,
 }: Props) {
+  const name = (day: Day) => strings.days[day];
   const toggle = (day: Day, open: boolean) =>
     onChange({
       ...value,
@@ -55,14 +73,14 @@ export function OpeningHoursFields({
                   onChange={(e) => toggle(day, e.target.checked)}
                   className="size-5 accent-primary"
                 />
-                <span>{DAY_LABELS[day]}</span>
+                <span>{name(day)}</span>
               </label>
               {hours.open ? (
                 <div className="flex items-center gap-2">
                   <Input
                     type="time"
                     name={`${day}.from`}
-                    aria-label={`${DAY_LABELS[day]} from`}
+                    aria-label={fill(strings.from, { day: name(day) })}
                     value={hours.from}
                     onChange={(e) => setTime(day, "from", e.target.value)}
                     aria-invalid={Boolean(error)}
@@ -72,7 +90,7 @@ export function OpeningHoursFields({
                   <Input
                     type="time"
                     name={`${day}.to`}
-                    aria-label={`${DAY_LABELS[day]} until`}
+                    aria-label={fill(strings.until, { day: name(day) })}
                     value={hours.to}
                     onChange={(e) => setTime(day, "to", e.target.value)}
                     aria-invalid={Boolean(error)}

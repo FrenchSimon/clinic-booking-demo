@@ -3,11 +3,14 @@
 import { startTransition, useActionState, useState } from "react";
 import { Field, FormMessage } from "@/components/field";
 import { Button } from "@/components/ui/button";
+import type { Dictionary } from "@/i18n/dictionaries";
+import type { Locale } from "@/i18n/locale";
 import { type ServiceFormState, saveService } from "../actions";
-import { formatEuros } from "../schema";
 import { PhysioChoices } from "./physio-choices";
 
 type Props = {
+  locale: Locale;
+  t: Dictionary["team"]["serviceForm"];
   physios: { id: string; name: string }[];
   /** The service to edit; a new one when absent. */
   service?: {
@@ -20,9 +23,15 @@ type Props = {
   };
 };
 
+/** 4550 → "45.00", or "45,00" in French: what the price field shows. */
+function priceInput(cents: number, locale: Locale): string {
+  const value = (cents / 100).toFixed(2);
+  return locale === "fr" ? value.replace(".", ",") : value;
+}
+
 // Controlled fields, submitted by hand: React's automatic reset after a form
 // action would untick the physio checkboxes without updating their state.
-export function ServiceForm({ physios, service }: Props) {
+export function ServiceForm({ locale, t, physios, service }: Props) {
   const [state, action, pending] = useActionState<ServiceFormState, FormData>(
     saveService.bind(null, service?.id ?? null),
     {},
@@ -32,7 +41,7 @@ export function ServiceForm({ physios, service }: Props) {
     String(service?.durationMinutes ?? 30),
   );
   const [price, setPrice] = useState(
-    service ? formatEuros(service.priceCents).slice(1) : "",
+    service ? priceInput(service.priceCents, locale) : "",
   );
   const [picked, setPicked] = useState(service?.practitionerIds ?? []);
   const [active, setActive] = useState(service?.active ?? true);
@@ -50,8 +59,8 @@ export function ServiceForm({ physios, service }: Props) {
     >
       <Field
         name="name"
-        label="Session name"
-        placeholder="Initial assessment"
+        label={t.name}
+        placeholder={t.namePlaceholder}
         autoComplete="off"
         required
         value={name}
@@ -61,8 +70,8 @@ export function ServiceForm({ physios, service }: Props) {
       <div className="grid gap-4 sm:grid-cols-2">
         <Field
           name="durationMinutes"
-          label="Length in minutes"
-          hint="From 10 to 240, in steps of 5."
+          label={t.length}
+          hint={t.lengthHint}
           type="number"
           inputMode="numeric"
           min={10}
@@ -75,10 +84,10 @@ export function ServiceForm({ physios, service }: Props) {
         />
         <Field
           name="price"
-          label="Price in euros"
-          hint="Paid by card when booking."
+          label={t.price}
+          hint={t.priceHint}
           inputMode="decimal"
-          placeholder="45.00"
+          placeholder={t.pricePlaceholder}
           autoComplete="off"
           required
           value={price}
@@ -91,6 +100,8 @@ export function ServiceForm({ physios, service }: Props) {
         picked={picked}
         onChange={setPicked}
         error={errors?.practitionerIds}
+        legend={t.physios}
+        empty={t.noPhysios}
       />
       <label className="flex min-h-11 items-center gap-3">
         <input
@@ -100,7 +111,7 @@ export function ServiceForm({ physios, service }: Props) {
           onChange={(e) => setActive(e.target.checked)}
           className="size-5 accent-primary"
         />
-        Patients can book it
+        {t.active}
       </label>
       <FormMessage error={state.error} />
       <Button
@@ -109,7 +120,7 @@ export function ServiceForm({ physios, service }: Props) {
         disabled={pending}
         className="w-full sm:w-auto sm:self-start"
       >
-        {pending ? "Saving…" : service ? "Save the changes" : "Add the service"}
+        {pending ? t.saving : service ? t.save : t.create}
       </Button>
     </form>
   );

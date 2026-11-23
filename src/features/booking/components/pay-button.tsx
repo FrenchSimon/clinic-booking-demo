@@ -4,7 +4,15 @@ import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 
 /** Submits the booking form; says so while the hold and Stripe are on their way. */
-export function PayButton({ disabled }: { disabled: boolean }) {
+export function PayButton({
+  disabled,
+  label,
+  pendingLabel,
+}: {
+  disabled: boolean;
+  label: string;
+  pendingLabel: string;
+}) {
   const { pending } = useFormStatus();
   return (
     <Button
@@ -13,7 +21,7 @@ export function PayButton({ disabled }: { disabled: boolean }) {
       disabled={disabled || pending}
       className="w-full"
     >
-      {pending ? "Holding your slot…" : "Continue to payment"}
+      {pending ? pendingLabel : label}
     </Button>
   );
 }

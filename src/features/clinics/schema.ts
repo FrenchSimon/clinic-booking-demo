@@ -1,23 +1,14 @@
 import { z } from "zod";
+import { clinic } from "@/i18n/en/clinic";
+
+const v = clinic.validation;
 
 // Shared by the form (instant feedback) and the Server Action (the real check).
 
 export const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 export type Day = (typeof DAYS)[number];
 
-export const DAY_LABELS: Record<Day, string> = {
-  mon: "Monday",
-  tue: "Tuesday",
-  wed: "Wednesday",
-  thu: "Thursday",
-  fri: "Friday",
-  sat: "Saturday",
-  sun: "Sunday",
-};
-
-const time = z
-  .string()
-  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use the 24-hour format, like 08:30");
+const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, v.time);
 
 /** One day: closed, or open from one time to a later one. */
 const dayHours = z.discriminatedUnion("open", [
@@ -25,7 +16,7 @@ const dayHours = z.discriminatedUnion("open", [
   z
     .object({ open: z.literal(true), from: time, to: time })
     .refine((d) => d.from < d.to, {
-      message: "Closing time must be after opening time",
+      message: v.closingAfterOpening,
       path: ["to"],
     }),
 ]);
@@ -55,30 +46,23 @@ export const DEFAULT_OPENING_HOURS: OpeningHours = {
 export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 export const clinicInput = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "Enter the clinic's name")
-    .max(80, "80 characters max"),
+  name: z.string().trim().min(2, v.name).max(80, v.max80),
   slug: z
     .string()
     .trim()
     .toLowerCase()
-    .min(3, "At least 3 characters")
-    .max(60, "60 characters max")
-    .regex(SLUG_PATTERN, "Use lowercase letters, digits and dashes"),
+    .min(3, v.slugMin)
+    .max(60, v.max60)
+    .regex(SLUG_PATTERN, v.slugPattern),
   // Easy to confuse with an email address: refuse one, and ask for a number
   // (street number or postcode), which every real address has.
   address: z
     .string()
     .trim()
-    .min(5, "Enter the street, number, postcode and city")
-    .max(200, "200 characters max")
-    .refine(
-      (v) => !v.includes("@"),
-      "Enter the clinic's street address, not an email",
-    )
-    .refine((v) => /\d/.test(v), "Add the street number and postcode"),
+    .min(5, v.address)
+    .max(200, v.max200)
+    .refine((v) => !v.includes("@"), v.addressNotEmail)
+    .refine((v) => /\d/.test(v), v.addressNumber),
   openingHours: openingHoursSchema,
 });
 

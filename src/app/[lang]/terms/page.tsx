@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/features/legal/components/legal-page";
-import { Terms } from "@/features/legal/components/terms";
+import { LegalText } from "@/features/legal/components/legal-text";
+import { getDictionary } from "@/i18n/server";
 
-export const metadata: Metadata = { title: "Terms of use · Kinora" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDictionary();
+  return { title: `${t.legal.terms.title}${t.meta.suffix}` };
+}
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const { t } = await getDictionary();
   return (
-    <LegalPage title="Terms of use">
-      <Terms />
+    <LegalPage title={t.legal.terms.title} updated={t.legal.updated}>
+      <LegalText sections={t.legal.terms.sections} newTab={t.legal.newTab} />
     </LegalPage>
   );
 }

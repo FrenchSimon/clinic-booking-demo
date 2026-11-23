@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { dateFormat } from "@/i18n/format";
+import { getDictionary } from "@/i18n/server";
 import type { MyBookingItem } from "../queries";
 import { StatusPill } from "./status-pill";
 
-const when = new Intl.DateTimeFormat("en-GB", {
+const WHEN: Intl.DateTimeFormatOptions = {
   weekday: "short",
   day: "numeric",
   month: "short",
@@ -10,20 +12,23 @@ const when = new Intl.DateTimeFormat("en-GB", {
   hour: "2-digit",
   minute: "2-digit",
   hourCycle: "h23",
-  timeZone: "Europe/Brussels",
-});
+};
 
 /** One section of the patient's bookings; each row opens the booking. */
-export function BookingList({
+export async function BookingList({
+  id,
   title,
   bookings,
   empty,
 }: {
+  /** The heading's id, the same in both languages. */
+  id: string;
   title: string;
   bookings: MyBookingItem[];
   empty: string;
 }) {
-  const id = `${title.toLowerCase().replace(/\W+/g, "-")}-title`;
+  const { locale, t } = await getDictionary();
+  const when = dateFormat(locale, WHEN);
   return (
     <section aria-labelledby={id} className="flex flex-col gap-3">
       <h2 id={id} className="font-heading font-semibold text-xl">
@@ -46,7 +51,7 @@ export function BookingList({
                     {when.format(b.startsAt)}
                   </span>
                   <span className="text-muted-foreground text-sm">
-                    {b.serviceName} · {b.physioName ?? "Physio"} ·{" "}
+                    {b.serviceName} · {b.physioName ?? t.booking.mine.physio} ·{" "}
                     {b.clinicName}
                   </span>
                 </span>

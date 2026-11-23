@@ -1,3 +1,120 @@
 import type { team as en } from "../en/team";
 
-export const team: typeof en = {};
+// Non-breaking space before « : » and in amounts.
+const nb = "\u00a0";
+
+export const team: typeof en = {
+  services: {
+    title: "Prestations",
+    intro: "Les séances que les patients réservent et paient en ligne.",
+    add: "Ajouter une prestation",
+    allServices: "← Toutes les prestations",
+    empty:
+      "Aucune prestation pour l’instant. Ajoutez les séances que les patients peuvent réserver, avec leur durée et leur prix.",
+    hidden: "Masquée",
+    noPhysio: `Aucun kiné pour l’instant${nb}: les patients ne peuvent pas la réserver`,
+    minutes: "{minutes} min",
+    firstTitle: "Ajoutez votre première prestation",
+    firstText:
+      "Les patients réservent un type de séance, comme un bilan initial, avec sa durée et son prix. Ajoutez les séances que vous proposez et les kinés qui les donnent.",
+  },
+  serviceForm: {
+    name: "Nom de la séance",
+    namePlaceholder: "Bilan initial",
+    length: "Durée en minutes",
+    lengthHint: "De 10 à 240, par tranches de 5.",
+    price: "Prix en euros",
+    priceHint: "Payé par carte à la réservation.",
+    pricePlaceholder: "45,00",
+    physios: "Kinés qui la proposent",
+    noPhysios:
+      "Aucun kiné n’a encore rejoint le cabinet. Invitez-les depuis la page Aujourd’hui, puis revenez les ajouter ici.",
+    active: "Les patients peuvent la réserver",
+    saving: "Enregistrement…",
+    save: "Enregistrer les modifications",
+    create: "Ajouter la prestation",
+  },
+  serviceErrors: {
+    tooMany: "Trop de modifications en une minute. Réessayez dans un instant.",
+    missing: "Cette prestation n’existe pas.",
+    ownerOnly: "Seul le propriétaire du cabinet peut modifier les prestations.",
+    foreignPhysio: "Choisissez des kinés de votre cabinet.",
+    duplicate: "Vous avez déjà une prestation qui porte ce nom.",
+  },
+  serviceValidation: {
+    nameMissing: "Indiquez le nom de la séance",
+    nameTooLong: "60 caractères maximum",
+    lengthMissing: "Indiquez la durée en minutes",
+    lengthWhole: "Indiquez un nombre entier de minutes",
+    lengthMin: "10 minutes minimum",
+    lengthMax: "4 heures maximum",
+    lengthStep: "Utilisez des tranches de 5 minutes",
+    priceInvalid: "Indiquez un prix comme 45,00",
+    priceMin: `Le paiement par carte commence à 0,50${nb}€`,
+    priceMax: `1${nb}000,00${nb}€ maximum`,
+  },
+  hours: {
+    title: "Mes horaires",
+    intro:
+      "Les patients ne peuvent vous réserver que sur ces horaires, dans les heures d’ouverture du cabinet.",
+    week: "Chaque semaine",
+    notSaved: `Pas encore enregistrés${nb}: les patients ne peuvent pas vous réserver tant que vous n’avez pas enregistré vos horaires. Les heures d’ouverture du cabinet sont reprises comme point de départ.`,
+    legend: "Jours et heures où vous recevez des patients",
+    notWorking: "Pas de consultation",
+    saving: "Enregistrement…",
+    save: "Enregistrer mes horaires",
+    saved: "Vos horaires sont enregistrés.",
+    daysOff: "Jours de congé",
+    noDayOff: "Aucun jour de congé prévu.",
+    firstDay: "Premier jour de congé",
+    lastDay: "Dernier jour de congé",
+    adding: "Ajout…",
+    addDayOff: "Ajouter le congé",
+    added: "Jour de congé ajouté.",
+    remove: "Retirer",
+    removeLabel: "Retirer {day}",
+  },
+  hoursErrors: {
+    tooMany: "Trop de modifications en une minute. Réessayez dans un instant.",
+    physioOnly: "Seuls les kinés définissent des horaires de travail.",
+    closedOn: "Le cabinet est fermé le {day}",
+    openOn: "Le cabinet est ouvert de {from} à {to} le {day}",
+  },
+  hoursValidation: {
+    pickDay: "Choisissez un jour",
+    notPast: "Choisissez aujourd’hui ou un jour suivant",
+    lastAfterFirst: "Le dernier jour ne peut pas précéder le premier",
+    oneYear: "Un an maximum",
+  },
+  days: {
+    mon: "lundi",
+    tue: "mardi",
+    wed: "mercredi",
+    thu: "jeudi",
+    fri: "vendredi",
+    sat: "samedi",
+    sun: "dimanche",
+  },
+  physios: {
+    title: "Kinés",
+    empty: `Aucun kiné pour l’instant. Invitez les personnes qui soignent les patients ici${nb}: chacune reçoit un e-mail pour créer son compte.`,
+    active: "Actif",
+    invitedUntil: "Invité · jusqu’au {date}",
+    invite: "Inviter un kiné",
+    name: "Nom du kiné",
+    email: "Son adresse e-mail",
+    sending: "Envoi…",
+    send: "Envoyer l’invitation",
+    sent: "Invitation envoyée à {name} ({email}).",
+  },
+  inviteErrors: {
+    tooMany: "Trop d’invitations en une minute. Réessayez dans un instant.",
+    ownerOnly: "Seul le propriétaire du cabinet peut inviter des kinés.",
+    alreadyInvited: "Cette adresse a déjà une invitation en cours.",
+  },
+  inviteValidation: {
+    nameMissing: "Indiquez le nom du kiné",
+    nameTooLong: "60 caractères maximum",
+    emailInvalid: "Indiquez une adresse e-mail valide",
+  },
+};

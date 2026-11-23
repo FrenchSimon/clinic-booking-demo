@@ -1,74 +1,55 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { formatEuros } from "@/features/services/schema";
+import type { Dictionary } from "@/i18n/dictionaries";
+import { dateFormat } from "@/i18n/format";
+import { fill, type Locale } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 import type { MyBooking } from "../queries";
 import { EmailCallout, type EmailNotice } from "./email-notice";
 import { StatusPill } from "./status-pill";
 
-const when = new Intl.DateTimeFormat("en-GB", {
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-  hour: "2-digit",
-  minute: "2-digit",
-  hourCycle: "h23",
-  timeZone: "Europe/Brussels",
-});
-
-const HEADLINES: Record<MyBooking["status"], { title: string; text: string }> =
-  {
-    confirmed: {
-      title: "Your session is booked",
-      text: "Paid by card. You can cancel online up to 24 hours before for a full refund.",
-    },
-    pending_payment: {
-      title: "We are confirming your payment",
-      text: "This usually takes a few seconds.",
-    },
-    expired: {
-      title: "This booking was not paid in time",
-      text: "The time was held for 15 minutes. Pick a time again to book.",
-    },
-    refunded: {
-      title: "This time was taken while you paid",
-      text: "We refunded your payment in full. It reaches your card in a few days.",
-    },
-    cancelled: {
-      title: "This booking is cancelled",
-      text: "Pick another time if you would like to come in.",
-    },
-  };
+type Strings = Dictionary["booking"]["mine"];
 
 /** The headline, telling a patient's own cancellation from a late payment. */
-function headline(booking: MyBooking) {
-  if (booking.cancelledAt === null) return HEADLINES[booking.status];
+function headline(booking: MyBooking, t: Strings, locale: Locale) {
+  if (booking.cancelledAt === null) return t.headlines[booking.status];
   if (booking.status === "refunded") {
     return {
-      title: "Your booking is cancelled",
-      text: `We refunded ${formatEuros(booking.priceCents)} in full. It reaches your card in a few days.`,
+      title: t.cancelledTitle,
+      text: fill(t.cancelledRefunded, {
+        price: formatEuros(booking.priceCents, locale),
+      }),
     };
   }
-  return {
-    title: "Your booking is cancelled",
-    text: "Your refund has not gone through yet. Try again below, or contact the clinic.",
-  };
+  return { title: t.cancelledTitle, text: t.cancelledRefundPending };
 }
 
 /** The patient's booking: what, when, where, and what happens next. */
-export function BookingReceipt({
+export async function BookingReceipt({
   booking,
   notice,
 }: {
   booking: MyBooking;
   notice?: EmailNotice;
 }) {
-  const { title, text } = headline(booking);
+  const { locale, t: all } = await getDictionary();
+  const t = all.booking.mine;
+  const when = dateFormat(locale, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+  const { title, text } = headline(booking, t, locale);
   const rows = [
-    ["Session", booking.serviceName],
-    ["Physio", booking.physioName ?? "Physio"],
-    ["When", when.format(booking.startsAt)],
-    ["Where", booking.clinicAddress],
-    ["Price", formatEuros(booking.priceCents)],
+    [t.rows.session, booking.serviceName],
+    [t.rows.physio, booking.physioName ?? t.physio],
+    [t.rows.when, when.format(booking.startsAt)],
+    [t.rows.where, booking.clinicAddress],
+    [t.rows.price, formatEuros(booking.priceCents, locale)],
   ];
   return (
     <div className="flex flex-col gap-5 rounded-[18px] border bg-card p-5 sm:p-8">
@@ -89,20 +70,20 @@ export function BookingReceipt({
           </div>
         ))}
       </dl>
-      <NextStep booking={booking} />
+      <NextStep booking={booking} t={t} />
     </div>
   );
 }
 
 /** Reload while the payment is confirmed; otherwise back to the clinic's page. */
-function NextStep({ booking }: { booking: MyBooking }) {
+function NextStep({ booking, t }: { booking: MyBooking; t: Strings }) {
   if (booking.status === "pending_payment") {
     return (
       <Link
         href={`/bookings/${booking.id}`}
         className={buttonVariants({ className: "self-start" })}
       >
-        Reload
+        {t.reload}
       </Link>
     );
   }
@@ -115,7 +96,7 @@ function NextStep({ booking }: { booking: MyBooking }) {
         className: "self-start",
       })}
     >
-      {confirmed ? "Book another session" : "Pick a time"}
+      {confirmed ? t.bookAnother : t.pickTime}
     </Link>
   );
 }

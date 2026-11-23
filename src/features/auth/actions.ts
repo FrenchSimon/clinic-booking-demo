@@ -3,6 +3,9 @@
 import { redirect } from "next/navigation";
 import type { z } from "zod";
 import { listMyRoles } from "@/features/clinics/queries";
+import { fill, type Locale } from "@/i18n/locale";
+import { translateMessage } from "@/i18n/messages";
+import { getRequestDictionary } from "@/i18n/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
 import { rateLimit } from "@/server/rate-limit";
@@ -23,8 +26,6 @@ export type FormState = {
   values?: { email?: string };
 };
 
-const TOO_MANY = "Too many attempts. Wait a minute and try again.";
-
 /**
  * Resolves /start here instead of redirecting to it: a Server Action redirect
  * is a client-side navigation, and /start is a route handler, so the address
@@ -34,11 +35,18 @@ async function destination(next: string, userId: string): Promise<string> {
   return next === "/start" ? landingPath(await listMyRoles(userId)) : next;
 }
 
-function fieldErrors(error: z.ZodError): FormState["fieldErrors"] {
+function fieldErrors(
+  error: z.ZodError,
+  locale: Locale,
+): FormState["fieldErrors"] {
   const result: Record<string, string> = {};
   for (const issue of error.issues) {
     const key = String(issue.path[0] ?? "form");
-    result[key] ??= issue.message;
+    result[key] ??= translateMessage(
+      issue.message,
+      locale,
+      (d) => d.auth.validation,
+    );
   }
   return result;
 }
@@ -47,12 +55,17 @@ export async function logIn(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  const { locale, t } = await getRequestDictionary();
   const email = String(formData.get("email") ?? "");
-  if (!(await rateLimit("auth:login", 5))) return { error: TOO_MANY };
+  if (!(await rateLimit("auth:login", 5)))
+    return { error: t.auth.errors.tooMany };
 
   const parsed = logInInput.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
-    return { fieldErrors: fieldErrors(parsed.error), values: { email } };
+    return {
+      fieldErrors: fieldErrors(parsed.error, locale),
+      values: { email },
+    };
   }
 
   const supabase = await createClient();
@@ -61,8 +74,8 @@ export async function logIn(
     // Same message whatever went wrong, so the form does not reveal which emails exist.
     const message =
       error.code === "email_not_confirmed"
-        ? "Confirm your email first: open the link we sent you."
-        : "Email or password is incorrect.";
+        ? t.auth.errors.notConfirmed
+        : t.auth.errors.wrongCredentials;
     return { error: message, values: { email } };
   }
 
@@ -74,13 +87,18 @@ export async function signUp(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  const { locale, t } = await getRequestDictionary();
   const email = String(formData.get("email") ?? "");
-  if (!(await rateLimit("auth:signup", 5))) return { error: TOO_MANY };
+  if (!(await rateLimit("auth:signup", 5)))
+    return { error: t.auth.errors.tooMany };
 
   const next = safeNext(formData.get("next"), "/start");
   const parsed = signUpInput.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
-    return { fieldErrors: fieldErrors(parsed.error), values: { email } };
+    return {
+      fieldErrors: fieldErrors(parsed.error, locale),
+      values: { email },
+    };
   }
 
   const supabase = await createClient();
@@ -96,7 +114,7 @@ export async function signUp(
   });
   if (error) {
     return {
-      error: "We could not create the account. Try again in a moment.",
+      error: t.auth.errors.signUpFailed,
       values: { email },
     };
   }
@@ -104,7 +122,9 @@ export async function signUp(
   // With email confirmation on, Supabase returns no session until the link is opened.
   if (!data.session || !data.user) {
     return {
-      message: `Almost there: we sent a confirmation link to ${parsed.data.email}.`,
+      message: fill(t.auth.messages.confirmSent, {
+        email: parsed.data.email,
+      }),
     };
   }
   redirect(await destination(next, data.user.id));
@@ -120,12 +140,17 @@ export async function requestPasswordReset(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  const { locale, t } = await getRequestDictionary();
   const email = String(formData.get("email") ?? "");
-  if (!(await rateLimit("auth:reset", 3))) return { error: TOO_MANY };
+  if (!(await rateLimit("auth:reset", 3)))
+    return { error: t.auth.errors.tooMany };
 
   const parsed = emailInput.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
-    return { fieldErrors: fieldErrors(parsed.error), values: { email } };
+    return {
+      fieldErrors: fieldErrors(parsed.error, locale),
+      values: { email },
+    };
   }
 
   const supabase = await createClient();
@@ -134,7 +159,7 @@ export async function requestPasswordReset(
   });
   // Same answer whether or not the account exists.
   return {
-    message: `If an account exists for ${parsed.data.email}, we sent a link to choose a new password.`,
+    message: fill(t.auth.messages.resetSent, { email: parsed.data.email }),
   };
 }
 
@@ -142,11 +167,13 @@ export async function updatePassword(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  const { locale, t } = await getRequestDictionary();
   // The reset link signs the user in with a short recovery session.
   await requireUser();
 
   const parsed = newPasswordInput.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) };
+  if (!parsed.success)
+    return { fieldErrors: fieldErrors(parsed.error, locale) };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({
@@ -155,8 +182,8 @@ export async function updatePassword(
   if (error) {
     const message =
       error.code === "same_password"
-        ? "Choose a password you have not used before."
-        : "We could not update the password. Ask for a new link and try again.";
+        ? t.auth.errors.samePassword
+        : t.auth.errors.updateFailed;
     return { error: message };
   }
   redirect("/");

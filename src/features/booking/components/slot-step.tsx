@@ -1,18 +1,21 @@
 import Link from "next/link";
+import { INTL_LOCALE, type Locale } from "@/i18n/locale";
+import { getDictionary } from "@/i18n/server";
 import { cn } from "@/lib/utils";
 import { type Selection, selectionHref } from "../selection";
 import { addDays } from "../time";
 import { Step } from "./step";
 
 // Calendar days: format them in UTC so they never shift.
-const weekdayFormat = new Intl.DateTimeFormat("en-GB", {
-  weekday: "short",
-  timeZone: "UTC",
-});
+const weekdayFormat = (locale: Locale) =>
+  new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    weekday: "short",
+    timeZone: "UTC",
+  });
 const noon = (day: string) => new Date(`${day}T12:00:00Z`);
 
 /** A row of days, then the free times of the chosen day. Never a month calendar. */
-export function SlotStep({
+export async function SlotStep({
   slug,
   selection,
   times,
@@ -25,15 +28,18 @@ export function SlotStep({
   today: string;
   days: number;
 }) {
+  const { locale, t } = await getDictionary();
+  const weekday = weekdayFormat(locale);
   const dates = Array.from({ length: days }, (_, i) => addDays(today, i));
   const dayTimes = selection.day ? (times.get(selection.day) ?? []) : [];
 
   return (
-    <Step number={3} title="Day and time">
+    <Step number={3} title={t.booking.steps.time}>
       {times.size === 0 ? (
         <p className="rounded-[14px] border bg-card p-4">
-          No free time in the next two weeks
-          {selection.physio === "any" ? "." : " with this physio. Try Any."}
+          {selection.physio === "any"
+            ? t.booking.noTime
+            : t.booking.noTimePhysio}
         </p>
       ) : (
         <>
@@ -42,6 +48,8 @@ export function SlotStep({
               <li key={day} className="shrink-0">
                 <DayChoice
                   day={day}
+                  weekday={weekday.format(noon(day))}
+                  noFreeTime={t.booking.noFreeTime}
                   open={times.has(day)}
                   current={day === selection.day}
                   href={selectionHref(slug, selection, { day })}
@@ -78,18 +86,22 @@ export function SlotStep({
 
 function DayChoice({
   day,
+  weekday,
+  noFreeTime,
   open,
   current,
   href,
 }: {
   day: string;
+  weekday: string;
+  noFreeTime: string;
   open: boolean;
   current: boolean;
   href: string;
 }) {
   const label = (
     <>
-      <span className="block text-xs">{weekdayFormat.format(noon(day))}</span>
+      <span className="block text-xs">{weekday}</span>
       <strong>{noon(day).getUTCDate()}</strong>
     </>
   );
@@ -99,7 +111,7 @@ function DayChoice({
     return (
       <span
         aria-disabled="true"
-        title="No free time"
+        title={noFreeTime}
         className={cn(box, "border border-dashed text-muted-foreground")}
       >
         {label}

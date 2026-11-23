@@ -6,6 +6,10 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getOwnedClinic } from "@/features/clinics/queries";
 import { getTeam } from "@/features/invitations/queries";
+import type { Dictionary } from "@/i18n/dictionaries";
+import type { Locale } from "@/i18n/locale";
+import { translateMessage } from "@/i18n/messages";
+import { getRequestDictionary } from "@/i18n/server";
 import { withRls } from "@/lib/db";
 import { isUniqueViolation } from "@/lib/pg-errors";
 import { requireUser } from "@/server/auth";
@@ -25,36 +29,53 @@ export async function saveService(
   formData: FormData,
 ): Promise<ServiceFormState> {
   const user = await requireUser();
+  const { locale, t } = await getRequestDictionary();
+  const e = t.team.serviceErrors;
   if (!(await rateLimit(`services:save:${user.id}`, 20))) {
-    return { error: "Too many changes in a minute. Try again shortly." };
+    return { error: e.tooMany };
   }
   if (serviceId !== null && !z.uuid().safeParse(serviceId).success) {
-    return { error: "This service does not exist." };
+    return { error: e.missing };
   }
   const parsed = serviceInput.safeParse(serviceFromForm(formData));
-  if (!parsed.success) return { fieldErrors: firstErrors(parsed.error) };
+  if (!parsed.success) {
+    return { fieldErrors: firstErrors(parsed.error, locale) };
+  }
 
   // RLS also refuses a non-owner and another clinic's physio; this gives clear messages first.
   const clinic = await getOwnedClinic(user.id);
-  if (!clinic) return { error: "Only the clinic's owner can change services." };
+  if (!clinic) return { error: e.ownerOnly };
   const { physios } = await getTeam(user.id, clinic.id);
   if (
     parsed.data.practitionerIds.some((id) => !physios.some((p) => p.id === id))
   ) {
-    return { fieldErrors: { practitionerIds: "Pick physios of your clinic." } };
+    return { fieldErrors: { practitionerIds: e.foreignPhysio } };
   }
 
-  const failed = await writeService(user.id, clinic.id, serviceId, parsed.data);
+  const failed = await writeService(
+    user.id,
+    clinic.id,
+    serviceId,
+    parsed.data,
+    e,
+  );
   if (failed) return failed;
 
   revalidatePath("/clinic/services");
   redirect("/clinic/services");
 }
 
-function firstErrors(error: z.ZodError): ServiceFormState["fieldErrors"] {
+function firstErrors(
+  error: z.ZodError,
+  locale: Locale,
+): ServiceFormState["fieldErrors"] {
   const fieldErrors: ServiceFormState["fieldErrors"] = {};
   for (const issue of error.issues) {
-    fieldErrors[issue.path[0] as keyof ServiceInput] ??= issue.message;
+    fieldErrors[issue.path[0] as keyof ServiceInput] ??= translateMessage(
+      issue.message,
+      locale,
+      (d) => d.team.serviceValidation,
+    );
   }
   return fieldErrors;
 }
@@ -65,6 +86,7 @@ async function writeService(
   clinicId: string,
   serviceId: string | null,
   { practitionerIds, ...fields }: ServiceInput,
+  e: Dictionary["team"]["serviceErrors"],
 ): Promise<ServiceFormState | null> {
   try {
     return await withRls(userId, async (tx) => {
@@ -80,7 +102,7 @@ async function writeService(
             .insert(services)
             .values({ clinicId, ...fields })
             .returning({ id: services.id });
-      if (!row) return { error: "This service does not exist." };
+      if (!row) return { error: e.missing };
       // The checkboxes are the whole list: replace the links.
       await tx
         .delete(servicePractitioners)
@@ -95,8 +117,6 @@ async function writeService(
     });
   } catch (error) {
     if (!isUniqueViolation(error, "services_clinic_name_unique")) throw error;
-    return {
-      fieldErrors: { name: "You already have a service with this name." },
-    };
+    return { fieldErrors: { name: e.duplicate } };
   }
 }
